@@ -51,27 +51,67 @@
     ]
    },
    {
-    "depth_norm": 0.25,
+    "depth_norm": 0.12,
     "rgb": [
-     20,
-     100,
-     150
+     26,
+     136,
+     184
     ]
    },
    {
-    "depth_norm": 0.65,
+    "depth_norm": 0.235,
     "rgb": [
-     8,
-     55,
-     105
+     20,
+     106,
+     158
+    ]
+   },
+   {
+    "depth_norm": 0.265,
+    "rgb": [
+     24,
+     44,
+     112
+    ]
+   },
+   {
+    "depth_norm": 0.45,
+    "rgb": [
+     16,
+     28,
+     84
+    ]
+   },
+   {
+    "depth_norm": 0.635,
+    "rgb": [
+     10,
+     18,
+     60
+    ]
+   },
+   {
+    "depth_norm": 0.665,
+    "rgb": [
+     3,
+     6,
+     15
+    ]
+   },
+   {
+    "depth_norm": 0.85,
+    "rgb": [
+     2,
+     4,
+     9
     ]
    },
    {
     "depth_norm": 1.0,
     "rgb": [
-     4,
-     30,
-     78
+     1,
+     2,
+     5
     ]
    }
   ],
@@ -108,7 +148,8 @@
   ],
   "vertical_gradient_gain": 0.2,
   "grid_gain": 0.08,
-  "meridian_gain": 0.05
+  "meridian_gain": 0.05,
+  "color_note": "Each level has its own water: sunlit turquoise above the reef floor, indigo twilight down to the wreck shelf, near black below it. The two sharp steps sit at the gates (0.25 and 0.65), so the change of colour is hidden inside the floor the sub passes through."
  },
  "enabled_faces": [
   "px",

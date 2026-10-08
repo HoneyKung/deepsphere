@@ -76,7 +76,14 @@ function backgroundColor(stripX,stripY) {
 // Sea colour, fast path. The cube is a body hanging in the water: every pixel has its own depth, so as the
 // cube sinks the LOWER pixels reach darker water first and the darkness climbs from the bottom up; the surface
 // (bright band) is above the top pixels at 0 m and rises out of view within the first ~170 m.
-const SEA_K=0.005, SEA_TOP_MM=45, SEA_TEX_DRIFT_MM=70;
+const SEA_TOP_MM=45, SEA_TEX_DRIFT_MM=70;
+// How far the floor nearest the screen has slid up after being passed (see FLOOR.shift in animate): the water
+// colour slides with it, so the step between two levels' colours stays inside the rock.
+function seaShift() {
+  let shift=0;
+  (state.gatesOff?[]:(config.gates||[])).forEach(gate=>{shift+=(gate.shift||0)*clamp01(1-Math.abs(state.depth-gate.depth)/0.18);});
+  return Math.round(shift*2)/2;
+}
 let SEA_LUT=null;
 function buildSeaLut() {
   const look=config.depth_darkening;SEA_LUT=new Float32Array(1024*3);
@@ -100,13 +107,14 @@ function paintSea(out,stripX,stripY,pre,n,skip,w,stride,h) {
   const amp=look.texture_amplitude_rgb,band=look.surface_band.rgb,lens=look.snell_window.rgb,gridGain=look.grid_gain;
   const texShift=d*SEA_TEX_DRIFT_MM,lensFade=clamp01(1-d/look.snell_window.depth_fade_norm),lensStrength=look.snell_window.strength;
   const bandFade=clamp01(1-d/look.surface_band.fade_depth_norm),grid=state.grid;
+  const seaK=1/geometry.depthTravelMm,seaRef=geometry.aimHeightMm-FLOOR.clear-FLOOR.thick/2+seaShift();
   for(let yy=0;yy<h;yy+=stride) for(let xx=0;xx<w;xx+=stride) {
     const i=yy*w+xx;
     if(skip&&skip[i]) continue;
-    const sy=stripY[i],raw=d+(SEA_TOP_MM-sy)*SEA_K,dp=raw<0?0:raw>1?1:raw,li=((dp*1023)|0)*3,yt=sy-texShift;
+    const sy=stripY[i],raw=d+(seaRef-sy)*seaK,dp=raw<0?0:raw>1?1:raw,li=((dp*1023)|0)*3,yt=sy-texShift,surf=d+(SEA_TOP_MM-sy)*seaK;
     const variation=Math.sin(pre.uPhase[i]+Math.sin(yt/9)),vl=pre.vert[i];
     let r=(SEA_LUT[li]+variation*amp[0])*vl,g=(SEA_LUT[li+1]+variation*amp[1])*vl,b=(SEA_LUT[li+2]+variation*amp[2])*vl;
-    if(raw<0) {const k=clamp01(-raw/0.012)*bandFade;r+=(band[0]-r)*k;g+=(band[1]-g)*k;b+=(band[2]-b)*k;}
+    if(surf<0) {const k=clamp01(-surf/0.012)*bandFade;r+=(band[0]-r)*k;g+=(band[1]-g)*k;b+=(band[2]-b)*k;}
     if(lensFade>0) {const w=lensFade*clamp01((sy-10)/30)*lensStrength;r+=(lens[0]-r)*w;g+=(lens[1]-g)*w;b+=(lens[2]-b)*w;}
     if(grid) {
       const gl=Math.abs(yt/gs-Math.round(yt/gs)),la=clamp01((0.022-gl)/0.022),a=Math.max(pre.lon[i],la)*0.58,m=1+a*gridGain;
@@ -381,9 +389,12 @@ function buildFloors() {
   const corals=['#ff7d6b','#ff9ec4','#ffb35a','#c79bff','#ff6f91','#6fe0c8'];
   FLOOR.reef=Array.from({length:46},(_,i)=>({x:(i+0.15+r()*0.7)*L/46,type:types[Math.floor(r()*types.length)],size:0.75+r()*0.7,hue:corals[Math.floor(r()*corals.length)],ph:r()*6.28}));
   FLOOR.boulders=Array.from({length:16},()=>({x:r()*L,w:1.5+r()*3.5,h:1+r()*2.2}));
-  FLOOR.cracks=Array.from({length:30},()=>({x:r()*L,ph:r()*6.28,steps:Array.from({length:4+Math.floor(r()*8)},()=>[(r()-0.5)*4.2,1.4+r()*3.2])}));
-  FLOOR.pockets=Array.from({length:22},()=>({x:r()*L,deep:8+r()*38,size:2+r()*4.5,ph:r()*6.28}));
+  FLOOR.cracks=Array.from({length:16},()=>({x:r()*L,ph:r()*6.28,steps:Array.from({length:4+Math.floor(r()*8)},()=>[(r()-0.5)*4.2,1.4+r()*3.2])}));
+  FLOOR.pockets=Array.from({length:9},()=>({x:r()*L,deep:8+r()*38,size:2+r()*4.5,ph:r()*6.28}));
   FLOOR.pillows=Array.from({length:60},()=>({x:r()*L,deep:2+r()*46,w:2+r()*3.5}));
+  // The trench: rock walls that stand behind the open water from the reef floor down to the sea bed.
+  FLOOR.walls=[{u:0.04,half:17,seed:1.3},{u:0.36,half:11,seed:4.1},{u:0.8,half:15,seed:7.7}];
+  FLOOR.ledges=Array.from({length:44},(_,i)=>({wall:i%3,w:0.31+r()*0.67,side:r()<0.5?-1:1,kind:Math.floor(r()*3),size:0.8+r()*0.7,ph:r()*6.28}));
   FLOOR.columns=[0.38,0.9].map(u=>({x:u*L,bars:Array.from({length:7},()=>3+r()*6)}));
   FLOOR.built=true;
 }
@@ -506,6 +517,94 @@ function drawFloor(ctx,m,gate,index) {
     ctx.globalAlpha=1;
   }
 }
+// Trench walls: the backdrop of levels 2 and 3. Their edges are a function of real depth, so ledges and strata
+// climb the screen as the sub goes down, and whatever grows on a ledge tells which level it belongs to.
+function drawWalls(ctx,m) {
+  const d=clamp01(state.depth),K=geometry.depthTravelMm,L=geometry.stripLengthMm,aimY=geometry.aimHeightMm,t=state.seconds;
+  const reach=m.reach||geometry.stripStepMm+18,depthAt=y=>d+(aimY-y)/K,yAt=w=>aimY-(w-d)*K;
+  if(depthAt(-62)<0.3) return;
+  ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);ctx.lineCap='round';
+  const deep=clamp01((d-0.6)/0.08);
+  FLOOR.walls.forEach((wall,index)=> {
+    const dx0=geometry.wrapDistance(wall.u*L,m.cx);
+    if(Math.abs(dx0)>reach+wall.half+16) return;
+    const edge=(w,side)=>(wall.half+6*Math.sin(w*23+wall.seed+side*2.1)+3.5*Math.sin(w*61+wall.seed*1.7+side)+1.6*Math.sin(w*140+side*5))*clamp01((w-0.295)/0.04);
+    ctx.beginPath();
+    for(let y=62;y>=-62;y-=3) {const x=dx0-edge(depthAt(y),-1);if(y===62)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+    for(let y=-62;y<=62;y+=3) ctx.lineTo(dx0+edge(depthAt(y),1),y);
+    ctx.closePath();
+    ctx.fillStyle='rgba(2,5,14,0.5)';ctx.fill();
+    if(deep>0) {ctx.fillStyle='rgba(74,86,100,'+(0.2*deep).toFixed(3)+')';ctx.fill();}
+    ctx.strokeStyle='rgba(150,190,215,0.2)';ctx.lineWidth=0.2;ctx.stroke();
+    ctx.strokeStyle='rgba(200,220,235,0.055)';ctx.lineWidth=0.25;ctx.beginPath();
+    for(let w=Math.ceil(depthAt(62)/0.022)*0.022;w<depthAt(-62);w+=0.022) {
+      if(w<0.31) continue;
+      const y=yAt(w),tilt=Math.sin(w*40+wall.seed)*1.2;
+      ctx.moveTo(dx0-edge(w,-1)+1,y+tilt);ctx.lineTo(dx0+edge(w,1)-1,y-tilt);
+    }
+    ctx.stroke();
+    for(const ledge of FLOOR.ledges) {
+      if(ledge.wall!==index) continue;
+      const y=yAt(ledge.w);
+      if(y<-60||y>60) continue;
+      const x=dx0+ledge.side*edge(ledge.w,ledge.side),s=ledge.size,out=ledge.side;
+      ctx.fillStyle='rgba(6,10,20,0.9)';ctx.beginPath();ctx.moveTo(x-out*2.5*s,y);ctx.lineTo(x+out*3.2*s,y);ctx.lineTo(x-out*2.5*s,y-1.6*s);ctx.closePath();ctx.fill();
+      if(ledge.w<0.655) {
+        if(ledge.kind===0) {            // sea whips
+          ctx.strokeStyle='rgba(196,140,220,0.6)';ctx.lineWidth=0.18;
+          for(let i=0;i<4;i++) {const bx=x+out*(i*0.7-0.6)*s,sway=Math.sin(t*0.8+ledge.ph+i)*0.9;ctx.beginPath();ctx.moveTo(bx,y);ctx.quadraticCurveTo(bx+out*0.6,y+2.5*s,bx+sway,y+(4.2+i*0.6)*s);ctx.stroke();}
+        } else if(ledge.kind===1) {     // a barrel sponge
+          ctx.fillStyle='rgba(150,96,120,0.75)';ctx.beginPath();ctx.moveTo(x+out*0.2-1.1*s,y);ctx.lineTo(x+out*0.2-1.5*s,y+2.6*s);ctx.lineTo(x+out*0.2+1.5*s,y+2.6*s);ctx.lineTo(x+out*0.2+1.1*s,y);ctx.closePath();ctx.fill();
+          ctx.fillStyle='rgba(20,10,24,0.8)';ctx.beginPath();ctx.ellipse(x+out*0.2,y+2.6*s,1.2*s,0.35*s,0,0,TAU);ctx.fill();
+        } else {                        // glass anemones with faint lights
+          ctx.globalCompositeOperation='lighter';
+          for(let i=0;i<5;i++) {const b=0.3+0.7*Math.pow(0.5+0.5*Math.sin(t*1.1+ledge.ph+i*1.9),3);ctx.fillStyle='rgba(120,220,255,'+(0.5*b).toFixed(3)+')';ctx.beginPath();ctx.arc(x+out*(i*0.75-1.2)*s,y+0.5+((i*7)%3)*0.5,0.24,0,TAU);ctx.fill();}
+          ctx.globalCompositeOperation='source-over';
+        }
+      } else if(ledge.kind===0) {       // basalt columns
+        for(let i=0;i<4;i++) {ctx.fillStyle=i%2?'rgba(30,36,44,0.95)':'rgba(40,48,58,0.95)';ctx.fillRect(x+out*(i*1.1-1.2)*s-0.5,y,1,(2+((i*5)%3))*s);}
+      } else if(ledge.kind===1) {       // a seam of lava inside the rock
+        ctx.globalCompositeOperation='lighter';
+        ctx.strokeStyle='rgba(255,110,40,'+(0.22+0.14*Math.sin(t*1.2+ledge.ph)).toFixed(3)+')';ctx.lineWidth=0.3;
+        ctx.beginPath();ctx.moveTo(x-out*1.5,y-0.6);ctx.lineTo(x-out*4,y-2.2);ctx.lineTo(x-out*5.5,y-1.4);ctx.lineTo(x-out*8,y-3.4);ctx.stroke();
+        ctx.globalCompositeOperation='source-over';
+      }
+    }
+  });
+}
+// Small life of the middle water: a school of lanternfish carrying their own lights, and comb jellies.
+function drawMidLife(ctx,m,vis) {
+  const d=clamp01(state.depth),t=state.seconds,reach=m.reach||geometry.stripStepMm+18;
+  ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);
+  LIFE.lanterns.forEach((sc,si)=> {
+    const dx0=geometry.wrapDistance(sc.x+t*sc.v,m.cx),y0=sc.y+(d-0.45)*170,dir=sc.v>0?1:-1;
+    if(Math.abs(dx0)>reach+12||y0>72||y0<-72) return;
+    for(const f of sc.fish) {
+      const x=dx0+f.dx+Math.sin(t*0.7+f.ph)*1.1,y=y0+f.dy+Math.cos(t*0.5+f.ph)*0.7,b=0.45+0.55*Math.max(0,Math.sin(t*2.4+f.ph*3));
+      ctx.fillStyle='rgba(6,10,26,'+(0.85*vis).toFixed(3)+')';
+      ctx.beginPath();ctx.ellipse(x,y,0.95,0.3,0,0,TAU);ctx.fill();
+      ctx.beginPath();ctx.moveTo(x-dir*0.8,y);ctx.lineTo(x-dir*1.5,y+0.42);ctx.lineTo(x-dir*1.5,y-0.42);ctx.closePath();ctx.fill();
+      ctx.globalCompositeOperation='lighter';
+      ctx.fillStyle='rgba(255,205,120,'+(0.75*b*vis).toFixed(3)+')';ctx.beginPath();ctx.arc(x+dir*0.25,y-0.16,0.17,0,TAU);ctx.fill();
+      ctx.fillStyle='rgba(255,190,90,'+(0.16*b*vis).toFixed(3)+')';ctx.beginPath();ctx.arc(x+dir*0.25,y-0.16,0.6,0,TAU);ctx.fill();
+      ctx.globalCompositeOperation='source-over';
+    }
+  });
+  for(const c of LIFE.combs) {
+    const dx=geometry.wrapDistance(c.x+Math.sin(t*0.12+c.ph)*5,m.cx),y=((c.y+t*c.v+d*200+60)%120+120)%120-60;
+    if(Math.abs(dx)>reach) continue;
+    ctx.fillStyle='rgba(170,205,255,'+(0.16*vis).toFixed(3)+')';ctx.strokeStyle='rgba(200,225,255,'+(0.3*vis).toFixed(3)+')';ctx.lineWidth=0.08;
+    ctx.beginPath();ctx.ellipse(dx,y,c.size*0.62,c.size,0,0,TAU);ctx.fill();ctx.stroke();
+    ctx.globalCompositeOperation='lighter';
+    for(let row=-1;row<=1;row++) for(let k=0;k<6;k++) {
+      const f=k/5-0.5,hue=(t*150+k*42+row*60+c.ph*57)%360;
+      ctx.fillStyle='hsla('+hue.toFixed(0)+',95%,66%,'+(0.7*vis).toFixed(3)+')';
+      ctx.beginPath();ctx.arc(dx+row*c.size*0.36*Math.cos(f*2.6),y+f*c.size*1.7,0.13,0,TAU);ctx.fill();
+    }
+    ctx.globalCompositeOperation='source-over';
+  }
+}
+
 // The bottom of the sea: black basalt with glowing cracks, columns, and two smoking vents.
 function drawSeaBed(ctx,m) {
   const d=clamp01(state.depth),t=state.seconds,base=geometry.aimHeightMm-FLOOR.clear-4+(d-1)*geometry.depthTravelMm;
@@ -517,6 +616,11 @@ function drawSeaBed(ctx,m) {
     if(Math.abs(dx)>reach+10) continue;
     col.bars.forEach((hgt,i)=> {const x=dx+(i-3)*1.7,foot=floor(col.x+(i-3)*1.7)-1;ctx.fillStyle=i%2?'#161d21':'#1d262b';ctx.fillRect(x-0.8,foot,1.6,hgt+1);ctx.fillStyle='rgba(150,170,175,0.35)';ctx.fillRect(x-0.8,foot+hgt+0.8,1.6,0.22);});
   }
+  // The only warm light down here comes up off the lava.
+  ctx.globalCompositeOperation='lighter';
+  const heat=ctx.createLinearGradient(0,base,0,base+46);heat.addColorStop(0,'rgba(255,84,24,0.2)');heat.addColorStop(1,'rgba(255,84,24,0)');
+  ctx.fillStyle=heat;ctx.fillRect(-reach,base-8,reach*2,54);
+  ctx.globalCompositeOperation='source-over';
   const g=ctx.createLinearGradient(0,base+5,0,base-24);g.addColorStop(0,'#232c31');g.addColorStop(0.35,'#0e1316');g.addColorStop(1,'#030405');
   ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(-reach,-95);
   for(let dx=-reach;dx<=reach;dx+=2) ctx.lineTo(dx,floor(m.cx+dx));
@@ -532,7 +636,7 @@ function drawSeaBed(ctx,m) {
     const dx=geometry.wrapDistance(k.x,m.cx);
     if(Math.abs(dx)>reach+6) continue;
     const y=floor(k.x)-k.deep,heat=0.5+0.5*Math.sin(t*0.8+k.ph),glow=ctx.createRadialGradient(dx,y,0.1,dx,y,k.size);
-    glow.addColorStop(0,'rgba(255,170,70,'+(0.5+0.3*heat).toFixed(3)+')');glow.addColorStop(0.35,'rgba(255,80,20,'+(0.22+0.12*heat).toFixed(3)+')');glow.addColorStop(1,'rgba(255,60,10,0)');
+    glow.addColorStop(0,'rgba(255,150,60,'+(0.3+0.2*heat).toFixed(3)+')');glow.addColorStop(0.35,'rgba(255,70,20,'+(0.12+0.08*heat).toFixed(3)+')');glow.addColorStop(1,'rgba(255,60,10,0)');
     ctx.fillStyle=glow;ctx.beginPath();ctx.arc(dx,y,k.size,0,TAU);ctx.fill();
   }
   for(const crack of FLOOR.cracks) {
@@ -583,6 +687,8 @@ function buildLife() {
   LIFE.schools=make(5,i=>({x:r()*L,y:-30+i*14,v:(i%2?-1:1)*(4+r()*3),fish:make(11,()=>({dx:(r()-0.5)*14,dy:(r()-0.5)*6,ph:r()*6.28}))}));
   LIFE.jellies=make(14,()=>({x:r()*L,y:r()*H,v:0.6+r()*0.8,ph:r()*6.28,size:1.1+r()*0.9,pink:r()<0.5}));
   LIFE.chain={x:r()*L,y:-6};
+  LIFE.lanterns=make(3,i=>({x:r()*L,y:-28+i*26,v:(i%2?-1:1)*(2.4+r()*2),fish:make(12,()=>({dx:(r()-0.5)*18,dy:(r()-0.5)*8,ph:r()*6.28}))}));
+  LIFE.combs=make(9,()=>({x:r()*L,y:r()*H,v:0.4+r()*0.6,ph:r()*6.28,size:1.1+r()*0.8}));
   LIFE.vents=[0.21,0.68].map(u=>({x:u*L,smoke:make(12,()=>({ph:r(),dx:(r()-0.5)*2})),worms:make(7,()=>({dx:(r()-0.5)*11,h:1.6+r()*1.6,ph:r()*6.28}))}));
   LIFE.travel=geometry.depthTravelMm;LIFE.built=true;
 }
@@ -647,15 +753,20 @@ function drawLife(ctx,m,shown) {
     }
   }
 
-  // Marine snow from the twilight zone down.
-  const snow=band(0.16,0.4,2,3);
+  // Trench walls stand behind everything else in the lower two levels.
+  if(!FLOOR.built) buildFloors();
+  drawWalls(ctx,m);
+
+  // Marine snow from the twilight zone down. lamp = the sub's own light, gloom = how dark the water has become.
+  const snow=band(0.16,0.4,2,3),lamp=band(0.24,0.34,2,3),gloom=band(0.6,0.7,2,3);
   if(snow>0) {
     ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='rgb(200,225,240)';
     const n=Math.floor(LIFE.snow.length*snow);
     for(let i=0;i<n;i++) {
-      const s=LIFE.snow[i];
-      if(!put(s.x+Math.sin(t*0.3+s.ph)*1.5,wrapY(s.y-t*s.v+d*LIFE.travel))) continue;
-      const z=Math.max(1,s.s*S);ctx.globalAlpha=s.a*(0.5+0.5*snow);ctx.fillRect(PX-z/2,PY-z/2,z,z);
+      const s=LIFE.snow[i],sx=s.x+Math.sin(t*0.3+s.ph)*1.5,sy=wrapY(s.y-t*s.v+d*LIFE.travel);
+      if(!put(sx,sy)) continue;
+      const lit=lamp>0?clamp01(1-Math.hypot(geometry.wrapDistance(sx,LIFE.aimX),sy-geometry.aimHeightMm)/26)*lamp:0;
+      const z=Math.max(1,s.s*S);ctx.globalAlpha=Math.min(1,s.a*(0.5+0.5*snow)*(1-0.55*gloom)*(1+2.2*lit));ctx.fillRect(PX-z/2,PY-z/2,z,z);
     }
     ctx.globalAlpha=1;
   }
@@ -676,25 +787,39 @@ function drawLife(ctx,m,shown) {
     }
   }
 
+  const twilight=band(0.27,0.36,0.6,0.67);
+  if(twilight>0) drawMidLife(ctx,m,twilight);
+
   // The creatures themselves, then the level floors and the sea bed in front of them.
   if(state.pretty) drawCreatures(ctx,m,shown);
-  if(!FLOOR.built) buildFloors();
   if(!state.gatesOff) (config.gates||[]).forEach((gate,i)=>drawFloor(ctx,m,gate,i));
   drawSeaBed(ctx,m);
+  // The sub's floodlight: a soft pool of light round the reticle once the sun is gone.
+  if(lamp>0) {
+    const lx=geometry.wrapDistance(LIFE.aimX,m.cx),ly=geometry.aimHeightMm;
+    if(Math.abs(lx)<reach+34) {
+      ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);ctx.globalCompositeOperation='lighter';
+      const pool=ctx.createRadialGradient(lx,ly,1,lx,ly,32);
+      pool.addColorStop(0,'rgba(150,200,235,'+(0.2*lamp).toFixed(3)+')');pool.addColorStop(0.45,'rgba(120,175,220,'+(0.08*lamp).toFixed(3)+')');pool.addColorStop(1,'rgba(110,160,210,0)');
+      ctx.fillStyle=pool;ctx.beginPath();ctx.arc(lx,ly,32,0,TAU);ctx.fill();
+      ctx.globalCompositeOperation='source-over';
+    }
+  }
 
   // Bioluminescent plankton in the dark: it twinkles by itself, flares when the water is stirred (turning,
   // diving, scanning) and breathes faintly with the beat of the music.
   const dark=band(0.45,0.66,2,3);
   if(dark>0) {
     ctx.setTransform(1,0,0,1,0,0);ctx.globalCompositeOperation='lighter';
-    const n=Math.floor(LIFE.plankton.length*dark),stir=state.stir||0,pulse=state.beatPulse||0,tints=['80,255,230','110,170,255','150,255,170'];
+    const n=Math.floor(LIFE.plankton.length*dark*0.42),stir=state.stir||0,pulse=state.beatPulse||0,tints=['80,255,230','110,170,255','150,255,170'];
     for(let i=0;i<n;i++) {
       const p=LIFE.plankton[i];
       if(!put(p.x+Math.cos(t*0.15*p.sp+p.ph)*4,wrapY(p.y+d*LIFE.travel*0.8+Math.sin(t*0.2+p.ph)*3))) continue;
-      const twinkle=Math.pow(0.5+0.5*Math.sin(t*p.sp*1.7+p.ph),6);
-      const b=Math.min(1,0.2+0.6*twinkle+stir*(0.35+0.65*p.k)+pulse*0.16)*dark,core=Math.max(1.5,0.2*S);
-      ctx.fillStyle='rgba('+tints[p.hue]+','+(b*0.3).toFixed(3)+')';
-      ctx.beginPath();ctx.arc(PX,PY,0.6*S*(0.7+b*0.7),0,Math.PI*2);ctx.fill();
+      const twinkle=Math.pow(0.5+0.5*Math.sin(t*p.sp*1.7+p.ph),14);
+      const b=Math.min(1,0.04+0.7*twinkle+stir*(0.2+0.6*p.k)+pulse*0.05)*dark,core=Math.max(1.2,0.16*S);
+      if(b<0.03) continue;
+      ctx.fillStyle='rgba('+tints[p.hue]+','+(b*0.16).toFixed(3)+')';
+      ctx.beginPath();ctx.arc(PX,PY,0.42*S*(0.7+b*0.7),0,Math.PI*2);ctx.fill();
       ctx.fillStyle='rgba('+tints[p.hue]+','+b.toFixed(3)+')';ctx.fillRect(PX-core/2,PY-core/2,core,core);
     }
     // A siphonophore: one long chain of lights with a pulse running down it.
@@ -712,7 +837,7 @@ function drawLife(ctx,m,shown) {
   // Bubbles: a few always rising, more near the surface, and a burst from the hull with every bubble sound.
   ctx.setTransform(1,0,0,1,0,0);ctx.lineWidth=1;
   const count=Math.floor(LIFE.bubbles.length*clamp01(0.7-0.5*d+(state.diving?0.25:0)));
-  ctx.strokeStyle='rgba(225,247,255,'+(0.62-0.3*d).toFixed(3)+')';ctx.fillStyle='rgba(255,255,255,'+(0.5-0.25*d).toFixed(3)+')';
+  ctx.strokeStyle='rgba(225,247,255,'+(0.62-0.5*d).toFixed(3)+')';ctx.fillStyle='rgba(255,255,255,'+(0.5-0.42*d).toFixed(3)+')';
   for(let i=0;i<count;i++) {
     const b=LIFE.bubbles[i];
     if(!put(b.x+Math.sin(t*1.3+b.ph)*1.2,wrapY(b.y+t*b.v+d*LIFE.travel*1.3))) continue;
@@ -729,6 +854,7 @@ function drawLife(ctx,m,shown) {
 // Once per frame: bubbles leave the hull in front of the viewer whenever a bubble sound has just played.
 function stepLife(hit) {
   const t=state.seconds;
+  LIFE.aimX=hit.strip_mm[0];
   if(state.bubbleBurstAt&&state.bubbleBurstAt!==LIFE.lastBurst) {
     LIFE.lastBurst=state.bubbleBurstAt;
     for(let i=0;i<9;i++) LIFE.bursts.push({x:hit.strip_mm[0]+(Math.random()-0.5)*18,y:geometry.aimHeightMm-26+Math.random()*16,v:16+Math.random()*16,
@@ -774,7 +900,7 @@ function applyShape() {
 function renderBall(hit,shown) {
   const W=BALL.W,H=BALL.H,k=BALL.k,ctx=BALL.ctx,now=performance.now();
   if(state.seaDepth!==state.depth) {state.seaDepth=state.depth;state.seaChangedAt=now;}
-  const moving=now-(state.seaChangedAt||0)<220,key=state.depth+'|'+state.grid+'|'+(moving?'c':'f');
+  const moving=now-(state.seaChangedAt||0)<220,key=state.depth+'|'+state.grid+'|'+(moving?'c':'f')+'|'+seaShift();
   if(BALL.cacheKey!==key) {paintSea(BALL.image.data,BALL.stripX,BALL.stripY,BALL.pre,W*H,null,W,moving?4:1,H);BALL.cacheKey=key;}
   ctx.setTransform(1,0,0,1,0,0);ctx.putImageData(BALL.image,0,0);
   for(const m of BALL.maps) drawLife(ctx,m,shown);
@@ -850,7 +976,7 @@ function drawRing(ring,face,hit,shown) {
   const nowR=performance.now(),onFrame=hit.face===face&&!hit.onPanel;
   if(!onFrame&&ring.lastAt&&nowR-ring.lastAt<120&&ring.lastDepth===state.depth&&ring.lastGrid===state.grid) return;
   ring.lastAt=nowR;ring.lastDepth=state.depth;ring.lastGrid=state.grid;
-  const key=state.depth+'|'+state.grid;
+  const key=state.depth+'|'+state.grid+'|'+seaShift();
   if(ring.cacheKey!==key) {
     if(!ring.pre) ring.pre=makeSeaPre(ring.stripX,ring.stripY,RING*RING);
     paintSea(ring.background,ring.stripX,ring.stripY,ring.pre,RING*RING,ring.skip,RING,(performance.now()-(state.seaChangedAt||0)<220)?3:1);
@@ -955,7 +1081,7 @@ function renderPanels() {
   panels.forEach((p,face)=> {
     if(state.seaDepth!==state.depth) {state.seaDepth=state.depth;state.seaChangedAt=performance.now();}
     const moving=performance.now()-(state.seaChangedAt||0)<220;
-    const key=state.depth+'|'+state.grid+'|'+(moving?'c':'f');
+    const key=state.depth+'|'+state.grid+'|'+(moving?'c':'f')+'|'+seaShift();
     if(p.cacheKey!==key) {
       if(!p.pre) p.pre=makeSeaPre(p.stripX,p.stripY,PANEL*PANEL);
       paintSea(p.background,p.stripX,p.stripY,p.pre,PANEL*PANEL,null,PANEL,moving?3:1);
