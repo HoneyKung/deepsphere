@@ -11,7 +11,7 @@ const TwinGeometry={
     const aimY=stripConfig.aim_y_mm||step/2,aimCenterX=0;
     const clamp01=x=>Math.max(0,Math.min(1,x)),wrap=x=>((x%stripLengthMm)+stripLengthMm)%stripLengthMm;
     const wrapDistance=(x,center)=>{let d=x-center;while(d>stripLengthMm/2)d-=stripLengthMm;while(d<-stripLengthMm/2)d+=stripLengthMm;return d;};
-    const stripScrollMm=depth=>(clamp01(depth)-0.1)*step*2;
+    const depthTravelMm=stripConfig.depth_travel_mm||step*2,stripScrollMm=depth=>(clamp01(depth)-0.1)*depthTravelMm;
     const depthLook=config.depth_darkening||{},backgroundLook=depthLook.background_scroll||{};
     const surfaceFadeDepth=backgroundLook.surface_fade_depth_norm||0.1;
     const surfaceScrollMm=backgroundLook.surface_scroll_mm??55;
@@ -42,7 +42,7 @@ const TwinGeometry={
     const atlas=(id,u,v,depth)=>stripPoint(id,u,v);
     const atlasFace=(x,y,depth)=>{const hit=faceForStrip(x,y);return {face:hit.k,face_id:hit.id,local:hit.local,valid:hit.faceOutside<=1e-9};};
     const horizontalPerimeterMm=()=>stripLengthMm;
-    return {config,faces,faceConfig,scene,mount,inverse,edge,point,strip,pixel,atlas,atlasFace,aim,poses,subjectAt,stripPoint,stripLocal,stripLengthMm,stripStepMm:step,stripScrollMm,backgroundScrollMm,aimHeightMm:aimY,aimPhaseDeg:90,referencePerimeterMm:stripLengthMm,wrapDistance,faceForStrip,stripFrames:faceFrames};
+    return {config,faces,faceConfig,scene,mount,inverse,edge,point,strip,pixel,atlas,atlasFace,aim,poses,subjectAt,stripPoint,stripLocal,stripLengthMm,stripStepMm:step,stripScrollMm,depthTravelMm,backgroundScrollMm,aimHeightMm:aimY,aimPhaseDeg:90,referencePerimeterMm:stripLengthMm,wrapDistance,faceForStrip,stripFrames:faceFrames};
   }
 };
 

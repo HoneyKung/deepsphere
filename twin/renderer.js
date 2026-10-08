@@ -178,7 +178,7 @@ function buildLife() {
   LIFE.jellies=make(14,()=>({x:r()*L,y:r()*H,v:0.6+r()*0.8,ph:r()*6.28,size:1.1+r()*0.9,pink:r()<0.5}));
   LIFE.chain={x:r()*L,y:-6};
   LIFE.vents=[0.21,0.68].map(u=>({x:u*L,smoke:make(12,()=>({ph:r(),dx:(r()-0.5)*2})),worms:make(7,()=>({dx:(r()-0.5)*11,h:1.6+r()*1.6,ph:r()*6.28}))}));
-  LIFE.built=true;
+  LIFE.travel=geometry.depthTravelMm;LIFE.built=true;
 }
 function lifeMap(faceId,width,ring) {
   const r=FACES.find(f=>f.id===faceId).rect,cx=config.azimuth_order.indexOf(faceId)*geometry.stripStepMm;
