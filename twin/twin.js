@@ -1688,17 +1688,55 @@ function setDepth(next, free) {
   }
 }
 
-// Holding a depth key or button sinks smoothly, about ten seconds from the surface to the bottom; a tap is one step.
-const depthHold = { dir: 0, timer: 0 };
-function depthHoldStop() { clearTimeout(depthHold.timer); depthHold.timer = 0; depthHold.dir = 0; }
-function depthHoldStart(dir) {
-  if (depthHold.dir === dir) return;
-  depthHoldStop();
-  depthHold.dir = dir;
-  setDepth(state.depth + dir * DEPTH_STEP);
-  const run = () => { setDepth(state.depth + dir * 0.005); depthHold.timer = window.setTimeout(run, 50); };
-  depthHold.timer = window.setTimeout(run, 280);
+// ---------------------------------------------------------------- motion: the sub has mass
+// Depth and heading are driven by a speed that eases towards what the controls ask for, so the sub gathers way
+// when a control is held and glides to a stop after it is released. A short tap is a small nudge. Turning by
+// drag is direct while the finger is down and coasts on from the speed it was released at.
+const MOTION = { depthSpeed: 0.055, depthRise: 0.55, depthFall: 0.6, yawSpeed: 48, yawRise: 0.35, yawFall: 0.4, fling: 200 };
+const motion = { key: { up: false, down: false, left: false, right: false }, pad: { depth: 0, yaw: 0 },
+  depthVel: 0, yawVel: 0, dragVel: 0, dragAt: 0, last: 0 };
+
+function easeSpeed(value, target, dt, rise, fall) {
+  const gathering = target !== 0 && (value === 0 || Math.sign(target) === Math.sign(value)) && Math.abs(target) >= Math.abs(value);
+  return value + (target - value) * (1 - Math.exp(-dt / (gathering ? rise : fall)));
 }
+
+function motionStep(now) {
+  requestAnimationFrame(motionStep);
+  const dt = Math.min(0.2, Math.max(0, (now - (motion.last || now)) / 1000));   // stays true to the clock on a slow device
+  motion.last = now;
+  if (!state.started) return;
+  const depthInput = Math.max(-1, Math.min(1, (motion.key.down ? 1 : 0) - (motion.key.up ? 1 : 0) + motion.pad.depth));
+  motion.depthVel = easeSpeed(motion.depthVel, depthInput * MOTION.depthSpeed, dt, MOTION.depthRise, MOTION.depthFall);
+  if (Math.abs(motion.depthVel) > 0.0003) {
+    const want = clamp01(state.depth + motion.depthVel * dt);
+    setDepth(want);
+    // Stopped dead by a floor, the surface or the sea bed.
+    if (Math.abs(state.depth - want) > 1e-9 || want <= 0 && motion.depthVel < 0 || want >= 1 && motion.depthVel > 0) motion.depthVel = 0;
+  } else if (!depthInput) motion.depthVel = 0;
+  const live = state.liveMode && state.liveConnected;
+  if (dragging || live) { motion.yawVel = 0; return; }
+  const yawInput = Math.max(-1, Math.min(1, (motion.key.right ? 1 : 0) - (motion.key.left ? 1 : 0) + motion.pad.yaw));
+  motion.yawVel = easeSpeed(motion.yawVel, yawInput * MOTION.yawSpeed, dt, MOTION.yawRise, MOTION.yawFall);
+  if (Math.abs(motion.yawVel) > 0.05) setYaw(state.yaw + motion.yawVel * dt);
+  else if (!yawInput) motion.yawVel = 0;
+}
+
+function dragTurn(clientX) {
+  const now = performance.now(), turn = (clientX - lastX) * 0.4, elapsed = Math.max(8, now - (motion.dragAt || now - 16));
+  motion.dragVel = 0.6 * motion.dragVel + 0.4 * (turn / elapsed * 1000);
+  motion.dragAt = now;
+  setYaw(state.yaw + turn);
+}
+function dragStart() { dragging = true; motion.dragVel = 0; motion.yawVel = 0; motion.dragAt = performance.now(); }
+function dragEnd() {
+  if (dragging && performance.now() - motion.dragAt < 90) motion.yawVel = Math.max(-MOTION.fling, Math.min(MOTION.fling, motion.dragVel));
+  dragging = false;
+}
+function motionRelease() { motion.key.up = motion.key.down = motion.key.left = motion.key.right = false; motion.pad.depth = 0; motion.pad.yaw = 0; }
+
+function depthHoldStop() { motion.pad.depth = 0; }
+function depthHoldStart(dir) { motion.pad.depth = dir; }
 
 // Friends open the page with no hardware: the player view hides the engineering controls and adds on-screen
 // buttons. ?dev=1 (and the live-board and acceptance runs) keep the full twin.
@@ -1711,14 +1749,8 @@ if (!DEV_MODE) {
   orbit.dist = 3.5;
 }
 
-const yawHold = { dir: 0, timer: 0 };
-function yawHoldStop() { clearInterval(yawHold.timer); yawHold.timer = 0; yawHold.dir = 0; }
-function yawHoldStart(dir) {
-  yawHoldStop();
-  if (state.liveMode && state.liveConnected) return;
-  yawHold.dir = dir;
-  yawHold.timer = window.setInterval(() => setYaw(state.yaw + dir * 1.5), 30);
-}
+function yawHoldStop() { motion.pad.yaw = 0; }
+function yawHoldStart(dir) { motion.pad.yaw = dir; }
 
 // Cube or sphere: the same sea on a different body. The choice is remembered on this device.
 const SHAPE_KEY = 'deepSphereShape';
@@ -1757,13 +1789,13 @@ function initPad() {
 
 function initInput() {
   const el = renderer.domElement;
-  el.addEventListener('mousedown', (e) => { if (state.liveMode && state.liveConnected) return; dragging = true; lastX = e.clientX; lastY = e.clientY; document.body.style.cursor = 'grabbing'; });
-  window.addEventListener('mouseup', () => { dragging = false; document.body.style.cursor = 'grab'; });
+  el.addEventListener('mousedown', (e) => { if (state.liveMode && state.liveConnected) return; dragStart(); lastX = e.clientX; lastY = e.clientY; document.body.style.cursor = 'grabbing'; });
+  window.addEventListener('mouseup', () => { dragEnd(); document.body.style.cursor = 'grab'; });
   window.addEventListener('mousemove', (e) => {
     if (!dragging || (state.liveMode && state.liveConnected)) return;
     // Sideways drag turns the box on its own standing axis, the same one the arrow keys drive.
     // The mounted body diagonal remains vertical during yaw.
-    setYaw(state.yaw + (e.clientX - lastX) * 0.4);
+    dragTurn(e.clientX);
     lastX = e.clientX; lastY = e.clientY;
   });
   el.addEventListener('wheel', (e) => {
@@ -1772,28 +1804,29 @@ function initInput() {
   }, { passive: false });
 
   el.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1 && !(state.liveMode && state.liveConnected)) { dragging = true; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; }
+    if (e.touches.length === 1 && !(state.liveMode && state.liveConnected)) { dragStart(); lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; }
   }, { passive: true });
   el.addEventListener('touchmove', (e) => {
     if (!dragging || e.touches.length !== 1 || (state.liveMode && state.liveConnected)) return;
-    setYaw(state.yaw + (e.touches[0].clientX - lastX) * 0.4);
+    dragTurn(e.touches[0].clientX);
     lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
   }, { passive: true });
-  el.addEventListener('touchend', () => { dragging = false; });
+  el.addEventListener('touchend', dragEnd);
+  el.addEventListener('touchcancel', dragEnd);
 
   // config/controls.json laptop_demo_input.keys
   window.addEventListener('keydown', (e) => {
     if (e.target instanceof Element && e.target.matches('input, select, textarea')) return;
     switch (e.code) {
-      case 'ArrowUp': e.preventDefault(); if (!e.repeat) depthHoldStart(-1); break;
-      case 'ArrowDown': e.preventDefault(); if (!e.repeat) depthHoldStart(1); break;
-      case 'ArrowLeft': e.preventDefault(); if (!(state.liveMode && state.liveConnected)) setYaw(state.yaw - HEADING_STEP); break;
-      case 'ArrowRight': e.preventDefault(); if (!(state.liveMode && state.liveConnected)) setYaw(state.yaw + HEADING_STEP); break;
+      case 'ArrowUp': e.preventDefault(); motion.key.up = true; break;
+      case 'ArrowDown': e.preventDefault(); motion.key.down = true; break;
+      case 'ArrowLeft': e.preventDefault(); motion.key.left = true; break;
+      case 'ArrowRight': e.preventDefault(); motion.key.right = true; break;
       case 'KeyH': e.preventDefault(); toggleHighlight(); break;
       case 'Digit1': case 'Numpad1': e.preventDefault(); doScan(); break;
       case 'Digit2': case 'Numpad2': e.preventDefault(); doCollect(); break;
       case 'Digit3': case 'Numpad3': e.preventDefault(); doAnalyze(); break;
-      case 'KeyR': orbit = { theta: -1.3, phi: 1.32, dist: DEV_MODE ? 4.4 : 3.5 }; fitOrbit(); setYaw(0); setDepth(0, true); break;
+      case 'KeyR': orbit = { theta: -1.3, phi: 1.32, dist: DEV_MODE ? 4.4 : 3.5 }; fitOrbit(); motion.depthVel = 0; motion.yawVel = 0; setYaw(0); setDepth(0, true); break;
       case 'Enter': case 'Escape': if ($('discovery-popup').classList.contains('show')) $('btn-discovery-close').click(); break;
       case 'KeyD': e.preventDefault(); setDebug(!audio.debug); break;
       case 'KeyB': setShape(!state.sphere); break;
@@ -1804,8 +1837,12 @@ function initInput() {
     }
   });
 
-  window.addEventListener('keyup', (e) => { if (e.code === 'ArrowUp' || e.code === 'ArrowDown') depthHoldStop(); });
-  window.addEventListener('blur', () => { depthHoldStop(); yawHoldStop(); });
+  window.addEventListener('keyup', (e) => {
+    const name = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[e.code];
+    if (name) motion.key[name] = false;
+  });
+  window.addEventListener('blur', motionRelease);
+  requestAnimationFrame(motionStep);
   initPad();
   initShape();
 

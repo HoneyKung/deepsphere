@@ -1,0 +1,183 @@
+<title>Deep Sphere คู่มือเล่น</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+/* Layout: one sheet. Thesis band on top, then two columns: how to play on the left, the dive itself (a depth
+   gauge with the three levels hanging off it) on the right. Palette and faces are the game's own HUD. */
+:root {
+  --abyss: #050f15; --hull: #0b1b23; --raised: #12303a; --line: #1f414d;
+  --text: #dcebec; --dim: #9db6bd; --sonar: #63d6cf; --brass: #d9b878;
+  --sea-1: #2a8fb8; --sea-2: #123f66; --sea-3: #06131f; --lava: #ff8a3d;
+  --display: 'Chakra Petch', 'IBM Plex Sans Thai', sans-serif;
+  --body: 'IBM Plex Sans Thai', 'Leelawadee UI', Tahoma, sans-serif;
+  --mono: 'IBM Plex Mono', Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --abyss: #e8f1f2; --hull: #f6fafa; --raised: #dbe9eb; --line: #bfd3d6;
+    --text: #0d2530; --dim: #456470; --sonar: #0c7c77; --brass: #86610f;
+    --sea-1: #7cc4dd; --sea-2: #2f6f9c; --sea-3: #123049; --lava: #c8551a;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --abyss: #e8f1f2; --hull: #f6fafa; --raised: #dbe9eb; --line: #bfd3d6;
+  --text: #0d2530; --dim: #456470; --sonar: #0c7c77; --brass: #86610f;
+  --sea-1: #7cc4dd; --sea-2: #2f6f9c; --sea-3: #123049; --lava: #c8551a;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--abyss); color: var(--text); font: 400 15px/1.65 var(--body); padding-inline: 20px; padding-block: 28px 40px; }
+.sheet { max-width: 1040px; margin-inline: auto; display: grid; gap: 22px; }
+a { color: var(--sonar); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+.label { font: 500 11.5px/1.3 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px 24px; }
+.top h1 { font-size: clamp(30px, 6vw, 44px); font-weight: 700; letter-spacing: 0.06em; color: var(--brass); line-height: 1.05; }
+.top p { margin: 6px 0 0; color: var(--dim); max-width: 56ch; }
+.go { display: inline-block; padding: 11px 20px; border-radius: 6px; background: var(--brass); color: var(--abyss); font: 600 14px/1.2 var(--display); letter-spacing: 0.08em; text-decoration: none; white-space: nowrap; }
+.go:focus-visible, a:focus-visible { outline: 2px solid var(--sonar); outline-offset: 3px; }
+.url { display: block; margin-top: 6px; font: 400 12px/1.4 var(--mono); color: var(--dim); overflow-wrap: anywhere; }
+
+/* thesis */
+.slow { border-block: 1px solid var(--line); padding-block: 20px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 18px 34px; align-items: start; }
+.slow h2 { font-size: clamp(24px, 4.4vw, 34px); font-weight: 600; line-height: 1.25; color: var(--text); }
+.slow h2 em { font-style: normal; color: var(--sonar); }
+.slow .lead { margin: 10px 0 0; color: var(--dim); }
+.why { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.why li { display: grid; grid-template-columns: 8.2em minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.why b { font: 600 13.5px/1.4 var(--display); letter-spacing: 0.03em; color: var(--brass); }
+
+/* two columns */
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px 34px; }
+.cols > section { min-width: 0; display: grid; gap: 14px; align-content: start; }
+h3 { font-size: 17px; font-weight: 600; letter-spacing: 0.04em; }
+.keys { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 14px; align-items: baseline; margin: 0; }
+.keys dt { white-space: nowrap; }
+.keys dd { margin: 0; color: var(--dim); }
+kbd { display: inline-block; min-width: 1.9em; padding: 2px 7px; border: 1px solid var(--line); border-radius: 5px; background: var(--raised); color: var(--sonar); font: 500 12.5px/1.5 var(--mono); text-align: center; }
+.round { margin: 0; padding: 0; list-style: none; counter-reset: step; display: grid; gap: 9px; }
+.round li { counter-increment: step; display: grid; grid-template-columns: 1.9em minmax(0, 1fr); gap: 10px; }
+.round li::before { content: counter(step); font: 600 14px/1.65 var(--display); color: var(--brass); }
+.round strong { color: var(--text); font-weight: 600; }
+.round span { color: var(--dim); }
+
+/* the dive: depth gauge with levels */
+.dive { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 0 16px; }
+.gauge { position: relative; border-radius: 6px; background: linear-gradient(to bottom, var(--sea-1) 0%, var(--sea-2) 38%, var(--sea-3) 78%, var(--sea-3) 100%); }
+.gauge i { position: absolute; left: 0; right: 0; height: 2px; background: var(--brass); }
+.gauge i::after { content: ''; position: absolute; left: 34%; width: 32%; top: -2px; height: 6px; background: var(--sea-2); border-inline: 2px solid var(--brass); }
+.gauge i.bed { height: 5px; background: var(--lava); bottom: 0; border-radius: 0 0 6px 6px; }
+.gauge i.bed::after { display: none; }
+.levels { display: grid; grid-template-rows: 25fr 40fr 35fr; }
+.level { padding: 4px 0 14px; border-top: 1px solid var(--line); display: grid; gap: 3px; align-content: start; }
+.level:first-child { border-top: 0; padding-top: 0; }
+.level .range { font: 500 12px/1.4 var(--mono); color: var(--dim); font-variant-numeric: tabular-nums; }
+.level h4 { margin: 0; font: 600 15px/1.35 var(--display); letter-spacing: 0.06em; color: var(--sonar); }
+.level p { margin: 0; color: var(--dim); font-size: 14px; }
+.level p b { color: var(--text); font-weight: 500; }
+.stuck { border: 1px solid var(--line); border-radius: 8px; background: var(--hull); padding: 14px 16px; display: grid; gap: 6px; }
+.stuck ul { margin: 0; padding-left: 1.1em; color: var(--dim); display: grid; gap: 4px; }
+.foot { color: var(--dim); font-size: 13px; border-top: 1px solid var(--line); padding-top: 14px; }
+
+@media (max-width: 760px) {
+  .slow, .cols { grid-template-columns: minmax(0, 1fr); }
+  .why li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+</style>
+
+<main class="sheet">
+  <header class="top">
+    <div>
+      <div class="label">คู่มือเล่น · Red Sea survey 22.3°N 38.9°E</div>
+      <h1>DEEP SPHERE</h1>
+      <p>กล่องหกจอ (หรือลูกกลม) ที่เป็นหน้าต่างมองทะเลแดง ตั้งแต่ผิวน้ำลงไปถึง 3,040 เมตร หมุนเพื่อมองรอบตัว ดำลงทีละชั้น แล้วสแกนและเก็บสัตว์ให้ครบ 8 ชนิด</p>
+    </div>
+    <div>
+      <a class="go" href="https://honeykung.github.io/deepsphere/" target="_blank" rel="noopener">เปิดเล่น</a>
+      <span class="url">honeykung.github.io/deepsphere</span>
+    </div>
+  </header>
+
+  <section class="slow" aria-labelledby="slow-title">
+    <div>
+      <h2 id="slow-title">งานนี้ตั้งใจให้<em>เล่นช้า ๆ</em></h2>
+      <p class="lead">ไม่มีเวลาจับ ไม่มีคะแนน ไม่มีแพ้ ใส่หูฟัง หมุนทีละนิด แล้วหยุดฟังบ้าง ยิ่งรีบยิ่งพลาดของที่ซ่อนอยู่</p>
+    </div>
+    <ul class="why">
+      <li><b>เพลงตามมือคุณ</b><span>ขยับต่อเนื่องสักครู่เพลงจะค่อย ๆ เข้ามาทีละชั้น หยุดนิ่ง 4 วินาทีเพลงจะจางหายไปเอง เหลือแต่เสียงทะเล ความเงียบเป็นส่วนหนึ่งของงาน</span></li>
+      <li><b>สัตว์มีเสียงของมัน</b><span>วางเป้าค้างบนตัวสัตว์ราว 1 วินาที จะได้ยินทำนองสั้น ๆ ของตัวนั้น กวาดผ่านเร็ว ๆ จะไม่ได้ยิน</span></li>
+      <li><b>แต่ละตัวอยู่ชั้นของมัน</b><span>ดำลงเร็วเกินไป สัตว์จะลอยผ่านจอไปก่อนที่คุณจะหมุนไปเจอ</span></li>
+      <li><b>ทางลงมีช่องเดียว</b><span>ทุกชั้นมีพื้นกั้น ต้องค่อย ๆ หมุนหาช่อง ช่องจะมีลำแสงจาง ๆ ลอยขึ้นมาให้สังเกต</span></li>
+    </ul>
+  </section>
+
+  <div class="cols">
+    <section aria-labelledby="keys-title">
+      <h3 id="keys-title">ปุ่มควบคุม</h3>
+      <dl class="keys">
+        <dt>ลากนิ้ว / เมาส์</dt><dd>หมุนกล่อง ปล่อยมือแล้วกล่องจะหมุนต่ออีกหน่อยแล้วค่อย ๆ หยุด (หรือปุ่ม ◀ ▶ และลูกศรซ้ายขวา)</dd>
+        <dt><kbd>▼</kbd> DIVE</dt><dd>กดค้างเพื่อดำลง เรือมีแรงเฉื่อย ค่อย ๆ ออกตัวและไหลต่ออีกนิดหลังปล่อยปุ่ม แตะสั้น ๆ คือขยับนิดเดียว</dd>
+        <dt><kbd>▲</kbd> UP</dt><dd>กดค้างเพื่อลอยขึ้น</dd>
+        <dt><kbd>1</kbd> SCAN</dt><dd>สแกนสิ่งที่อยู่ในเป้า รอผลประมาณ 4 วินาที</dd>
+        <dt><kbd>2</kbd> COLLECT</dt><dd>เก็บตัวอย่าง การ์ดสปีชีส์จะเด้งขึ้น</dd>
+        <dt><kbd>3</kbd> ANALYZE</dt><dd>ดูรายการทั้ง 8 ชนิด ตัวที่ยังไม่เจอบอกชั้นไว้</dd>
+        <dt><kbd>B</kbd> Shape</dt><dd>สลับลูกบาศก์กับทรงกลม</dd>
+        <dt><kbd>M</kbd> Sound</dt><dd>ปิดหรือเปิดเสียง</dd>
+        <dt><kbd>R</kbd></dt><dd>กลับผิวน้ำทันที</dd>
+      </dl>
+
+      <h3>หนึ่งรอบเล่นยังไง</h3>
+      <ol class="round">
+        <li><div><strong>กด BEGIN EXPLORATION</strong> <span>รอโหลดเสียงครั้งแรกสักครู่ มีเพลงเปิดสั้น ๆ แล้วเงียบ</span></div></li>
+        <li><div><strong>หมุนดูรอบตัวก่อน</strong> <span>สัตว์ว่ายวนรอบกล่อง รอให้มันเข้ามาใกล้เป้า</span></div></li>
+        <li><div><strong>SCAN แล้ว COLLECT</strong> <span>ต้องให้สัตว์อยู่ในกรอบเป้าตอนกดทั้งสองครั้ง</span></div></li>
+        <li><div><strong>ดำลงจนถึงพื้น แล้วหมุนหาช่อง</strong> <span>เมื่อเป้าตรงช่อง เป้าจะเปลี่ยนเป็นสีทองและมีลูกศรชี้ลง จึงกด DIVE ต่อได้</span></div></li>
+        <li><div><strong>ทำซ้ำอีกสองชั้น</strong> <span>ถึงก้นทะเลแล้วกด ANALYZE ดูว่าเก็บครบหรือยัง</span></div></li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="dive-title">
+      <h3 id="dive-title">สามชั้นของทะเล</h3>
+      <div class="dive">
+        <div class="gauge" aria-hidden="true">
+          <i style="top:25%"></i><i style="top:65%"></i><i class="bed"></i>
+        </div>
+        <div class="levels">
+          <div class="level">
+            <span class="range">0 – 760 m</span>
+            <h4>LEVEL 1 · CORAL REEF</h4>
+            <p>พื้นทรายและปะการัง ทางลงคือ<b>โพรงที่มีฟองลอยขึ้น</b></p>
+            <p>Sea Goldie · Red Sea Clownfish · Sea Pony</p>
+          </div>
+          <div class="level">
+            <span class="range">760 – 1,976 m</span>
+            <h4>LEVEL 2 · SHIPWRECK</h4>
+            <p>ลานหินกับซากเรือเอียง ทางลงคือ<b>รอยแยกเรืองแสงสีฟ้า</b>ข้างซากเรือ</p>
+            <p>Reef Manta Ray · Skinnycheek Lanternfish</p>
+          </div>
+          <div class="level">
+            <span class="range">1,976 – 3,040 m</span>
+            <h4>LEVEL 3 · VOLCANIC VENTS</h4>
+            <p>มืดสนิท มีแพลงก์ตอนเรืองแสงที่สว่างวาบเมื่อคุณขยับ ก้นสุดเป็นหินบะซอลต์กับรอยแตกลาวา</p>
+            <p>Atolla Jellyfish · Humpback Anglerfish · Vampire Squid</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stuck">
+        <div class="label">ถ้าติด</div>
+        <ul>
+          <li>ชนพื้นแล้วลงไม่ได้: ชนซ้ำอีกครั้ง หน้าจอจะบอกว่าช่องอยู่ทาง ◀ หรือ ▶</li>
+          <li>ขึ้นไม่ได้: ขากลับต้องผ่านช่องเดิม หรือกด <kbd>R</kbd> กลับผิวน้ำ</li>
+          <li>สแกนแล้วขึ้นว่าเป้าอยู่บนขอบจอ: หมุนต่ออีกนิด หรือสลับเป็นทรงกลมด้วย <kbd>B</kbd> ซึ่งไม่มีขอบ</li>
+          <li>ไม่มีเพลง: ลองหมุนหรือดำต่อเนื่องสัก 2 วินาที เพลงพักเองได้นานถึงครึ่งนาที</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <p class="foot">หน้าจอและเสียงพากย์ในเกมเป็นภาษาอังกฤษ ตัวเลขแรงดัน อุณหภูมิ ความเค็ม และชื่อโซนที่มุมจอเปลี่ยนตามความลึกจริง ลองดูไปด้วยระหว่างดำลง</p>
+</main>

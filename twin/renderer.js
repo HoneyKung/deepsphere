@@ -1072,7 +1072,7 @@ function drawEdgeDebug() {
 
 function animate(now) {
   requestAnimationFrame(animate);
-  if(now-lastFrame<50) return;
+  if(now-lastFrame<30) return;
   const dt=previousTime?Math.min((now-previousTime)/1000,0.15):0;previousTime=now;lastFrame=now;
   if(state.liveMode&&state.liveConnected){let delta=state.liveTargetYaw-state.yaw;while(delta>180)delta-=360;while(delta<-180)delta+=360;setYaw((state.yaw+delta*Math.min(1,dt*12)+360)%360);}
   if(state.started&&!state.paused) state.seconds+=dt;
