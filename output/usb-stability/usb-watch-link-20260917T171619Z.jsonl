@@ -1,0 +1,9 @@
+{"at": "2026-09-17T17:16:19.328+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 12.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-17T17:16:19.328+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:16:19.329+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:16:20.331+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:16:20.338+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-17T17:16:21.981+00:00", "event": "board_session_changed", "port": "COM6", "previous": null, "session": "s3-af6e27ac-340-e77eef3d", "type": "log"}
+{"at": "2026-09-17T17:16:21.984+00:00", "event": "board_dropped_line_bytes", "port": "COM6", "total": 1, "note": "the board could not fit a whole line in the USB FIFO"}
+{"at": "2026-09-17T17:16:31.393+00:00", "event": "close", "port": "COM6", "reason": "window elapsed"}
+{"at": "2026-09-17T17:16:31.396+00:00", "event": "watch_end", "port": "COM6", "boots_observed": 1, "damaged_lines": 0, "board_reported_truncations": 1, "last_session": "s3-af6e27ac-340-e77eef3d", "watch_start": 1, "open_attempt": 2, "open_error": 1, "open_success": 1, "board_session_changed": 1, "board_dropped_line_bytes": 1, "close": 1}

@@ -1,0 +1,3 @@
+{"at": "2026-09-14T14:20:47.073+00:00", "event": "watch_start", "port": "COM6", "mode": "presence-only", "seconds": 180.0, "note": "no program opens the port in this mode"}
+{"at": "2026-09-14T14:20:47.091+00:00", "event": "initial_state", "port": "COM6", "present": true}
+{"at": "2026-09-14T14:23:47.300+00:00", "event": "watch_end", "port": "COM6", "watch_start": 1, "initial_state": 1}

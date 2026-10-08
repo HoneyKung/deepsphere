@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "display_size": [
+    240,
+    240
+  ],
+  "active_image": {
+    "left": 0.03,
+    "top": 0.03,
+    "right": 0.97,
+    "bottom": 0.97
+  },
+  "display_pixel_mask": {
+    "left": 0.0,
+    "top": 0.0,
+    "right": 1.0,
+    "bottom": 1.0
+  },
+  "physical_face_uv_status": "dimensions_confirmed_mount_unmeasured",
+  "physical_face_dimensions_mm": {
+    "face_edge": 50.0,
+    "active_opening": 30.0,
+    "frame_each_side": 10.0
+  },
+  "module_orientation_fact": "Screen-down is world -Z on all four side faces and (right, down, -normal) is right-handed on every face, so no panel reads mirrored or a quarter turned from its neighbours. Corrected on 11 September 2026 after the digital twin rendered a waterline that ran vertically on px and nx and horizontally on py and ny. Still unverified against a lit panel.",
+  "enabled_outputs": {
+    "mode": "five_panel_no_bottom",
+    "faces": [
+      "px",
+      "nx",
+      "py",
+      "ny",
+      "pz"
+    ],
+    "note": "All six panels are available; nz uses CS7. LUNA-07 sweep initializes all six. This five-face ocean mask stays unchanged pending successful six-panel bring-up."
+  },
+  "faces": [
+    {
+      "id": "px",
+      "screen": 1,
+      "cs_gpio": 8,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "right": [
+        0,
+        1,
+        0
+      ],
+      "down": [
+        0,
+        0,
+        -1
+      ],
+      "physical_face_uv": {
+        "left": 0.2,
+        "top": 0.2,
+        "right": 0.8,
+        "bottom": 0.8
+      },
+      "rotation": 0,
+      "inversion": true
+    },
+    {
+      "id": "nx",
+      "screen": 2,
+      "cs_gpio": 3,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "right": [
+        0,
+        -1,
+        0
+      ],
+      "down": [
+        0,
+        0,
+        -1
+      ],
+      "physical_face_uv": {
+        "left": 0.2,
+        "top": 0.2,
+        "right": 0.8,
+        "bottom": 0.8
+      },
+      "rotation": 0,
+      "inversion": true
+    },
+    {
+      "id": "py",
+      "screen": 3,
+      "cs_gpio": 4,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "right": [
+        -1,
+        0,
+        0
+      ],
+      "down": [
+        0,
+        0,
+        -1
+      ],
+      "physical_face_uv": {
+        "left": 0.2,
+        "top": 0.2,
+        "right": 0.8,
+        "bottom": 0.8
+      },
+      "rotation": 0,
+      "inversion": true
+    },
+    {
+      "id": "ny",
+      "screen": 4,
+      "cs_gpio": 5,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "right": [
+        1,
+        0,
+        0
+      ],
+      "down": [
+        0,
+        0,
+        -1
+      ],
+      "physical_face_uv": {
+        "left": 0.2,
+        "top": 0.2,
+        "right": 0.8,
+        "bottom": 0.8
+      },
+      "rotation": 0,
+      "inversion": true
+    },
+    {
+      "id": "pz",
+      "screen": 5,
+      "cs_gpio": 6,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "right": [
+        1,
+        0,
+        0
+      ],
+      "down": [
+        0,
+        -1,
+        0
+      ],
+      "physical_face_uv": {
+        "left": 0.2,
+        "top": 0.2,
+        "right": 0.8,
+        "bottom": 0.8
+      },
+      "rotation": 0,
+      "inversion": true
+    },
+    {
+      "id": "nz",
+      "screen": 6,
+      "cs_gpio": 7,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "right": [
+        -1,
+        0,
+        0
+      ],
+      "down": [
+        0,
+        -1,
+        0
+      ],
+      "physical_face_uv": {
+        "left": 0.2,
+        "top": 0.2,
+        "right": 0.8,
+        "bottom": 0.8
+      },
+      "rotation": 0,
+      "inversion": true
+    }
+  ],
+  "mount_orientation": {
+    "quaternion_wxyz": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "confirmed": false,
+    "note": "Identity is a deterministic test fixture only. Face dimensions are confirmed; global cube mount, per-face screen assignment, rotation/inversion and wiring remain uncalibrated.",
+    "test_fixtures": {
+      "cube_body_diagonal_upright_quaternion_wxyz": [
+        0.888073833977,
+        0.325057584,
+        -0.325057584,
+        0.0
+      ],
+      "description": "Maps local body diagonal (1,1,1) to world +Z; use only for non-identity math tests."
+    }
+  },
+  "inversion_note": "These IPS panels show complementary colours without INVON; set true on 14 September 2026 after the sea rendered orange."
+}

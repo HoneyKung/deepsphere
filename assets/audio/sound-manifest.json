@@ -1,0 +1,888 @@
+{
+ "schema": 2,
+ "generated": "2026-10-02",
+ "note": "ผลคัดของผู้ใช้รอบ 1-2 (ดู output/sound-picks-v1.md); cue ที่ files มีหลายไฟล์ = สุ่มสลับ (mode random) หรือซ้อนกัน (mode layer)",
+ "sfx": {
+  "ambient_surface": {
+   "files": [
+    "ambient_surface.wav"
+   ],
+   "bus": "bed",
+   "loop": true,
+   "mode": "random",
+   "status": "final",
+   "note": "ไฟล์เพื่อน peak 0 dBFS ลดไว้ 6 dB กันแตก"
+  },
+  "ambient_mid": {
+   "files": [
+    "ambient_mid.wav"
+   ],
+   "bus": "bed",
+   "loop": true,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "ambient_deep": {
+   "files": [
+    "ambient_deep.wav"
+   ],
+   "bus": "bed",
+   "loop": true,
+   "mode": "random",
+   "status": "final",
+   "note": "เนื้อใหม่ (โดรนอุ่น) แทนไฟล์เพื่อนที่เบาและคล้ายชั้นบน"
+  },
+  "whale_distant": {
+   "files": [
+    "whale_distant.wav"
+   ],
+   "bus": "bed",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "ไฟล์ยาว 63 วิ เบา ตัดช่วงร้องออกมาเล่นทีละครั้งเมื่อมีเวลา ตอนนี้เล่นทั้งไฟล์ได้"
+  },
+  "sub_roomtone": {
+   "files": [
+    "sub_roomtone.wav"
+   ],
+   "bus": "hull",
+   "loop": true,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "hull_creak": {
+   "files": [
+    "hull_creak_1.wav",
+    "hull_creak_2.wav",
+    "hull_creak_3.wav",
+    "hull_creak_4.wav",
+    "hull_creak_5.wav",
+    "hull_creak_6.wav",
+    "hull_creak_7.wav",
+    "hull_creak_8.wav",
+    "hull_creak_9.wav",
+    "hull_creak_10.wav",
+    "hull_creak_11.wav",
+    "hull_creak_12.wav",
+    "hull_creak_13.wav",
+    "hull_creak_14.wav",
+    "hull_creak_15.wav",
+    "hull_creak_16.wav",
+    "hull_creak_17.wav",
+    "hull_creak_18.wav",
+    "hull_creak_19.wav",
+    "hull_creak_20.wav",
+    "hull_creak_21.wav",
+    "hull_creak_22.wav",
+    "hull_creak_23.wav",
+    "hull_creak_24.wav",
+    "hull_creak_25.wav"
+   ],
+   "bus": "hull",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "ตัดช่วงเงียบแล้ว 25 จังหวะ สุ่มสลับ ห้ามซ้ำตัวเดิมติดกัน normalize peak -9 dBFS"
+  },
+  "sonar_idle": {
+   "files": [
+    "sonar_idle.wav"
+   ],
+   "bus": "hull",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เล่นเฉพาะช่วงสแกน (ดูใบ 12B) ไฟล์ยาว 20 วิ มีหลายปิง"
+  },
+  "scan_sweep": {
+   "files": [
+    "scan_sweep.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "dive_start": {
+   "files": [
+    "dive_start_1.wav",
+    "dive_start_2.wav",
+    "dive_start_3.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "สลับสุ่ม"
+  },
+  "descend_thrust": {
+   "files": [
+    "descend_thrust_1.wav",
+    "descend_thrust_2.wav"
+   ],
+   "bus": "hull",
+   "loop": true,
+   "mode": "random",
+   "status": "final",
+   "note": "ลูปเครื่องยนต์ ระดับเสียง/pitch ตามความเร็วเปลี่ยนความลึก"
+  },
+  "descend_bubbles": {
+   "files": [
+    "descend_bubbles.wav"
+   ],
+   "bus": "hull",
+   "loop": true,
+   "mode": "layer",
+   "status": "final",
+   "note": "ชั้นฟองซ้อนกับ descend_thrust"
+  },
+  "ascend_blow": {
+   "files": [
+    "ascend_blow_1.wav",
+    "ascend_blow_2.wav"
+   ],
+   "bus": "hull",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "turn_periscope": {
+   "files": [
+    "turn_periscope_1.wav",
+    "turn_periscope_2.wav",
+    "turn_periscope_3.wav",
+    "turn_periscope_4.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "คลิกหมุนทุก 5° สุ่มสลับ"
+  },
+  "zone_enter_mid": {
+   "files": [
+    "zone_enter_mid.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "ดิ่งลง (ระฆังต่ำ) ต่อด้วยความสวยงามตอนถึง รวมเป็นไฟล์เดียวแล้ว"
+  },
+  "zone_enter_deep": {
+   "files": [
+    "zone_enter_deep.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เหมือนกันแต่ลึกกว่า"
+  },
+  "zone_up": {
+   "files": [
+    "zone_up.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "deep_mystery": {
+   "files": [
+    "deep_mystery_1.wav",
+    "deep_mystery_2.wav",
+    "deep_mystery_3.wav"
+   ],
+   "bus": "bed",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "สุ่มทุก 45–90 วิ ในโซนลึก"
+  },
+  "max_depth_warning": {
+   "files": [
+    "max_depth_warning.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "surface_break": {
+   "files": [
+    "surface_break.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "scan_hit": {
+   "files": [
+    "scan_hit.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "scan_miss": {
+   "files": [
+    "scan_miss.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "action_error": {
+   "files": [
+    "action_error.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "collect_success": {
+   "files": [
+    "collect_success.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "collect_duplicate": {
+   "files": [
+    "collect_duplicate.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "analyze_open": {
+   "files": [
+    "analyze_open.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "analyze_close": {
+   "files": [
+    "analyze_close.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "dive_assist_on": {
+   "files": [
+    "dive_assist_on.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "dive_assist_off": {
+   "files": [
+    "dive_assist_off.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "first_discovery": {
+   "files": [
+    "first_discovery.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "pending_review",
+   "note": "ผู้ใช้เลือกแบบที่ 3 (ฟลูต D–E–A + ฮาร์ป) แต่บอกยาวไป จึงตัดให้สั้นลง ถ้าผู้ใช้เลือก short_b ให้สลับไฟล์ รอผู้ใช้ยืนยัน"
+  },
+  "mission_complete": {
+   "files": [
+    "mission_complete.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "ใช้ไฟล์เดียวกับ collect_success ตามที่เลือก (ใช้ชุดเดียวเมื่อเกิดติดกัน ดูใบ 12B)"
+  },
+  "board_link_on": {
+   "files": [
+    "board_link_on.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "board_link_off": {
+   "files": [
+    "board_link_off.wav"
+   ],
+   "bus": "tool",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": ""
+  },
+  "life_shoal_glimpse": {
+   "files": [
+    "life_shoal_glimpse.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เศษ 2 โน้ต ตอนสัตว์เข้ามาเป็นจุดสนใจ"
+  },
+  "life_shoal_known": {
+   "files": [
+    "life_shoal_known.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "วลีเต็ม ตอนสแกนพบ"
+  },
+  "life_shoal_memory": {
+   "files": [
+    "life_shoal_memory.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เบา ต่ำลงอ็อกเทฟ ตอนเก็บแล้วกลับมาเจอ/วิเคราะห์"
+  },
+  "life_reef_glimpse": {
+   "files": [
+    "life_reef_glimpse.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เศษ 2 โน้ต ตอนสัตว์เข้ามาเป็นจุดสนใจ"
+  },
+  "life_reef_known": {
+   "files": [
+    "life_reef_known.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "วลีเต็ม ตอนสแกนพบ"
+  },
+  "life_reef_memory": {
+   "files": [
+    "life_reef_memory.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เบา ต่ำลงอ็อกเทฟ ตอนเก็บแล้วกลับมาเจอ/วิเคราะห์"
+  },
+  "life_seahorse_glimpse": {
+   "files": [
+    "life_seahorse_glimpse.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เศษ 2 โน้ต ตอนสัตว์เข้ามาเป็นจุดสนใจ"
+  },
+  "life_seahorse_known": {
+   "files": [
+    "life_seahorse_known.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "วลีเต็ม ตอนสแกนพบ"
+  },
+  "life_seahorse_memory": {
+   "files": [
+    "life_seahorse_memory.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เบา ต่ำลงอ็อกเทฟ ตอนเก็บแล้วกลับมาเจอ/วิเคราะห์"
+  },
+  "life_manta_glimpse": {
+   "files": [
+    "life_manta_glimpse.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เศษ 2 โน้ต ตอนสัตว์เข้ามาเป็นจุดสนใจ"
+  },
+  "life_manta_known": {
+   "files": [
+    "life_manta_known.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "วลีเต็ม ตอนสแกนพบ"
+  },
+  "life_manta_memory": {
+   "files": [
+    "life_manta_memory.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เบา ต่ำลงอ็อกเทฟ ตอนเก็บแล้วกลับมาเจอ/วิเคราะห์"
+  },
+  "life_jelly_glimpse": {
+   "files": [
+    "life_jelly_glimpse.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เศษ 2 โน้ต ตอนสัตว์เข้ามาเป็นจุดสนใจ"
+  },
+  "life_jelly_known": {
+   "files": [
+    "life_jelly_known.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "วลีเต็ม ตอนสแกนพบ"
+  },
+  "life_jelly_memory": {
+   "files": [
+    "life_jelly_memory.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เบา ต่ำลงอ็อกเทฟ ตอนเก็บแล้วกลับมาเจอ/วิเคราะห์"
+  },
+  "life_lantern_glimpse": {
+   "files": [
+    "life_lantern_glimpse.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เศษ 2 โน้ต ตอนสัตว์เข้ามาเป็นจุดสนใจ"
+  },
+  "life_lantern_known": {
+   "files": [
+    "life_lantern_known.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "วลีเต็ม ตอนสแกนพบ"
+  },
+  "life_lantern_memory": {
+   "files": [
+    "life_lantern_memory.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เบา ต่ำลงอ็อกเทฟ ตอนเก็บแล้วกลับมาเจอ/วิเคราะห์"
+  },
+  "descend_bubble_pop": {
+   "files": [
+    "descend_bubble_pop_1.wav",
+    "descend_bubble_pop_2.wav",
+    "descend_bubble_pop_3.wav",
+    "descend_bubble_pop_4.wav"
+   ],
+   "bus": "hull",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "ฟองเดี่ยวสั้น ๆ สุ่มทุก 1.5–4 วิ ขณะดำลงเท่านั้น (แทนลูป descend_bubbles ที่ซ้ำน่ารำคาญ) ดู sound-rules.json"
+  },
+  "life_angler_glimpse": {
+   "files": [
+    "life_angler_glimpse.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เศษ 2 โน้ต ตอนสัตว์เข้ามาเป็นจุดสนใจ"
+  },
+  "life_angler_known": {
+   "files": [
+    "life_angler_known.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "วลีเต็ม ตอนสแกนพบครั้งแรก"
+  },
+  "life_angler_memory": {
+   "files": [
+    "life_angler_memory.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เบา ต่ำลง ตอนกลับมาเจอ/วิเคราะห์"
+  },
+  "life_squid_glimpse": {
+   "files": [
+    "life_squid_glimpse.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เศษ 2 โน้ต ตอนสัตว์เข้ามาเป็นจุดสนใจ"
+  },
+  "life_squid_known": {
+   "files": [
+    "life_squid_known.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "วลีเต็ม ตอนสแกนพบครั้งแรก"
+  },
+  "life_squid_memory": {
+   "files": [
+    "life_squid_memory.wav"
+   ],
+   "bus": "life",
+   "loop": false,
+   "mode": "random",
+   "status": "final",
+   "note": "เบา ต่ำลง ตอนกลับมาเจอ/วิเคราะห์"
+  }
+ },
+ "music": {
+  "invite": {
+   "files": {
+    "mix": "music/invite_mix.ogg",
+    "pad": "music/invite_pad.ogg",
+    "lead": "music/invite_lead.ogg",
+    "motion": "music/invite_motion.ogg",
+    "sparkle": "music/invite_sparkle.ogg"
+   },
+   "bus": "music",
+   "loop": true,
+   "status": "final",
+   "note": ""
+  },
+  "shallow": {
+   "files": {
+    "mix": "music/shallow_mix.ogg",
+    "pad": "music/shallow_pad.ogg",
+    "lead": "music/shallow_lead.ogg",
+    "motion": "music/shallow_motion.ogg",
+    "sparkle": "music/shallow_sparkle.ogg"
+   },
+   "bus": "music",
+   "loop": true,
+   "status": "final",
+   "note": ""
+  },
+  "mid": {
+   "files": {
+    "mix": "music/mid_mix.ogg",
+    "pad": "music/mid_pad.ogg",
+    "lead": "music/mid_lead.ogg",
+    "motion": "music/mid_motion.ogg",
+    "sparkle": "music/mid_sparkle.ogg"
+   },
+   "bus": "music",
+   "loop": true,
+   "status": "final",
+   "note": "ผู้ใช้บอกบท mid/deep เบาไปหน่อย ปรับ +3.5 dB แล้ว (รอฟังยืนยัน)"
+  },
+  "deep": {
+   "files": {
+    "mix": "music/deep_mix.ogg",
+    "pad": "music/deep_pad.ogg",
+    "lead": "music/deep_lead.ogg",
+    "motion": "music/deep_motion.ogg",
+    "sparkle": "music/deep_sparkle.ogg"
+   },
+   "bus": "music",
+   "loop": true,
+   "status": "final",
+   "note": "ผู้ใช้บอกบท mid/deep เบาไปหน่อย ปรับ +3.5 dB แล้ว (รอฟังยืนยัน)"
+  },
+  "discovery": {
+   "files": {
+    "mix": "music/discovery_mix.ogg",
+    "pad": "music/discovery_pad.ogg",
+    "lead": "music/discovery_lead.ogg",
+    "motion": "music/discovery_motion.ogg",
+    "sparkle": "music/discovery_sparkle.ogg"
+   },
+   "bus": "music",
+   "loop": false,
+   "status": "final",
+   "note": ""
+  },
+  "home": {
+   "files": {
+    "mix": "music/home_mix.ogg",
+    "pad": "music/home_pad.ogg",
+    "lead": "music/home_lead.ogg",
+    "motion": "music/home_motion.ogg",
+    "sparkle": "music/home_sparkle.ogg"
+   },
+   "bus": "music",
+   "loop": false,
+   "status": "final",
+   "note": ""
+  }
+ },
+ "voice": {
+  "vo_welcome": {
+   "en": "voice/vo_welcome_en.wav"
+  },
+  "vo_zone_mid": {
+   "en": "voice/vo_zone_mid_en.wav"
+  },
+  "vo_zone_deep": {
+   "en": "voice/vo_zone_deep_en.wav"
+  },
+  "vo_scan_hit": {
+   "en": "voice/vo_scan_hit_en.wav"
+  },
+  "vo_scan_miss": {
+   "en": "voice/vo_scan_miss_en.wav"
+  },
+  "vo_on_frame": {
+   "en": "voice/vo_on_frame_en.wav"
+  },
+  "vo_collect": {
+   "en": "voice/vo_collect_en.wav"
+  },
+  "vo_duplicate": {
+   "en": "voice/vo_duplicate_en.wav"
+  },
+  "vo_nothing": {
+   "en": "voice/vo_nothing_en.wav"
+  },
+  "vo_tray_empty": {
+   "en": "voice/vo_tray_empty_en.wav"
+  },
+  "vo_analyze": {
+   "en": "voice/vo_analyze_en.wav"
+  },
+  "vo_max_depth": {
+   "en": "voice/vo_max_depth_en.wav"
+  },
+  "vo_surface": {
+   "en": "voice/vo_surface_en.wav"
+  },
+  "vo_complete": {
+   "en": "voice/vo_complete_en.wav"
+  }
+ },
+ "bridges": {
+  "down_mid": "music/bridge_down_mid.wav",
+  "down_deep": "music/bridge_down_deep.wav",
+  "up_mid": "music/bridge_up_mid.wav",
+  "up_shallow": "music/bridge_up_shallow.wav",
+  "discovery_in": "music/bridge_discovery_in.wav",
+  "discovery_out": "music/bridge_discovery_out.wav",
+  "to_invite": "music/bridge_to_invite.wav"
+ },
+ "voice_note": "เสียงพากย์: ผู้หญิงอังกฤษหวาน เบาลม (en-US-MichelleNeural ผ่าน edge-tts, ผู้ใช้เลือกรอบ 4) ปรับ pitch/ความช้า/ลมหายใจ ไม่มีไฟล์ไทย (เว็บสลับเป็นอังกฤษเอง) vo_analyze ไม่พูดชื่อสัตว์",
+ "voice_names": {
+  "shoal": "voice/vo_name_shoal_en.wav",
+  "reef": "voice/vo_name_reef_en.wav",
+  "seahorse": "voice/vo_name_seahorse_en.wav",
+  "manta": "voice/vo_name_manta_en.wav",
+  "lantern": "voice/vo_name_lantern_en.wav",
+  "jelly": "voice/vo_name_jelly_en.wav",
+  "angler": "voice/vo_name_angler_en.wav",
+  "squid": "voice/vo_name_squid_en.wav"
+ },
+ "voice_names_note": "ชื่อสัตว์ 6 ตัว (อังกฤษ) ให้ vo_analyze เล่น 'Analysis complete.' แล้วต่อด้วยชื่อสัตว์ในถาดทีละตัว เว้น ~0.15 วิ",
+ "web": {
+  "dir": "web/",
+  "files": {
+   "ambient_surface.wav": "ambient_surface.mp3",
+   "ambient_mid.wav": "ambient_mid.mp3",
+   "ambient_deep.wav": "ambient_deep.mp3",
+   "whale_distant.wav": "whale_distant.mp3",
+   "sub_roomtone.wav": "sub_roomtone.mp3",
+   "hull_creak_1.wav": "hull_creak_1.mp3",
+   "hull_creak_2.wav": "hull_creak_2.mp3",
+   "hull_creak_5.wav": "hull_creak_5.mp3",
+   "hull_creak_7.wav": "hull_creak_7.mp3",
+   "hull_creak_8.wav": "hull_creak_8.mp3",
+   "hull_creak_9.wav": "hull_creak_9.mp3",
+   "hull_creak_11.wav": "hull_creak_11.mp3",
+   "hull_creak_12.wav": "hull_creak_12.mp3",
+   "hull_creak_13.wav": "hull_creak_13.mp3",
+   "hull_creak_14.wav": "hull_creak_14.mp3",
+   "hull_creak_15.wav": "hull_creak_15.mp3",
+   "hull_creak_16.wav": "hull_creak_16.mp3",
+   "hull_creak_17.wav": "hull_creak_17.mp3",
+   "hull_creak_18.wav": "hull_creak_18.mp3",
+   "hull_creak_19.wav": "hull_creak_19.mp3",
+   "hull_creak_20.wav": "hull_creak_20.mp3",
+   "hull_creak_21.wav": "hull_creak_21.mp3",
+   "hull_creak_22.wav": "hull_creak_22.mp3",
+   "hull_creak_23.wav": "hull_creak_23.mp3",
+   "hull_creak_24.wav": "hull_creak_24.mp3",
+   "hull_creak_25.wav": "hull_creak_25.mp3",
+   "sonar_idle.wav": "sonar_idle.mp3",
+   "scan_sweep.wav": "scan_sweep.mp3",
+   "dive_start_1.wav": "dive_start_1.mp3",
+   "dive_start_2.wav": "dive_start_2.mp3",
+   "dive_start_3.wav": "dive_start_3.mp3",
+   "descend_thrust_1.wav": "descend_thrust_1.mp3",
+   "descend_thrust_2.wav": "descend_thrust_2.mp3",
+   "descend_bubbles.wav": "descend_bubbles.mp3",
+   "ascend_blow_2.wav": "ascend_blow_2.mp3",
+   "zone_enter_mid.wav": "zone_enter_mid.mp3",
+   "zone_enter_deep.wav": "zone_enter_deep.mp3",
+   "zone_up.wav": "zone_up.mp3",
+   "deep_mystery_1.wav": "deep_mystery_1.mp3",
+   "deep_mystery_2.wav": "deep_mystery_2.mp3",
+   "deep_mystery_3.wav": "deep_mystery_3.mp3",
+   "max_depth_warning.wav": "max_depth_warning.mp3",
+   "surface_break.wav": "surface_break.mp3",
+   "scan_hit.wav": "scan_hit.mp3",
+   "analyze_close.wav": "analyze_close.mp3",
+   "first_discovery.wav": "first_discovery.mp3",
+   "board_link_on.wav": "board_link_on.mp3",
+   "life_shoal_glimpse.wav": "life_shoal_glimpse.mp3",
+   "life_shoal_known.wav": "life_shoal_known.mp3",
+   "life_shoal_memory.wav": "life_shoal_memory.mp3",
+   "life_reef_glimpse.wav": "life_reef_glimpse.mp3",
+   "life_reef_known.wav": "life_reef_known.mp3",
+   "life_reef_memory.wav": "life_reef_memory.mp3",
+   "life_seahorse_glimpse.wav": "life_seahorse_glimpse.mp3",
+   "life_seahorse_known.wav": "life_seahorse_known.mp3",
+   "life_seahorse_memory.wav": "life_seahorse_memory.mp3",
+   "life_manta_glimpse.wav": "life_manta_glimpse.mp3",
+   "life_manta_known.wav": "life_manta_known.mp3",
+   "life_manta_memory.wav": "life_manta_memory.mp3",
+   "life_jelly_glimpse.wav": "life_jelly_glimpse.mp3",
+   "life_jelly_known.wav": "life_jelly_known.mp3",
+   "life_jelly_memory.wav": "life_jelly_memory.mp3",
+   "life_lantern_glimpse.wav": "life_lantern_glimpse.mp3",
+   "life_lantern_known.wav": "life_lantern_known.mp3",
+   "life_lantern_memory.wav": "life_lantern_memory.mp3",
+   "life_angler_glimpse.wav": "life_angler_glimpse.mp3",
+   "life_angler_known.wav": "life_angler_known.mp3",
+   "life_angler_memory.wav": "life_angler_memory.mp3",
+   "life_squid_glimpse.wav": "life_squid_glimpse.mp3",
+   "life_squid_known.wav": "life_squid_known.mp3",
+   "life_squid_memory.wav": "life_squid_memory.mp3",
+   "music/invite_pad.ogg": "music/invite_pad.mp3",
+   "music/invite_lead.ogg": "music/invite_lead.mp3",
+   "music/invite_motion.ogg": "music/invite_motion.mp3",
+   "music/invite_sparkle.ogg": "music/invite_sparkle.mp3",
+   "music/shallow_pad.ogg": "music/shallow_pad.mp3",
+   "music/shallow_lead.ogg": "music/shallow_lead.mp3",
+   "music/shallow_motion.ogg": "music/shallow_motion.mp3",
+   "music/shallow_sparkle.ogg": "music/shallow_sparkle.mp3",
+   "music/mid_pad.ogg": "music/mid_pad.mp3",
+   "music/mid_lead.ogg": "music/mid_lead.mp3",
+   "music/mid_motion.ogg": "music/mid_motion.mp3",
+   "music/mid_sparkle.ogg": "music/mid_sparkle.mp3",
+   "music/deep_pad.ogg": "music/deep_pad.mp3",
+   "music/deep_lead.ogg": "music/deep_lead.mp3",
+   "music/deep_motion.ogg": "music/deep_motion.mp3",
+   "music/deep_sparkle.ogg": "music/deep_sparkle.mp3",
+   "music/discovery_pad.ogg": "music/discovery_pad.mp3",
+   "music/discovery_lead.ogg": "music/discovery_lead.mp3",
+   "music/discovery_motion.ogg": "music/discovery_motion.mp3",
+   "music/discovery_sparkle.ogg": "music/discovery_sparkle.mp3",
+   "music/home_pad.ogg": "music/home_pad.mp3",
+   "music/home_lead.ogg": "music/home_lead.mp3",
+   "music/home_motion.ogg": "music/home_motion.mp3",
+   "music/home_sparkle.ogg": "music/home_sparkle.mp3",
+   "music/bridge_down_mid.wav": "music/bridge_down_mid.mp3",
+   "music/bridge_down_deep.wav": "music/bridge_down_deep.mp3",
+   "music/bridge_up_mid.wav": "music/bridge_up_mid.mp3",
+   "music/bridge_up_shallow.wav": "music/bridge_up_shallow.mp3",
+   "music/bridge_discovery_in.wav": "music/bridge_discovery_in.mp3",
+   "music/bridge_discovery_out.wav": "music/bridge_discovery_out.mp3",
+   "music/bridge_to_invite.wav": "music/bridge_to_invite.mp3",
+   "voice/vo_welcome_en.wav": "voice/vo_welcome_en.mp3",
+   "voice/vo_zone_mid_en.wav": "voice/vo_zone_mid_en.mp3",
+   "voice/vo_zone_deep_en.wav": "voice/vo_zone_deep_en.mp3",
+   "voice/vo_scan_hit_en.wav": "voice/vo_scan_hit_en.mp3",
+   "voice/vo_scan_miss_en.wav": "voice/vo_scan_miss_en.mp3",
+   "voice/vo_on_frame_en.wav": "voice/vo_on_frame_en.mp3",
+   "voice/vo_collect_en.wav": "voice/vo_collect_en.mp3",
+   "voice/vo_duplicate_en.wav": "voice/vo_duplicate_en.mp3",
+   "voice/vo_nothing_en.wav": "voice/vo_nothing_en.mp3",
+   "voice/vo_tray_empty_en.wav": "voice/vo_tray_empty_en.mp3",
+   "voice/vo_analyze_en.wav": "voice/vo_analyze_en.mp3",
+   "voice/vo_max_depth_en.wav": "voice/vo_max_depth_en.mp3",
+   "voice/vo_surface_en.wav": "voice/vo_surface_en.mp3",
+   "voice/vo_complete_en.wav": "voice/vo_complete_en.mp3",
+   "voice/vo_name_shoal_en.wav": "voice/vo_name_shoal_en.mp3",
+   "voice/vo_name_reef_en.wav": "voice/vo_name_reef_en.mp3",
+   "voice/vo_name_seahorse_en.wav": "voice/vo_name_seahorse_en.mp3",
+   "voice/vo_name_manta_en.wav": "voice/vo_name_manta_en.mp3",
+   "voice/vo_name_lantern_en.wav": "voice/vo_name_lantern_en.mp3",
+   "voice/vo_name_jelly_en.wav": "voice/vo_name_jelly_en.mp3",
+   "voice/vo_name_angler_en.wav": "voice/vo_name_angler_en.mp3",
+   "voice/vo_name_squid_en.wav": "voice/vo_name_squid_en.mp3"
+  },
+  "note": "Compressed copies of the same recordings for the hosted page; made by tools/make_web_audio.py"
+ }
+}

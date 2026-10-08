@@ -1,0 +1,209 @@
+{
+  "schema_version": 2,
+  "renderer": "procedural-live-ocean",
+  "seed": 184467,
+  "tick_ms": 250,
+  "frame_rgb": [
+    0,
+    0,
+    0
+  ],
+  "background_keyframes": [
+    {
+      "depth": 0.0,
+      "top": [
+        40,
+        170,
+        200
+      ],
+      "bottom": [
+        18,
+        96,
+        150
+      ]
+    },
+    {
+      "depth": 0.45,
+      "top": [
+        14,
+        110,
+        170
+      ],
+      "bottom": [
+        8,
+        56,
+        118
+      ]
+    },
+    {
+      "depth": 1.0,
+      "top": [
+        8,
+        62,
+        128
+      ],
+      "bottom": [
+        4,
+        28,
+        80
+      ]
+    }
+  ],
+  "sprite_mask_note": "8x8 masks, row 0 on top, column 7 is the side the animal travels towards. The fish has a forked tail and an eye hole; jellyfish and seahorse are the LUNA-06 masks turned so the bell or head leads.",
+  "sprite_masks_8x8": {
+    "fish": [
+      0,
+      28,
+      190,
+      251,
+      255,
+      190,
+      28,
+      0
+    ],
+    "manta": [
+      0,
+      60,
+      231,
+      255,
+      255,
+      231,
+      60,
+      0
+    ],
+    "jellyfish": [
+      12,
+      30,
+      223,
+      63,
+      63,
+      223,
+      30,
+      12
+    ],
+    "seahorse": [
+      0,
+      0,
+      106,
+      191,
+      191,
+      106,
+      0,
+      0
+    ]
+  },
+  "route_note": "Every subject travels a closed path on the real cube surface through the ny panel centre, where the board's fixed reticle rests. Five follow the four enabled side faces; the seahorse follows the ny/pz/py/nz loop, so it is hidden while crossing the absent nz.",
+  "subjects": [
+    {
+      "target_id": "luna04_surface_fish_seam",
+      "label": "striped reef fish",
+      "band": "surface",
+      "kind": "fish",
+      "rgb": [
+        245,
+        178,
+        66
+      ],
+      "w": 0.15,
+      "h": 0.1,
+      "face_id": "py",
+      "u": 0.37,
+      "v": 0.5,
+      "heading": "+u",
+      "speed": 0.021
+    },
+    {
+      "target_id": "luna04_orange_reef_fish",
+      "label": "orange reef fish",
+      "band": "surface",
+      "kind": "fish",
+      "rgb": [
+        236,
+        106,
+        68
+      ],
+      "w": 0.13,
+      "h": 0.09,
+      "face_id": "py",
+      "u": 0.5,
+      "v": 0.33,
+      "heading": "+v",
+      "speed": 0.027,
+      "note": "Vertical diver on the py/nz/ny/pz great circle, so it passes under the fixed aim on ny."
+    },
+    {
+      "target_id": "luna04_manta_ray",
+      "label": "manta ray silhouette",
+      "band": "middle",
+      "kind": "manta",
+      "rgb": [
+        190,
+        218,
+        255
+      ],
+      "w": 0.18,
+      "h": 0.24,
+      "face_id": "pz",
+      "u": 0.5,
+      "v": 0.62,
+      "heading": "+v",
+      "speed": 0.017,
+      "note": "Glides off the top face down towards ny, so it crosses the fixed aim on ny."
+    },
+    {
+      "target_id": "luna04_jellyfish",
+      "label": "jellyfish",
+      "band": "middle",
+      "kind": "jellyfish",
+      "rgb": [
+        238,
+        156,
+        242
+      ],
+      "w": 0.22,
+      "h": 0.16,
+      "face_id": "ny",
+      "u": 0.42,
+      "v": 0.5,
+      "heading": "-u",
+      "speed": 0.011
+    },
+    {
+      "target_id": "luna04_lantern_fish",
+      "label": "lantern fish",
+      "band": "deep",
+      "kind": "fish",
+      "rgb": [
+        255,
+        198,
+        90
+      ],
+      "w": 0.16,
+      "h": 0.11,
+      "face_id": "ny",
+      "u": 0.66,
+      "v": 0.47,
+      "heading": "+u",
+      "speed": 0.024
+    },
+    {
+      "target_id": "luna04_seahorse_shape",
+      "label": "seahorse-like silhouette",
+      "band": "deep",
+      "kind": "seahorse",
+      "rgb": [
+        184,
+        238,
+        180
+      ],
+      "w": 0.22,
+      "h": 0.1,
+      "face_id": "ny",
+      "u": 0.5,
+      "v": 0.71,
+      "heading": "-v",
+      "speed": 0.013
+    }
+  ],
+  "background_note": "Brightened on 11 September 2026 after the first flash read as black on the real panels; the deep end stays clearly blue."
+}

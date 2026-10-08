@@ -1,0 +1,93 @@
+Processing diag (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/waveshare_esp32_s3_zero.html
+PLATFORM: Espressif 32 (6.7.0) > Waveshare ESP32-S3-Zero 4MB Flash 2MB PSRAM
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (esp-builtin) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20016.0 (2.0.16) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 37 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Adafruit GFX Library @ 1.11.11
+|-- Adafruit ST7735 and ST7789 Library @ 1.10.4
+|-- SPI @ 2.0.0
+|-- Wire @ 2.0.0
+Building in release mode
+Compiling .pio\build\diag\src\diag\panel_check.cpp.o
+Building .pio\build\diag\bootloader.bin
+Generating partitions .pio\build\diag\partitions.bin
+Compiling .pio\build\diag\lib73f\Wire\Wire.cpp.o
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 1 ELF section
+Successfully created esp32s3 image.
+Compiling .pio\build\diag\lib43a\SPI\SPI.cpp.o
+Compiling .pio\build\diag\lib4e2\Adafruit BusIO\Adafruit_BusIO_Register.cpp.o
+Compiling .pio\build\diag\lib4e2\Adafruit BusIO\Adafruit_GenericDevice.cpp.o
+Compiling .pio\build\diag\lib4e2\Adafruit BusIO\Adafruit_I2CDevice.cpp.o
+Compiling .pio\build\diag\lib4e2\Adafruit BusIO\Adafruit_SPIDevice.cpp.o
+Compiling .pio\build\diag\lib7d9\Adafruit GFX Library\Adafruit_GFX.cpp.o
+Compiling .pio\build\diag\lib7d9\Adafruit GFX Library\Adafruit_GrayOLED.cpp.o
+Compiling .pio\build\diag\lib7d9\Adafruit GFX Library\Adafruit_SPITFT.cpp.o
+Compiling .pio\build\diag\lib7d9\Adafruit GFX Library\glcdfont.c.o
+Compiling .pio\build\diag\libab1\Adafruit ST7735 and ST7789 Library\Adafruit_ST7735.cpp.o
+Compiling .pio\build\diag\libab1\Adafruit ST7735 and ST7789 Library\Adafruit_ST7789.cpp.o
+Compiling .pio\build\diag\libab1\Adafruit ST7735 and ST7789 Library\Adafruit_ST77xx.cpp.o
+Archiving .pio\build\diag\lib73f\libWire.a
+Archiving .pio\build\diag\lib43a\libSPI.a
+Compiling .pio\build\diag\FrameworkArduino\Esp.cpp.o
+Archiving .pio\build\diag\lib4e2\libAdafruit BusIO.a
+Compiling .pio\build\diag\FrameworkArduino\FirmwareMSC.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\HardwareSerial.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\IPAddress.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\IPv6Address.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\MD5Builder.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\Print.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\Stream.cpp.o
+Archiving .pio\build\diag\lib7d9\libAdafruit GFX Library.a
+Compiling .pio\build\diag\FrameworkArduino\StreamString.cpp.o
+Archiving .pio\build\diag\libab1\libAdafruit ST7735 and ST7789 Library.a
+Compiling .pio\build\diag\FrameworkArduino\Tone.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\USB.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\USBCDC.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\USBMSC.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\WMath.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\WString.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\base64.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\cbuf.cpp.o
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-adc.c.o
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-bt.c.o
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-cpu.c.o
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-dac.c.o
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-gpio.c.o
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-i2c-slave.c.o
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-i2c.c.o
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-ledc.c.o
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-matrix.c.o
+xtensa-esp32s3-elf-gcc: error: C:\Users\Acer\Downloads\oceanX\prototype-v1\.pio\build\diag\tmp1n77hszj.tmp: No such file or directory
+xtensa-esp32s3-elf-gcc: fatal error: no input files
+compilation terminated.
+xtensa-esp32s3-elf-gcc: error: C:\Users\Acer\Downloads\oceanX\prototype-v1\.pio\build\diag\tmplkd5elcx.tmp: No such file or directory
+xtensa-esp32s3-elf-gcc: fatal error: no input files
+compilation terminated.
+Compiling .pio\build\diag\FrameworkArduino\esp32-hal-misc.c.o
+*** [.pio\build\diag\FrameworkArduino\esp32-hal-gpio.c.o] Error 1
+*** [.pio\build\diag\FrameworkArduino\esp32-hal-i2c-slave.c.o] Error 1
+========================= [FAILED] Took 28.08 seconds =========================
+
+Environment    Status    Duration
+-------------  --------  ------------
+diag           FAILED    00:00:28.077
+==================== 1 failed, 0 succeeded in 00:00:28.077 ====================

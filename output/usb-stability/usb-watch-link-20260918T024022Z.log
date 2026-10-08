@@ -1,0 +1,363 @@
+2026-09-18T02:40:25.751+00:00	[   698][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.760+00:00	[   708][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.771+00:00	[   718][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.780+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:25.783+00:00	[   728][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.791+00:00	[   738][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.801+00:00	[   748][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.811+00:00	[   758][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.821+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:25.823+00:00	[   768][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.832+00:00	[   778][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.841+00:00	[   788][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.851+00:00	[   798][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.860+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:25.861+00:00	[   808][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.870+00:00	[   818][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.881+00:00	[   828][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.890+00:00	[   838][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.899+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:25.900+00:00	[   848][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.910+00:00	[   858][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.920+00:00	[   868][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.930+00:00	[   878][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.939+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:25.941+00:00	[   888][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.951+00:00	[   898][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.960+00:00	[   908][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.970+00:00	[   918][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.979+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:25.980+00:00	[   928][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:25.990+00:00	[   938][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.000+00:00	[   948][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.010+00:00	[   958][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.019+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.020+00:00	[   968][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.030+00:00	[   978][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.040+00:00	[   988][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.050+00:00	[   998][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.059+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.060+00:00	[  1008][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.070+00:00	[  1018][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.081+00:00	[  1028][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.090+00:00	[  1038][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.099+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.100+00:00	[  1048][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.110+00:00	[  1058][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.120+00:00	[  1068][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.131+00:00	[  1078][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.139+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.140+00:00	[  1088][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.151+00:00	[  1098][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.160+00:00	[  1108][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.171+00:00	[  1118][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.179+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.181+00:00	[  1128][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.190+00:00	[  1138][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.201+00:00	[  1148][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.210+00:00	[  1158][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.219+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.221+00:00	[  1168][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.230+00:00	[  1178][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.240+00:00	[  1188][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.250+00:00	[  1198][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.258+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.260+00:00	[  1208][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.271+00:00	[  1218][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.280+00:00	[  1228][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.291+00:00	[  1238][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.300+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.301+00:00	[  1248][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.311+00:00	[  1258][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.321+00:00	[  1268][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.331+00:00	[  1278][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.341+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.343+00:00	[  1288][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.350+00:00	[  1298][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.361+00:00	[  1308][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.371+00:00	[  1318][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.379+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.381+00:00	[  1328][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.390+00:00	[  1338][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.400+00:00	[  1348][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.411+00:00	[  1358][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.420+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.422+00:00	[  1368][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.430+00:00	[  1378][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.440+00:00	[  1388][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.450+00:00	[  1398][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.459+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.460+00:00	[  1408][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.471+00:00	[  1418][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.481+00:00	[  1428][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.490+00:00	[  1438][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.499+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.501+00:00	[  1448][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.510+00:00	[  1458][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.520+00:00	[  1468][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.530+00:00	[  1478][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.539+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.540+00:00	[  1488][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.550+00:00	[  1498][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.560+00:00	[  1508][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.570+00:00	[  1518][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.578+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.580+00:00	[  1528][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.590+00:00	[  1538][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.600+00:00	[  1548][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.610+00:00	[  1558][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.619+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.620+00:00	[  1568][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.630+00:00	[  1578][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.640+00:00	[  1588][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.650+00:00	[  1598][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.659+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.660+00:00	[  1608][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.670+00:00	[  1618][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.680+00:00	[  1628][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.690+00:00	[  1638][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.699+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.700+00:00	[  1648][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.710+00:00	[  1658][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.720+00:00	[  1668][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.730+00:00	[  1678][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.738+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.740+00:00	[  1688][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.750+00:00	[  1698][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.760+00:00	[  1708][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.771+00:00	[  1718][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.778+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.780+00:00	[  1728][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.790+00:00	[  1738][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.800+00:00	[  1748][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.810+00:00	[  1758][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.818+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.820+00:00	[  1768][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.830+00:00	[  1778][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.840+00:00	[  1788][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.850+00:00	[  1798][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.859+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.860+00:00	[  1808][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.870+00:00	[  1818][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.880+00:00	[  1828][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.890+00:00	[  1838][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.899+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.900+00:00	[  1848][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.910+00:00	[  1858][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.920+00:00	[  1868][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.930+00:00	[  1878][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.938+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.940+00:00	[  1888][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.950+00:00	[  1898][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.960+00:00	[  1908][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.970+00:00	[  1918][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.979+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:26.980+00:00	[  1928][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:26.990+00:00	[  1938][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.000+00:00	[  1948][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.010+00:00	[  1958][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.019+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.020+00:00	[  1968][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.030+00:00	[  1978][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.040+00:00	[  1988][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.050+00:00	[  1998][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.059+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.061+00:00	[  2008][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.071+00:00	[  2018][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.081+00:00	[  2028][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.090+00:00	[  2038][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.099+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.100+00:00	[  2048][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.110+00:00	[  2058][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.120+00:00	[  2068][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.130+00:00	[  2078][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.139+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.141+00:00	[  2088][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.151+00:00	[  2098][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.160+00:00	[  2108][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.171+00:00	[  2118][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.180+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.181+00:00	[  2128][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.191+00:00	[  2138][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.200+00:00	[  2148][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.210+00:00	[  2158][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.218+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.220+00:00	[  2168][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.230+00:00	[  2178][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.241+00:00	[  2188][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.250+00:00	[  2198][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.259+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.261+00:00	[  2208][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.271+00:00	[  2218][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.281+00:00	[  2228][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.290+00:00	[  2238][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.298+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.300+00:00	[  2248][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.310+00:00	[  2258][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.320+00:00	[  2268][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.331+00:00	[  2278][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.339+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.340+00:00	[  2288][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.350+00:00	[  2298][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.360+00:00	[  2308][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.371+00:00	[  2318][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.379+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.380+00:00	[  2328][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.390+00:00	[  2338][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.400+00:00	[  2348][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.410+00:00	[  2358][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.420+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.422+00:00	[  2368][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.430+00:00	[  2378][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.441+00:00	[  2388][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.450+00:00	[  2398][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.459+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.461+00:00	[  2408][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.470+00:00	[  2418][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.480+00:00	[  2428][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.490+00:00	[  2438][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.499+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.500+00:00	[  2448][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.511+00:00	[  2458][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.521+00:00	[  2468][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.530+00:00	[  2478][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.539+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.540+00:00	[  2488][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.550+00:00	[  2498][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.560+00:00	[  2508][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.570+00:00	[  2518][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.579+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.580+00:00	[  2528][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.590+00:00	[  2538][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.600+00:00	[  2548][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.610+00:00	[  2558][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.619+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.620+00:00	[  2568][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.630+00:00	[  2578][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.640+00:00	[  2588][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.650+00:00	[  2598][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.659+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.660+00:00	[  2608][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.670+00:00	[  2618][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.681+00:00	[  2628][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.690+00:00	[  2638][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.698+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.700+00:00	[  2648][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.710+00:00	[  2658][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.720+00:00	[  2668][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.730+00:00	[  2678][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.739+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.740+00:00	[  2688][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.750+00:00	[  2698][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.760+00:00	[  2708][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.770+00:00	[  2718][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.779+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.780+00:00	[  2728][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.790+00:00	[  2738][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.800+00:00	[  2748][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.811+00:00	[  2758][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.819+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.820+00:00	[  2768][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.831+00:00	[  2778][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.840+00:00	[  2788][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.851+00:00	[  2798][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.860+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.862+00:00	[  2808][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.871+00:00	[  2818][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.880+00:00	[  2828][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.890+00:00	[  2838][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.899+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.901+00:00	[  2848][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.910+00:00	[  2858][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.920+00:00	[  2868][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.930+00:00	[  2878][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.939+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.940+00:00	[  2888][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.950+00:00	[  2898][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.960+00:00	[  2908][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.970+00:00	[  2918][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.979+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:27.980+00:00	[  2928][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:27.990+00:00	[  2938][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.000+00:00	[  2948][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.010+00:00	[  2958][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.019+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.020+00:00	[  2968][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.030+00:00	[  2978][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.040+00:00	[  2988][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.050+00:00	[  2998][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.059+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.060+00:00	[  3008][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.070+00:00	[  3018][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.080+00:00	[  3028][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.090+00:00	[  3038][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.099+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.100+00:00	[  3048][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.111+00:00	[  3058][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.120+00:00	[  3068][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.130+00:00	[  3078][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.139+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.140+00:00	[  3088][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.151+00:00	[  3098][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.160+00:00	[  3108][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.171+00:00	[  3118][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.179+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.181+00:00	[  3128][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.190+00:00	[  3138][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.201+00:00	[  3148][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.210+00:00	[  3158][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.220+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.222+00:00	[  3168][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.231+00:00	[  3178][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.240+00:00	[  3188][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.250+00:00	[  3198][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.259+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.261+00:00	[  3208][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.271+00:00	[  3218][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.281+00:00	[  3228][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.291+00:00	[  3238][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.300+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.302+00:00	[  3248][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.310+00:00	[  3258][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.321+00:00	[  3268][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.331+00:00	[  3278][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.340+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.342+00:00	[  3288][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.351+00:00	[  3298][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.361+00:00	[  3308][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.371+00:00	[  3318][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.378+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.380+00:00	[  3328][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.390+00:00	[  3338][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.401+00:00	[  3348][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.410+00:00	[  3358][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.420+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.421+00:00	[  3368][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.431+00:00	[  3378][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.440+00:00	[  3388][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.450+00:00	[  3398][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.459+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.460+00:00	[  3408][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.470+00:00	[  3418][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.480+00:00	[  3428][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.491+00:00	[  3438][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.499+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.500+00:00	[  3448][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.510+00:00	[  3458][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.520+00:00	[  3468][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.530+00:00	[  3478][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.539+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.540+00:00	[  3488][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.550+00:00	[  3498][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.561+00:00	[  3508][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.570+00:00	[  3518][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.580+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.581+00:00	[  3528][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.590+00:00	[  3538][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.601+00:00	[  3548][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.611+00:00	[  3558][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.619+00:00	{"v":1,"type":"yaw","deg":0.0,"raw":0,"ok":false,"magnet":"missing"}
+2026-09-18T02:40:28.621+00:00	[  3568][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.631+00:00	[  3578][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.641+00:00	[  3588][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:40:28.650+00:00	[  3598][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1

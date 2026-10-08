@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "source_art": "assets/source/sea_atlas_luna04_master.png",
+  "source_role": "original raster master generated for LUNA-04",
+  "output_size": [1024, 512],
+  "conversion": "resize source art to output_size with Lanczos, then quantize RGB888 to RGB565 once",
+  "horizontal_shift_px": 900,
+  "horizontal_wrap": true,
+  "vertical_wrap": false,
+  "subjects": [
+    {"target_id": "luna04_surface_fish_seam", "label": "striped reef fish at horizontal seam", "band": "surface", "center_px": [158, 88], "size_px": [112, 86]},
+    {"target_id": "luna04_orange_reef_fish", "label": "orange reef fish", "band": "surface", "center_px": [874, 92], "size_px": [102, 64]},
+    {"target_id": "luna04_manta_ray", "label": "manta ray silhouette", "band": "middle", "center_px": [466, 202], "size_px": [300, 154]},
+    {"target_id": "luna04_jellyfish", "label": "jellyfish", "band": "middle", "center_px": [713, 212], "size_px": [174, 154]},
+    {"target_id": "luna04_lantern_fish", "label": "lantern fish", "band": "deep", "center_px": [312, 424], "size_px": [176, 112]},
+    {"target_id": "luna04_seahorse_shape", "label": "seahorse-like silhouette", "band": "deep", "center_px": [814, 420], "size_px": [92, 124]}
+  ]
+}

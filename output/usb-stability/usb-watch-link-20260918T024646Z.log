@@ -1,0 +1,46 @@
+2026-09-18T02:46:47.356+00:00	selftest SDA1 gpio1 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.357+00:00	selftest SCL2 gpio2 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.357+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.358+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.358+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.359+00:00	selftest RST gpio10 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.360+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.360+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.361+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.361+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.362+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.362+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.363+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:46:47.363+00:00	as5600: scanning I2C on SDA=GPIO1 SCL=GPIO2 ...
+2026-09-18T02:46:47.367+00:00	as5600: device answers at 0x36
+2026-09-18T02:46:47.587+00:00	panel_check: shared reset pulsed
+2026-09-18T02:46:47.587+00:00	panel_check: bringing up px on CS 8 ...
+2026-09-18T02:46:47.917+00:00	panel_check: px painted, free heap 368816
+2026-09-18T02:46:48.418+00:00	panel_check: bringing up nx on CS 13 ...
+2026-09-18T02:46:48.748+00:00	panel_check: nx painted, free heap 368720
+2026-09-18T02:46:49.248+00:00	panel_check: bringing up py on CS 4 ...
+2026-09-18T02:46:49.578+00:00	panel_check: py painted, free heap 368624
+2026-09-18T02:46:50.080+00:00	panel_check: bringing up ny on CS 5 ...
+2026-09-18T02:46:50.410+00:00	panel_check: ny painted, free heap 368528
+2026-09-18T02:46:50.911+00:00	panel_check: bringing up pz on CS 6 ...
+2026-09-18T02:46:51.242+00:00	panel_check: pz painted, free heap 368432
+2026-09-18T02:46:51.743+00:00	panel_check: all five brought up; now cycling colours forever
+2026-09-18T02:46:52.389+00:00	panel_check: cycle 0, boot diag-63b43ed4, uptime_ms 6787, free heap 368432
+2026-09-18T02:46:52.390+00:00	[  6787][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:52.396+00:00	[  6795][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:52.403+00:00	[  6802][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:52.410+00:00	[  6809][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:52.418+00:00	as5600: read failed
+2026-09-18T02:46:53.465+00:00	panel_check: cycle 1, boot diag-63b43ed4, uptime_ms 7863, free heap 368432
+2026-09-18T02:46:54.465+00:00	[  8863][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error 263
+2026-09-18T02:46:54.473+00:00	[  8871][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:54.479+00:00	[  8878][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:54.487+00:00	[  8885][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:54.493+00:00	as5600: read failed
+2026-09-18T02:46:55.542+00:00	panel_check: cycle 2, boot diag-63b43ed4, uptime_ms 9939, free heap 368432
+2026-09-18T02:46:55.545+00:00	[  9939][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:55.549+00:00	[  9947][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:55.557+00:00	[  9954][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:55.564+00:00	[  9962][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:46:55.571+00:00	as5600: read failed
+2026-09-18T02:46:56.617+00:00	panel_check: cycle 3, boot diag-63b43ed4, uptime_ms 11015, free heap 368432

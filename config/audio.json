@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "zone_thresholds": {"surface_below": 0.25, "mid_below": 0.65},
+  "hysteresis": 0.03,
+  "catalog": "assets/audio/catalog.json",
+  "missing_files_are_nonfatal": true
+}

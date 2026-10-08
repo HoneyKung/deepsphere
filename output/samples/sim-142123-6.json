@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "sample_id": "sim-142123-6",
+  "target_id": "target_01",
+  "depth_norm": 0.4125,
+  "asset_pack": "pack-v1-test-atlas",
+  "crop": {
+    "u": 0.962,
+    "v": 0.37,
+    "w": 0.06,
+    "h": 0.12
+  },
+  "received_at": "2026-09-10T14:21:27.037659+00:00",
+  "image_file": "sim-142123-6.png"
+}

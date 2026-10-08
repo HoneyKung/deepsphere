@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Deep Sphere — ดำลงไปกับลูกบาศก์</title>
+<meta name="description" content="Browser digital twin of the six-panel Deep Sphere cube: the same face maths, the same live-ocean motion and the same audio cues the firmware uses.">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="deepcore.css?v=20261008i">
+</head>
+<body>
+
+<div class="twin-banner">DIGITAL TWIN — SIMULATED PANELS, NO BOARD ATTACHED</div>
+
+<div class="intro" id="intro">
+    <div class="intro-title">DEEP SPHERE</div>
+    <div class="intro-sub">SIX-PANEL CUBE — DIGITAL TWIN</div>
+    <button class="intro-start" id="btn-start" disabled>LOADING PANELS</button>
+    <div class="intro-hint">ลากเพื่อหมุนกล่อง · กดค้าง ▼ เพื่อดำลง · สแกน → เก็บ → วิเคราะห์<br>ใส่หูฟังแล้วจะได้ยินครบ · เพลงจะมาเมื่อคุณขยับ และค่อย ๆ จางเมื่อคุณหยุด</div>
+</div>
+
+<div id="canvas-container"></div>
+<div id="unfold-view" hidden>
+  <div class="unfold-title">AZIMUTH UNFOLD <span>3 UPPER + 3 LOWER / FACET SIDE PROJECTIONS</span></div>
+  <canvas id="unfold-canvas" aria-label="Six mounted faces unfolded in azimuth order"></canvas>
+  <div class="edge-debug" id="edge-debug">
+    <label>EDGE DEBUG <select id="edge-select" aria-label="Cube edge"></select></label>
+    <canvas id="edge-canvas" aria-label="Two cube faces unfolded at the selected edge"></canvas>
+  </div>
+</div>
+<div class="twin-controls">
+  <button id="btn-unfold">Unfold</button>
+  <button id="btn-edge-debug">Two-face edge</button>
+  <button id="btn-labels" aria-pressed="true">Face labels</button>
+  <button id="btn-grid" aria-pressed="true">Map grid</button>
+  <button id="btn-frame" aria-pressed="false" title="Show the opaque 10 mm frame of the physical cube">Frame</button>
+  <button id="btn-pause">Pause</button>
+  <button id="btn-seam">Seam fixture</button>
+  <button id="btn-highlight" aria-pressed="false">Outline life <span class="keycap">H</span></button>
+  <label>Yaw <input id="heading-input" aria-label="Heading degrees" type="number" step="5" value="0"></label>
+  <label>Depth <input id="depth-input" aria-label="Ocean depth" type="range" min="0" max="1" step="0.02" value="0"></label>
+</div>
+
+<div class="scan-effect" id="scan-effect"></div>
+
+<div class="hud hud-status" id="hud-status">
+    <div class="status-title">Deep Sphere Navigation</div>
+    <div class="status-grid">
+        <span class="status-label">Pressure</span>
+        <span class="status-value" id="val-pressure">1.0 ATM</span>
+        <span class="status-label">Temp</span>
+        <span class="status-value" id="val-temp">28.0&deg;C</span>
+        <span class="status-label">Visibility</span>
+        <span class="status-value" id="val-visibility">EXCELLENT</span>
+        <span class="status-label">Panels lit</span>
+        <span class="status-value" id="val-panels">6 / 6</span>
+        <span class="status-label">Heading</span>
+        <span class="status-value" id="val-heading">0.0 deg</span>
+        <span class="status-label">Reticle</span>
+        <span class="status-value" id="val-reticle">ny</span>
+        <span class="status-label">Tray</span>
+        <span class="status-value" id="val-specimens">0 / 6</span>
+    </div>
+</div>
+
+<div class="hud hud-depth" id="hud-depth">
+    <div class="depth-number" id="depth-number">0</div>
+    <div class="depth-unit">METERS</div>
+        <div class="depth-zone" id="depth-zone" data-zone="surface">ตื้น · SURFACE</div>
+</div>
+
+<div class="hud hud-bar">
+    <div class="depth-bar">
+        <div class="depth-bar-marker" id="depth-marker" style="top: 0%;"></div>
+        <span class="depth-bar-break" style="top: 25%;"></span>
+        <span class="depth-bar-break" style="top: 65%;"></span>
+        <span class="depth-bar-label" style="top: 0;">0m</span>
+        <span class="depth-bar-label" style="top: 25%;">760m</span>
+        <span class="depth-bar-label" style="top: 65%;">1976m</span>
+        <span class="depth-bar-label" style="top: 100%; transform: translateY(-100%);">3040m</span>
+    </div>
+</div>
+
+<div class="hud hud-mission">
+    <button class="mission-btn active" id="btn-explore">Explore</button>
+    <button class="mission-btn" id="btn-scan">Scan <kbd class="key">1</kbd></button>
+    <button class="mission-btn" id="btn-collect">Collect <kbd class="key">2</kbd></button>
+    <button class="mission-btn" id="btn-analyze">Analyze <kbd class="key">3</kbd></button>
+</div>
+
+<div class="hud hud-narration">
+    <div class="narration-box">
+        <div class="narration-header">
+            <div class="narration-dot"></div>
+            <div class="narration-label">Deep Sphere Twin</div>
+        </div>
+    <div class="narration-text" id="narration">Twin online. No board attached.<span class="cursor"></span></div>
+    </div>
+</div>
+
+<div class="hud-keys">
+    <span class="keycap">&#8593;</span><span class="keycap">&#8595;</span> depth<br>
+    <span class="keycap">&#8592;</span><span class="keycap">&#8594;</span> turn the box<br>
+    <span class="keycap">1</span> scan <span class="keycap">2</span> collect<br>
+    <span class="keycap">3</span> analyze<br>
+    <span class="keycap">R</span> reset <button class="keycap mute-key" id="btn-mute" type="button" aria-label="Mute audio">M</button> mute
+    <label class="voice-volume-control">Voice <input id="voice-volume" aria-label="Voice volume" type="range" min="0" max="100" value="100"><output id="voice-volume-value">100%</output></label>
+</div>
+
+<div class="panel-strip" id="panel-strip"></div>
+
+<div class="pad" id="pad" aria-label="ปุ่มควบคุม">
+  <button class="pad-btn" id="pad-left" type="button" aria-label="หมุนซ้าย">◀</button>
+  <div class="pad-col">
+    <button class="pad-btn" id="pad-up" type="button" aria-label="ลอยขึ้น">▲<span>ขึ้น</span></button>
+    <button class="pad-btn" id="pad-down" type="button" aria-label="ดำลง">▼<span>ดำลง</span></button>
+  </div>
+  <button class="pad-btn" id="pad-right" type="button" aria-label="หมุนขวา">▶</button>
+</div>
+<button class="sound-btn" id="btn-sound" type="button" aria-label="เปิดหรือปิดเสียง" aria-pressed="true">เสียง: เปิด</button>
+
+<div class="discovery-popup" id="discovery-popup">
+    <div class="discovery-title">SPECIMEN COLLECTED </div>
+    <div id="discovery-emoji" style="font-size: 64px; margin: 12px 0;"></div>
+    <div class="discovery-species" id="discovery-species"></div>
+    <div class="discovery-info" id="discovery-info"></div>
+    <button class="discovery-close" id="btn-discovery-close">ACKNOWLEDGE</button>
+</div>
+
+<aside class="audio-debug" id="audio-debug" aria-label="Audio diagnostics" hidden>
+  <div class="audio-debug-head"><strong>AUDIO CHECK · D</strong><span id="audio-meter">Waiting</span></div>
+  <div>Playing: <span id="audio-current">None</span></div>
+  <pre id="audio-events">No sound events yet.</pre>
+  <div class="audio-debug-controls">
+    <button id="audio-music-toggle" type="button">Music: on</button>
+    <label>Volume <input id="audio-volume" type="range" min="0" max="100" value="85"></label>
+    <label>Voice <input id="audio-voice-volume" aria-label="Voice volume" type="range" min="0" max="100" value="100"><output id="audio-voice-volume-value">100%</output></label>
+    <label>Language <select id="audio-language"><option value="th">Thai</option><option value="en" selected>English</option><option value="off">Off</option></select></label>
+    <label class="sonar-option"><input id="audio-sonar-toggle" type="checkbox"> Continuous sonar</label>
+    <span id="audio-voice-status">Checking speech voices</span>
+  </div>
+</aside>
+
+<div class="audio-event-pill" id="audio-event-pill" aria-live="polite" hidden>
+  <span id="audio-event-label"></span><button id="audio-event-dismiss" type="button" aria-label="Dismiss event">×</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="geometry.js?v=20261008i"></script>
+<script src="ocean.js?v=20261008i"></script>
+<script src="renderer.js?v=20261008i"></script>
+<script src="twin.js?v=20261008i"></script>
+</body>
+</html>

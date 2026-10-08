@@ -1,0 +1,5 @@
+{"at": "2026-09-18T02:47:42.683+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 15.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-18T02:47:42.686+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:47:42.688+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-18T02:47:57.788+00:00", "event": "close", "port": "COM6", "reason": "window elapsed"}
+{"at": "2026-09-18T02:47:57.789+00:00", "event": "watch_end", "port": "COM6", "boots_observed": 0, "damaged_lines": 0, "board_reported_truncations": 0, "last_session": "none", "watch_start": 1, "open_attempt": 1, "open_success": 1, "close": 1}

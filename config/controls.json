@@ -1,0 +1,57 @@
+{
+  "schema_version": 3,
+  "source": "keyboard_first",
+  "hardware_confirmed": false,
+  "yaw": {
+    "source": "none",
+    "source_options": [
+      "none",
+      "encoder"
+    ],
+    "source_note": "There is no rotation sensor in this build. The AS5600 and its diametric magnet both failed to arrive, so the cube's own rotation is not measured at all. Heading stays fixed; the KY-040 path remains documented for a later physical-controls enablement. The encoder option also has no pins now: GPIO4/5/6 were reassigned to display CS.",
+    "rotation_sensing": "absent",
+    "degrees_per_detent": 7.5,
+    "zero_offset_deg": 0.0,
+    "reverse": false,
+    "wrap_degrees": 360.0
+  },
+  "wheel": {
+    "sensor": "KY-040",
+    "role_at_boot": "depth",
+    "role_toggle": "push_switch",
+    "role_toggle_note": "The KY-040 has no pins in this build. GPIO4/5/6 carry display CS for py/ny/pz because the user cannot solder to GPIO14/15/16. Three free GPIOs must be found again before the wheel can be enabled.",
+    "encoder_steps_per_detent": 4,
+    "depth_step_norm": 0.02,
+    "depth_min_norm": 0.0,
+    "depth_max_norm": 1.0,
+    "depth_reverse": false,
+    "pins": "unassigned"
+  },
+  "buttons": {
+    "active_level": 0,
+    "debounce_ms": 35,
+    "cooldown_ms": 350,
+    "scan": 1,
+    "collect": 2,
+    "analyze": null,
+    "analyze_recommended_alternative": null,
+    "analyze_pin_note": "Analyze has no physical GPIO assignment because GPIO3 is nx CS. Physical controls are disabled and the laptop numpad is used; GPIO7 is nz CS and is not a button alternative.",
+    "wiring_status": "No physical buttons; Scan/Collect/Analyze use the laptop numpad. GPIO1/2 are reserved for AS5600 SDA/SCL in the next phase."
+  },
+  "laptop_demo_input": {
+    "mode": "keyboard_first",
+    "keys": {
+      "1": "scan",
+      "2": "collect",
+      "3": "analyze",
+      "Up": "depth_decrease",
+      "Down": "depth_increase",
+      "Left": "heading_left",
+      "Right": "heading_right"
+    },
+    "depth_step_norm": 0.02,
+    "heading_step_deg": 5.0,
+    "heading_note": "Left/Right step the simulated heading on the laptop only. This is a stand-in for the heading the KY-040 wheel would supply later; it does not measure the cube turning and does not change the board's fixed heading.",
+    "note": "Keyboard controls are the primary input for this prototype round. Physical buttons and KY-040 wiring remain available for later hardware validation."
+  }
+}

@@ -1,0 +1,311 @@
+{
+ "schema_version": 1,
+ "geometry_version": "LUNA-09-strip-map",
+ "scope": "Twin reference pending review and firmware port; faces.json retains the legacy board fixture.",
+ "mount_orientation": {
+  "matrix": [
+   [
+    0.816496580927726,
+    -0.408248290463863,
+    -0.408248290463863
+   ],
+   [
+    0,
+    0.7071067811865476,
+    -0.7071067811865476
+   ],
+   [
+    0.5773502691896258,
+    0.5773502691896258,
+    0.5773502691896258
+   ]
+  ],
+  "hardware_confirmed": false
+ },
+ "strip_map": {
+  "face_step_mm": 35.35533905932738,
+  "length_mm": 212.13203435596427,
+  "aim_y_mm": 17.67766952966369,
+  "basis_mm": [
+   [
+    35.35533905932738,
+    35.35533905932738
+   ],
+   [
+    35.35533905932738,
+    -35.35533905932738
+   ]
+  ],
+  "x_wrap": "length_mm"
+ },
+ "depth_darkening": {
+  "color_stops": [
+   {
+    "depth_norm": 0.0,
+    "rgb": [
+     28,
+     154,
+     194
+    ]
+   },
+   {
+    "depth_norm": 0.25,
+    "rgb": [
+     20,
+     100,
+     150
+    ]
+   },
+   {
+    "depth_norm": 0.65,
+    "rgb": [
+     8,
+     55,
+     105
+    ]
+   },
+   {
+    "depth_norm": 1.0,
+    "rgb": [
+     4,
+     30,
+     78
+    ]
+   }
+  ],
+  "background_scroll": {
+   "surface_fade_depth_norm": 0.1,
+   "surface_scroll_mm": 46.5,
+   "deep_travel_mm": 35.0
+  },
+  "surface_band": {
+   "threshold_v": 0.105,
+   "transition_v": 0.012,
+   "fade_depth_norm": 0.1,
+   "rgb": [
+    177,
+    223,
+    249
+   ]
+  },
+  "snell_window": {
+   "depth_fade_norm": 0.14,
+   "v_start": 0.2,
+   "v_span": 0.3,
+   "strength": 0.12,
+   "rgb": [
+    180,
+    225,
+    250
+   ]
+  },
+  "texture_amplitude_rgb": [
+   0.7,
+   1.0,
+   1.2
+  ],
+  "vertical_gradient_gain": 0.2,
+  "grid_gain": 0.08,
+  "meridian_gain": 0.05
+ },
+ "enabled_faces": [
+  "px",
+  "nx",
+  "py",
+  "ny",
+  "pz",
+  "nz"
+ ],
+ "azimuth_order": [
+  "px",
+  "nz",
+  "py",
+  "nx",
+  "pz",
+  "ny"
+ ],
+ "sprite_masks": [
+  [
+   0,
+   28,
+   190,
+   251,
+   255,
+   190,
+   28,
+   0
+  ],
+  [
+   0,
+   60,
+   231,
+   255,
+   255,
+   231,
+   60,
+   0
+  ],
+  [
+   12,
+   30,
+   223,
+   63,
+   63,
+   223,
+   30,
+   12
+  ],
+  [
+   0,
+   0,
+   106,
+   191,
+   191,
+   106,
+   0,
+   0
+  ],
+  [
+   16,
+   44,
+   126,
+   255,
+   171,
+   126,
+   60,
+   18
+  ],
+  [
+   24,
+   60,
+   126,
+   126,
+   60,
+   90,
+   90,
+   153
+  ]
+ ],
+ "subjects": [
+  {
+   "id": "luna04_surface_fish_seam",
+   "kind": 0,
+   "x_mm": 21.213203435596427,
+   "y_mm": 14.142135623730951,
+   "speed_mm_s": 2.4,
+   "w_mm": 20,
+   "h_mm": 8,
+   "rgb": [
+    245,
+    178,
+    66
+   ],
+   "name": "Surface Shoal Fish"
+  },
+  {
+   "id": "luna04_orange_reef_fish",
+   "kind": 0,
+   "x_mm": 84.8528137423857,
+   "y_mm": 17.67766952966369,
+   "speed_mm_s": 1.8,
+   "w_mm": 10,
+   "h_mm": 5,
+   "rgb": [
+    236,
+    106,
+    68
+   ],
+   "name": "Orange Reef Fish"
+  },
+  {
+   "id": "luna04_manta_ray",
+   "kind": 1,
+   "x_mm": 148.49242404917499,
+   "y_mm": 36.06244584051393,
+   "speed_mm_s": 1.2,
+   "w_mm": 14,
+   "h_mm": 8,
+   "rgb": [
+    190,
+    218,
+    255
+   ],
+   "name": "Manta Ray"
+  },
+  {
+   "id": "luna04_jellyfish",
+   "kind": 2,
+   "x_mm": 159.0990257669732,
+   "y_mm": 64.34671708797583,
+   "speed_mm_s": -0.8,
+   "w_mm": 10,
+   "h_mm": 7,
+   "rgb": [
+    238,
+    156,
+    242
+   ],
+   "name": "Bloom Jellyfish"
+  },
+  {
+   "id": "luna04_lantern_fish",
+   "kind": 0,
+   "x_mm": 140.00714267493643,
+   "y_mm": 47.37615433949869,
+   "speed_mm_s": 2.5,
+   "w_mm": 10,
+   "h_mm": 5,
+   "rgb": [
+    255,
+    198,
+    90
+   ],
+   "name": "Lantern Fish"
+  },
+  {
+   "id": "luna04_seahorse_shape",
+   "kind": 3,
+   "x_mm": 97.58073580374356,
+   "y_mm": 24.748737341529164,
+   "speed_mm_s": -1.0,
+   "w_mm": 10,
+   "h_mm": 5,
+   "rgb": [
+    184,
+    238,
+    180
+   ],
+   "name": "Seahorse"
+  },
+  {
+   "id": "claude_deep_angler",
+   "kind": 4,
+   "x_mm": 40.0,
+   "y_mm": 71.41778489984131,
+   "speed_mm_s": 1.4,
+   "w_mm": 12,
+   "h_mm": 8,
+   "rgb": [
+    120,
+    255,
+    200
+   ],
+   "name": "Deep Glow Angler"
+  },
+  {
+   "id": "claude_abyss_squid",
+   "kind": 5,
+   "x_mm": 118.0,
+   "y_mm": 77.78174593052023,
+   "speed_mm_s": -0.9,
+   "w_mm": 10,
+   "h_mm": 10,
+   "rgb": [
+    255,
+    120,
+    140
+   ],
+   "name": "Abyss Squid"
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+{"at": "2026-09-17T16:40:30.643+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 45.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-17T16:40:30.645+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T16:40:30.648+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-17T16:40:30.697+00:00", "event": "board_session_changed", "port": "COM6", "previous": null, "session": "s3-af6e27ac-340-1845ca18", "type": "log"}
+{"at": "2026-09-17T16:41:45.663+00:00", "event": "close", "port": "COM6", "reason": "window elapsed"}
+{"at": "2026-09-17T16:41:45.666+00:00", "event": "watch_end", "port": "COM6", "boots_observed": 1, "damaged_lines": 0, "board_reported_truncations": 0, "last_session": "s3-af6e27ac-340-1845ca18", "watch_start": 1, "open_attempt": 1, "open_success": 1, "board_session_changed": 1, "close": 1}

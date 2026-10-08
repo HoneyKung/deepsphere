@@ -1,0 +1,121 @@
+{
+  "captures": [
+    {
+      "file": "dashboard-after-empty-1280x800.png",
+      "requested_output": {
+        "width": 1280,
+        "height": 800
+      },
+      "client": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 640,
+        "dpi": 120,
+        "scale": 1.25
+      },
+      "captured_pixels": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "file": "dashboard-after-collected-1280x800.png",
+      "requested_output": {
+        "width": 1280,
+        "height": 800
+      },
+      "client": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 640,
+        "dpi": 120,
+        "scale": 1.25
+      },
+      "captured_pixels": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "file": "dashboard-after-error-1280x800.png",
+      "requested_output": {
+        "width": 1280,
+        "height": 800
+      },
+      "client": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 640,
+        "dpi": 120,
+        "scale": 1.25
+      },
+      "captured_pixels": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "file": "dashboard-after-collected-1024x720.png",
+      "requested_output": {
+        "width": 1024,
+        "height": 720
+      },
+      "client": {
+        "x": 0,
+        "y": 0,
+        "width": 819,
+        "height": 576,
+        "dpi": 120,
+        "scale": 1.25
+      },
+      "captured_pixels": {
+        "width": 1024,
+        "height": 720
+      }
+    }
+  ],
+  "depth_pointer_samples": [
+    {
+      "depth_norm": 0.0,
+      "pointer_coords": [
+        28.0,
+        18.0,
+        160.0,
+        18.0
+      ],
+      "canvas_height": 142
+    },
+    {
+      "depth_norm": 0.5,
+      "pointer_coords": [
+        28.0,
+        71.0,
+        160.0,
+        71.0
+      ],
+      "canvas_height": 142
+    },
+    {
+      "depth_norm": 1.0,
+      "pointer_coords": [
+        28.0,
+        124.0,
+        176.0,
+        124.0
+      ],
+      "canvas_height": 142
+    }
+  ],
+  "gui_interaction_checks": {
+    "focus_out_clears_held_depth": true,
+    "open_settings_clears_held_depth": true,
+    "focus_out_clears_held_heading": true,
+    "arrow_keys_step_heading": true,
+    "arrow_keys_report_keyboard_heading_source": true,
+    "opposite_arrow_steps_return_heading": true,
+    "disconnect_clears_held_depth": true
+  }
+}

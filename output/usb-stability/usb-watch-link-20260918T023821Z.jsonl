@@ -1,0 +1,14 @@
+{"at": "2026-09-18T02:38:21.985+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 6.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-18T02:38:21.986+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:38:21.988+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-18T02:38:22.989+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:38:22.991+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-18T02:38:23.995+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:38:23.996+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-18T02:38:24.999+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:38:25.002+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-18T02:38:26.005+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:38:26.007+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-18T02:38:27.010+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:38:27.012+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-18T02:38:28.015+00:00", "event": "watch_end", "port": "COM6", "boots_observed": 0, "damaged_lines": 0, "board_reported_truncations": 0, "last_session": "none", "watch_start": 1, "open_attempt": 6, "open_error": 6}

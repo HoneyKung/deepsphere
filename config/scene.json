@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "atlas": {
+    "width": 1024,
+    "height": 512,
+    "pixel_format": "RGB565",
+    "byte_order": "big_endian",
+    "source": "assets/source/sea_atlas_luna04_master.png"
+  },
+  "u_offset": 0.0,
+  "aim_world": [0.0, -1.0, 0.0],
+  "asset_pack_id": "luna-04-ocean-atlas",
+  "vertical_scale": 0.28,
+  "depth_window": {"min_center": 0.10, "max_center": 0.90},
+  "targets_file": "assets/source/targets.json",
+  "composition_file": "assets/source/sea_atlas_luna04_composition.json",
+  "pack_id_file": "assets/generated/pack.json",
+  "test_mode": false,
+  "content_status": "original_illustrated_luna04_ocean_art"
+}

@@ -1,0 +1,9 @@
+{"at": "2026-09-18T02:50:05.884+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 12.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-18T02:50:05.885+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:50:05.886+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-18T02:50:06.887+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:50:06.887+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-18T02:50:07.888+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-18T02:50:07.891+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-18T02:50:47.921+00:00", "event": "close", "port": "COM6", "reason": "window elapsed"}
+{"at": "2026-09-18T02:50:47.922+00:00", "event": "watch_end", "port": "COM6", "boots_observed": 0, "damaged_lines": 0, "board_reported_truncations": 0, "last_session": "none", "watch_start": 1, "open_attempt": 3, "open_error": 2, "open_success": 1, "close": 1}

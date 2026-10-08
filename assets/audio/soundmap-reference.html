@@ -1,0 +1,1320 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Deep Sphere Sound Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: a submarine console. Left: the twin's dive as a periscope view with live sound layers. Right: the cue sheet the team works through. A drawer slides over for one cue. One dark look on purpose: it is the deep sea. */
+:root{
+  --abyss:#050f15; --hull:#0b1b23; --hull-2:#10262f; --hull-3:#15313c; --line:#1c3a45; --line-2:#28505d;
+  --ink:#d9e8ea; --ink-2:#9db6bd; --ink-3:#6c8790;
+  --brass:#d9b878; --sonar:#63d6cf;
+  --ok:#6fd99a; --up:#ff9f43; --miss:#ff6b6b; --found:#8fb3ff; --skip:#627a84;
+  --f-display:"Chakra Petch","IBM Plex Sans Thai",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--abyss);color:var(--ink)}
+body{font-family:var(--f-body);font-size:14px;line-height:1.55;padding-inline:16px;padding-block:0 40px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--sonar);outline-offset:2px}
+a{color:var(--sonar)}
+h1,h2,h3{text-wrap:balance;margin:0}
+
+/* top bar */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px;padding-block:14px 12px;border-bottom:1px solid var(--line);max-width:1500px;margin-inline:auto}
+.brand{display:flex;flex-direction:column;gap:1px;margin-right:auto;min-width:0}
+.brand h1{font-family:var(--f-display);font-weight:700;letter-spacing:.16em;font-size:15px;color:var(--brass);text-transform:uppercase}
+.brand p{margin:0;font-size:12.5px;color:var(--ink-2)}
+.prog{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--ink-2);min-width:200px}
+.prog .bar{height:6px;border-radius:3px;background:var(--hull-3);overflow:hidden;display:flex}
+.prog .bar i{display:block;height:100%}
+.prog b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.ctrl label{font-size:12px;color:var(--ink-2);display:flex;align-items:center;gap:6px}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden;background:var(--hull)}
+.seg button{background:transparent;border:0;padding:6px 11px;font-size:12.5px;color:var(--ink-2)}
+.seg button+button{border-left:1px solid var(--line-2)}
+.seg button[aria-pressed="true"]{background:var(--hull-3);color:var(--ink);box-shadow:inset 0 -2px 0 var(--sonar)}
+select.small{background:var(--hull);border:1px solid var(--line-2);border-radius:8px;padding:5px 8px;font-size:12.5px}
+input[type=range]{accent-color:var(--sonar);width:88px}
+.hint{font-size:11.5px;color:var(--up)}
+
+.wrap{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:22px;padding-block:18px;max-width:1500px;margin-inline:auto}
+@media (max-width:1000px){.wrap{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+
+/* periscope */
+.scope{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;border:1px solid var(--line-2);background:#02070a;max-width:100%}
+.scope canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
+.scope canvas:active{cursor:grabbing}
+.hud{position:absolute;pointer-events:none;font-family:var(--f-display);text-shadow:0 1px 6px rgba(0,0,0,.7)}
+.hud-depth{left:14px;top:12px}
+.hud-depth .num{font-size:clamp(22px,3.2vw,36px);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.hud-depth .unit{font-size:11px;letter-spacing:.14em;color:var(--ink-2);margin-left:4px}
+.zone{display:inline-block;margin-top:6px;font-size:11px;letter-spacing:.12em;padding:2px 8px;border:1px solid currentColor;border-radius:4px}
+.hud-read{right:14px;top:12px;text-align:right;font-size:11.5px;line-height:1.7;color:var(--ink-2)}
+.hud-read b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;margin-left:6px}
+.hud-tray{left:14px;bottom:10px;font-size:11.5px;color:var(--ink-2);letter-spacing:.06em}
+.markers{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.mk{position:absolute;transform:translate(-50%,-100%);font:500 11px/1.3 var(--f-body);padding:3px 8px 3px 7px;border-radius:999px;background:rgba(5,15,21,.86);border:1px solid currentColor;white-space:nowrap;display:flex;align-items:center;gap:6px;animation:mk 2.8s ease-out forwards}
+.mk small{color:var(--ink-3);font-size:10.5px}
+@keyframes mk{0%{opacity:0;transform:translate(-50%,-70%)}8%{opacity:1;transform:translate(-50%,-100%)}72%{opacity:1}100%{opacity:0;transform:translate(-50%,-165%)}}
+@media (prefers-reduced-motion:reduce){.mk{animation:mkr 2.8s linear forwards}@keyframes mkr{0%,80%{opacity:1}100%{opacity:0}}}
+.intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px;background:radial-gradient(ellipse at center,rgba(5,15,21,.55),rgba(5,15,21,.9))}
+.intro h2{font-family:var(--f-display);letter-spacing:.2em;font-size:clamp(18px,3vw,28px);color:var(--brass)}
+.intro p{margin:0;max-width:44ch;color:var(--ink-2);font-size:13px}
+.btn-main{background:var(--brass);color:#1a1307;border:0;border-radius:8px;padding:10px 22px;font-family:var(--f-display);font-weight:700;letter-spacing:.12em;font-size:14px}
+.btn-main:hover{filter:brightness(1.08)}
+.pop{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,86%);background:rgba(8,22,29,.95);border:1px solid var(--brass);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.pop h3{font-family:var(--f-display);letter-spacing:.14em;font-size:13px;color:var(--brass)}
+.pop ul{margin:0;padding-left:18px;font-size:13px}
+.pop button{align-self:flex-end;background:var(--hull-3);border:1px solid var(--line-2);border-radius:6px;padding:5px 12px;font-family:var(--f-display);letter-spacing:.1em;font-size:12px}
+
+/* subtitles */
+.subs{background:var(--hull);border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:start}
+.subs .who{font-family:var(--f-display);font-size:11px;letter-spacing:.14em;color:var(--sonar);text-transform:uppercase}
+.subs p{margin:0}
+#sub-th{font-size:15px}
+#sub-en{font-size:12.5px;color:var(--ink-2)}
+.subs .who,.subs p{grid-column:1}
+#sub-chip{grid-column:2;grid-row:1 / span 3;align-self:center}
+button.chip{background:transparent}
+
+/* pad */
+.pad{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pad .grp{display:flex;gap:6px;flex-wrap:wrap}
+.key{display:inline-flex;align-items:center;gap:7px;background:var(--hull);border:1px solid var(--line-2);border-radius:8px;padding:7px 11px;font-size:13px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.key:hover{border-color:var(--sonar)}
+.key:active{background:var(--hull-3)}
+.key kbd{font-family:var(--f-mono);font-size:11px;background:var(--hull-3);border:1px solid var(--line-2);border-radius:4px;padding:0 5px;color:var(--ink-2)}
+.pad .sep{width:1px;height:26px;background:var(--line)}
+
+/* rack + log */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:640px){.two{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--hull);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.panel h2{font-family:var(--f-display);font-size:12px;letter-spacing:.14em;color:var(--ink-2);text-transform:uppercase;margin-bottom:8px;font-weight:600}
+.empty{color:var(--ink-3);font-size:12.5px;margin:4px 0}
+.rack{display:flex;flex-direction:column;gap:6px}
+.lay{display:grid;grid-template-columns:auto minmax(0,1fr) 64px;gap:4px 10px;align-items:center;background:transparent;border:0;padding:4px 2px;text-align:left;border-radius:6px}
+.lay:hover{background:var(--hull-2)}
+.lay .t{min-width:0;display:flex;flex-direction:column}
+.lay .t b{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lay .t small{font-size:11px;color:var(--ink-3)}
+.meter{height:6px;border-radius:3px;background:var(--hull-3);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:currentColor;transition:width .15s linear}
+.meter.silent i{background:repeating-linear-gradient(135deg,currentColor 0 3px,transparent 3px 6px)}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;max-height:260px;overflow:auto}
+.log li button{width:100%;display:grid;grid-template-columns:40px auto minmax(0,1fr) auto;gap:8px;align-items:center;background:transparent;border:0;padding:3px 2px;text-align:left;border-radius:6px;font-size:12.5px}
+.log li button:hover{background:var(--hull-2)}
+.log .tm{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.log .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log .sr{font-size:11px;color:var(--ink-3);white-space:nowrap}
+
+/* status chips */
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:none;background:currentColor}
+.st-have{color:var(--ok)}
+.st-upgrade{color:var(--up)}
+.st-upgrade.dot,.st-upgrade .dot{background:linear-gradient(90deg,currentColor 50%,transparent 50%);box-shadow:inset 0 0 0 1.5px currentColor}
+.st-missing{color:var(--miss)}
+.st-missing.dot,.st-missing .dot{background:transparent;box-shadow:inset 0 0 0 2px currentColor}
+.st-found{color:var(--found)}
+.st-found.dot,.st-found .dot{border-radius:1px;transform:rotate(45deg) scale(.85)}
+.st-skip{color:var(--skip)}
+.st-skip.dot,.st-skip .dot{height:3px;border-radius:2px;width:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:2px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;line-height:1.5}
+.chip span{color:var(--ink)}
+
+/* sheet */
+.sheet{background:var(--hull);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;min-width:0}
+@media (min-width:1001px){.sheet{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 24px)}}
+.sheet-head{padding:14px 16px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.sheet-head .row1{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline;justify-content:space-between}
+.sheet-head h2{font-family:var(--f-display);font-size:16px;letter-spacing:.06em}
+.team-state{font-size:11.5px;color:var(--ink-3)}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filters button{background:transparent;border:1px solid var(--line-2);border-radius:999px;padding:3px 11px;font-size:12px;color:var(--ink-2)}
+.filters button[aria-pressed="true"]{background:var(--hull-3);color:var(--ink);border-color:var(--sonar)}
+.filters b{font-family:var(--f-mono);font-weight:500;font-size:11px;margin-left:4px;color:var(--ink-3)}
+.linkbtn{background:transparent;border:1px solid var(--line-2);border-radius:8px;padding:4px 10px;font-size:12px;color:var(--ink-2)}
+.linkbtn:hover{color:var(--ink);border-color:var(--sonar)}
+.sheet-body{overflow:auto;padding:4px 10px 18px;min-height:0}
+details.guide{margin:10px 4px 6px;border:1px solid var(--line);border-radius:10px;background:var(--hull-2);padding:10px 14px}
+details.guide summary{cursor:pointer;font-weight:600;color:var(--brass)}
+details.guide ul{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13px;max-width:70ch}
+details.guide h3{font-size:12px;letter-spacing:.12em;color:var(--ink-2);margin-top:12px;font-family:var(--f-display);text-transform:uppercase}
+.grp-h{padding:16px 6px 6px;display:flex;flex-direction:column;gap:2px;border-bottom:1px solid var(--line)}
+.grp-h h3{font-family:var(--f-display);font-size:13.5px;letter-spacing:.06em;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.grp-h h3 small{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);font-weight:400}
+.grp-h p{margin:0;font-size:12px;color:var(--ink-3);max-width:70ch}
+.cue{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;background:transparent;border:0;border-bottom:1px solid rgba(28,58,69,.55);padding:9px 6px;text-align:left}
+.cue:hover{background:var(--hull-2)}
+.cue .t{min-width:0;display:flex;flex-direction:column;gap:1px}
+.cue .t b{font-weight:500;font-size:13.5px}
+.cue .t small{font-size:11.5px;color:var(--ink-3);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.cue .t code{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.tags{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.pri{font-size:10.5px;padding:1px 7px;border-radius:4px;white-space:nowrap;border:1px solid var(--line-2);color:var(--ink-2)}
+.pri.p1{border-color:var(--brass);color:var(--brass)}
+.badge{font-size:10.5px;color:var(--found);white-space:nowrap}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(2,8,12,.6);z-index:19}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--hull);border-left:1px solid var(--line-2);box-shadow:-24px 0 60px rgba(0,0,0,.5);z-index:20;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+.drawer-bar button{background:transparent;border:1px solid var(--line-2);border-radius:8px;padding:4px 12px;font-size:12.5px}
+.drawer-body{overflow:auto;padding:16px 20px 32px;display:flex;flex-direction:column;gap:16px}
+.dh{display:flex;flex-direction:column;gap:6px}
+.dh .meta{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:12px;color:var(--ink-3)}
+.dh h2{font-family:var(--f-display);font-size:21px;letter-spacing:.02em}
+.cid{display:inline-flex;gap:8px;align-items:center}
+.cid code{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-2);background:var(--hull-2);border:1px solid var(--line);border-radius:5px;padding:1px 7px}
+.cid button{background:transparent;border:0;font-size:11.5px;color:var(--sonar);padding:0}
+.plays{display:flex;flex-wrap:wrap;gap:8px}
+.plays button{background:var(--hull-2);border:1px solid var(--line-2);border-radius:8px;padding:6px 12px;font-size:12.5px;display:inline-flex;gap:7px;align-items:center}
+.plays button:hover{border-color:var(--sonar)}
+.plays button::before{content:"";width:0;height:0;border-left:7px solid var(--sonar);border-top:4.5px solid transparent;border-bottom:4.5px solid transparent}
+.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 14px;margin:0;font-size:13.5px}
+.facts dt{color:var(--ink-3);font-size:12.5px}
+.facts dd{margin:0}
+.sec h3{font-family:var(--f-display);font-size:12px;letter-spacing:.14em;color:var(--brass);text-transform:uppercase;margin-bottom:6px;font-weight:600}
+.sec p{margin:0 0 6px;max-width:65ch}
+.why{color:var(--ink-2);font-size:13px}
+.nat{font-size:12.5px;border-left:3px solid var(--line-2);padding:4px 10px;color:var(--ink-2);margin:0}
+.nat.real{border-color:var(--ok)}
+.nat.designed{border-color:var(--found)}
+blockquote{margin:0 0 6px;padding:8px 12px;background:var(--hull-2);border-radius:8px;border-left:3px solid var(--sonar);font-size:15px}
+blockquote.en{font-size:13px;color:var(--ink-2);border-left-color:var(--line-2)}
+.old{font-size:12.5px;color:var(--ink-3)}
+.kw{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.kw li{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:13px}
+.kw li span{font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+.kw li a{font-size:11.5px}
+.dev{font-size:12.5px;color:var(--ink-2);background:var(--hull-2);border:1px dashed var(--line-2);border-radius:8px;padding:8px 10px;margin:0}
+.box{background:var(--hull-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.box p{margin:0;font-size:12.5px;color:var(--ink-2)}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;color:var(--ink-2)}
+.field input,.field select,.field textarea{background:var(--hull);border:1px solid var(--line-2);border-radius:7px;padding:6px 9px;font-size:13px;width:100%}
+.field textarea{resize:vertical}
+.rowbtn{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--sonar);color:#04201f;border:0;border-radius:7px;padding:6px 14px;font-weight:600;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink-2);border:1px solid var(--line-2);font-weight:400}
+.saved{font-size:12px;color:var(--ink-3)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--hull-3);border:1px solid var(--line-2);border-radius:10px;padding:8px 14px;font-size:13px;z-index:30;max-width:calc(100% - 32px)}
+.copyout{width:100%;min-height:160px;background:var(--hull);border:1px solid var(--line-2);border-radius:8px;font-family:var(--f-mono);font-size:11.5px;padding:8px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.slot{border:1.5px dashed var(--line-2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--hull-2)}
+.slot.over,.cue.over{border-color:var(--sonar);background:var(--hull-3)}
+.slot h3{font-family:var(--f-display);font-size:12px;letter-spacing:.14em;color:var(--sonar);text-transform:uppercase;font-weight:600}
+.slot p{margin:0;font-size:12.5px;color:var(--ink-2);max-width:65ch}
+.files{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.files li{display:flex;align-items:center;gap:8px;background:var(--hull);border:1px solid var(--line);border-radius:7px;padding:4px 6px 4px 10px}
+.files li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--f-mono);font-size:12px}
+.files li button{background:transparent;border:1px solid var(--line-2);border-radius:6px;padding:2px 9px;font-size:12px}
+.files li button:hover{border-color:var(--sonar)}
+label.btn{display:inline-block;cursor:pointer}
+.plays button[data-play="scene"]{background:var(--sonar);color:#04201f;border-color:var(--sonar);font-weight:600}
+.plays button[data-play="scene"]::before{border-left-color:#04201f}
+.brief{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 14px;margin:0;font-size:13.5px}
+.brief dt{color:var(--brass);font-size:12px;font-weight:600;padding-top:2px}
+.brief dd{margin:0;max-width:62ch}
+.brief ul{margin:0;padding-left:18px}
+.brief .avoid{color:#ffb0a8}
+.story{font-size:13px;margin:10px 0 0;max-width:70ch;color:var(--ink)}
+.drop-hint{font-size:11.5px;color:var(--ink-3)}
+</style>
+
+<header class="top">
+  <div class="brand">
+    <h1>Deep Sphere · Sound Map</h1>
+    <p>จำลองการดำของทวิน แล้วดูว่าตรงไหนมีเสียงอะไร ตรงไหนยังขาด · ส่งงานศุกร์ 2 ต.ค.</p>
+  </div>
+  <div class="prog" aria-live="polite">
+    <div><b id="p-ready">0</b> จาก <b id="p-total">0</b> เสียงพร้อมแล้ว · <span id="p-p1"></span></div>
+    <div class="bar" id="p-bar"></div>
+  </div>
+  <div class="ctrl">
+    <label>ฟังแบบ
+      <span class="seg" role="group" aria-label="โหมดเสียง">
+        <button id="m-now" aria-pressed="false" title="เล่นเฉพาะไฟล์ที่มีจริงในโปรเจกต์ ส่วนที่ขาดจะเงียบ">ตอนนี้</button>
+        <button id="m-full" aria-pressed="true" title="เติมส่วนที่ขาดด้วยเสียงร่างสังเคราะห์ ให้ได้ยินภาพรวมตามแผน">เต็มตัวตามแผน</button>
+      </span>
+    </label>
+    <label for="tts">พากย์ร่าง
+      <select id="tts" class="small"><option value="th">ไทย</option><option value="en">English</option><option value="off">ปิด</option></select>
+    </label>
+    <label for="vol">ดัง <input id="vol" type="range" min="0" max="1" step="0.05"></label>
+    <span class="hint" id="tts-hint" hidden></span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="col" aria-label="จำลองการดำ">
+    <div class="scope" id="scope">
+      <canvas id="view" aria-label="มุมมองกล้องใต้น้ำของทวิน ลากซ้ายขวาเพื่อหมุน"></canvas>
+      <div class="hud hud-depth"><span class="num" id="h-depth">304</span><span class="unit">เมตร</span><br><span class="zone" id="h-zone">ตื้น · SURFACE</span></div>
+      <div class="hud hud-read">ทิศ<b id="h-yaw">0°</b><br>แรงดัน<b id="h-atm">31.4 ATM</b><br>อุณหภูมิ<b id="h-temp">24.2°C</b><br>จอที่เล็ง<b id="h-face">px</b></div>
+      <div class="hud hud-tray" id="h-tray">ถาดตัวอย่าง 0 / 6</div>
+      <div class="markers" id="markers"></div>
+      <div class="pop" id="pop" hidden role="dialog" aria-labelledby="pop-h">
+        <h3 id="pop-h">ANALYSIS</h3>
+        <ul id="pop-list"></ul>
+        <button id="pop-close">ACKNOWLEDGE</button>
+      </div>
+      <div class="intro" id="intro">
+        <h2>DEEP SPHERE</h2>
+        <p>ปุ่มเหมือนทวิน: ลูกศรขึ้นลงคุมความลึก ซ้ายขวาหรือลากเพื่อหมุนกล่อง 1 สแกน 2 เก็บ 3 วิเคราะห์ H ไฮไลต์ M ปิดเสียง ทุกเสียงที่เกิดจะมีป้ายขึ้นบนจอ บอกว่ามีแล้วหรือยังขาด</p>
+        <button class="btn-main" id="btn-start">เริ่มดำน้ำ</button>
+      </div>
+    </div>
+
+    <div class="subs" aria-live="polite">
+      <span class="who">ผู้ช่วย AI ในเรือ</span>
+      <p id="sub-th">กดเริ่มดำน้ำเพื่อเปิดเสียง</p>
+      <p id="sub-en">Press start to switch the sound on.</p>
+      <span id="sub-chip"></span>
+    </div>
+
+    <div class="pad" aria-label="ปุ่มควบคุม">
+      <div class="grp">
+        <button class="key" data-k="up"><kbd>↑</kbd>ขึ้น</button>
+        <button class="key" data-k="down"><kbd>↓</kbd>ดำลง</button>
+        <button class="key" data-k="left"><kbd>←</kbd>หมุน</button>
+        <button class="key" data-k="right"><kbd>→</kbd>หมุน</button>
+      </div>
+      <span class="sep" aria-hidden="true"></span>
+      <div class="grp">
+        <button class="key" data-k="scan"><kbd>1</kbd>สแกน</button>
+        <button class="key" data-k="collect"><kbd>2</kbd>เก็บ</button>
+        <button class="key" data-k="analyze"><kbd>3</kbd>วิเคราะห์</button>
+        <button class="key" data-k="assist"><kbd>H</kbd>ไฮไลต์</button>
+      </div>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <h2>ตอนนี้กำลังดัง</h2>
+        <div class="rack" id="rack"><p class="empty">ยังไม่มีเสียง กดเริ่มดำน้ำก่อน</p></div>
+      </div>
+      <div class="panel">
+        <h2>เสียงที่เพิ่งเกิด</h2>
+        <ol class="log" id="log"><li class="empty">ยังไม่มีเหตุการณ์ ลองดำลง หมุน หรือกดสแกน</li></ol>
+      </div>
+    </div>
+  </section>
+
+  <aside class="sheet" aria-label="รายการเสียงทั้งหมด">
+    <div class="sheet-head">
+      <div class="row1">
+        <h2>รายการเสียงทั้งหมด</h2>
+        <button class="linkbtn" id="copy-list">คัดลอกรายการที่ยังขาด</button>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="กรองตามสถานะ"></div>
+      <span class="drop-hint">ลากไฟล์เสียงมาวางบนรายการไหนก็ได้ เพื่อใส่ในช่องนั้นแล้วลองฟังในฉาก</span>
+      <span class="team-state" id="team-state">กำลังเชื่อมบันทึกร่วม…</span>
+    </div>
+    <div class="sheet-body" id="sheet-body">
+      <details class="guide" id="guide" open>
+        <summary>หลักทำเสียงให้ immersive และที่หาเสียง</summary>
+        <p class="story"><b>เรื่องของเสียงทั้งงาน:</b> ผู้เล่นคือคนขับเรือดำน้ำลำเล็ก เริ่มจากน้ำใสที่ยังได้ยินคลื่นอยู่เหนือหัว แล้วค่อย ๆ ลงไปในความเงียบ ที่เหลือแค่เสียงเครื่องในเรือ เหล็กที่ลั่นเพราะแรงดัน และเสียงสิ่งมีชีวิตที่ได้ยินก่อนจะเห็น จนถึงก้นทะเลที่มืดสนิท วัสดุหลักของเสียงมีสี่อย่าง คือ น้ำ เหล็ก ไฟฟ้า และชีวิต ถ้าเสียงไหนไม่ได้มาจากสี่อย่างนี้ ให้คิดอีกรอบ</p>
+        <p class="story">รอบนี้เราเปลี่ยนเสียงเดิมทั้ง 8 ไฟล์ด้วย ไม่ใช่แค่เติมส่วนที่ขาด ทุกจุดมีบรีฟเสียง และมีช่องใส่ไฟล์ให้ลองฟังในฉากได้ทันที</p>
+        <ul>
+          <li>ซ้อน 5 ชั้นให้ดังพร้อมกันเสมอ: ทะเล · ตัวเรือ · สิ่งมีชีวิต · เครื่องมือ · เสียงพากย์ ชั้นไหนเงียบจะรู้สึกโหว่ทันที ลองสลับ "ตอนนี้" กับ "เต็มตัวตามแผน" ด้านบนแล้วฟังเทียบ</li>
+          <li>ยิ่งลึก ยิ่งทุ้ม ยิ่งก้อง ยิ่งเงียบ ให้เสียงตัวเรือลั่นโผล่มาแทนเสียงน้ำ ผู้เล่นจะรู้สึกถึงแรงดันโดยไม่ต้องอ่านตัวเลข</li>
+          <li>ทุกการกระทำต้องมีเสียงตอบทันที โดยเฉพาะการหมุนกล่อง ซึ่งเป็นการกระทำหลักของงานเรา หมุนแล้วเงียบ มือกับหูจะไม่ต่อกัน</li>
+          <li>ตอนเสียงพากย์พูด ให้เสียงทะเลเบาลงครึ่งหนึ่ง (ประมาณ −6 dB) แล้วค่อยกลับ จำลองนี้ทำให้ฟังแล้ว</li>
+          <li>ลำโพงโน้ตบุ๊กแทบไม่ออกเสียงต่ำกว่าราว 300 Hz เสียงทุ้มอย่างบูมหรือครางต่ำต้องมีรายละเอียดช่วงกลางด้วย ไม่งั้นจะเงียบ ฟังบนโน้ตบุ๊กที่ใช้โชว์จริงทุกครั้ง</li>
+          <li>เสียงที่ได้ยินบ่อย เช่น ตัวเรือลั่นหรือคลิกตอนหมุน หาไว้ 3–6 แบบแล้วสุ่มสลับ หูจะได้ไม่จับได้ว่าวน</li>
+          <li>ไฟล์ที่ส่ง: WAV 16-bit 44.1 kHz ตั้งชื่อตาม ID เช่น <code>hull_creak_1.wav</code> ตัดช่วงเงียบหัวท้าย และจดลิงก์ ผู้สร้าง กับสัญญาอนุญาตของทุกไฟล์ไว้ใส่เครดิต</li>
+          <li>สัตว์ที่ในธรรมชาติไม่มีเสียง ใช้เสียงออกแบบได้ แต่ห้ามบอกว่าเป็นเสียงจริงของสัตว์ตัวนั้น</li>
+        </ul>
+        <h3>ที่หาเสียง</h3>
+        <ul>
+          <li><a href="https://freesound.org" target="_blank" rel="noopener">Freesound</a> ดูสัญญาทีละไฟล์: CC0 ใช้ได้เลย, CC-BY ต้องใส่ชื่อผู้สร้าง, CC-BY-NC ห้ามใช้เชิงพาณิชย์</li>
+          <li><a href="https://pixabay.com/sound-effects/" target="_blank" rel="noopener">Pixabay Sound Effects</a> ใช้ฟรี ไม่บังคับให้เครดิต</li>
+          <li><a href="https://sound-effects.bbcrewind.co.uk" target="_blank" rel="noopener">BBC Sound Effects</a> ใช้เพื่อการศึกษาได้ตามสัญญา RemArc ห้ามใช้เชิงพาณิชย์</li>
+          <li><a href="https://sonniss.com/gameaudiogdc" target="_blank" rel="noopener">Sonniss GDC Bundle</a> ชุดเสียงแจกฟรีรายปี เหมาะกับเสียงเครื่องจักรและโลหะ</li>
+          <li>คลังไฮโดรโฟนของ NOAA สำหรับเสียงจริงใต้ทะเล เช่น วาฬ อ่านเงื่อนไขการใช้ในหน้าแหล่งก่อน</li>
+        </ul>
+      </details>
+      <div id="sheet"></div>
+    </div>
+  </aside>
+</main>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="รายละเอียดเสียง">
+  <div class="drawer-bar"><span class="team-state" id="d-pos"></span><button id="d-close">ปิด</button></div>
+  <div class="drawer-body" id="d-body"></div>
+</aside>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rand=(a,b)=>a+Math.random()*(b-a);
+const wrapD=a=>((a%360)+540)%360-180;
+const store={get(k,d){try{const v=localStorage.getItem('dsm.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('dsm.'+k,JSON.stringify(v))}catch(e){}}};
+
+// ---------------------------------------------------------------- twin constants (prototype-v1/twin)
+const MAX_M=3040, DEPTH_STEP=0.02, HEADING_STEP=5, ZB=[0.25,0.65], ZH=0.03;
+const FACE_IDS=['px','nz','py','nx','pz','ny'];           // azimuth order, 60 degrees apart
+const PANEL_HALF=21.78, FRAME=60-2*PANEL_HALF;             // reticle on a panel ~72.6% of a turn
+const onPanel=yaw=>{const d=((yaw%60)+60)%60;return Math.min(d,60-d)<=PANEL_HALF};
+const faceAt=yaw=>FACE_IDS[Math.round((((yaw%360)+360)%360)/60)%6];
+const ZONE_TH={surface:'ตื้น · SURFACE',mid:'กลาง · MID',deep:'ลึก · DEEP'};
+const ZONE_COL={surface:'#7fd3e6',mid:'#63d6cf',deep:'#ff9f43'};
+
+// The six subjects in twin.json, placed at rough depths so each one can be tested by ear.
+const LIFE=[
+  {id:'life_shoal',   name:'Surface Shoal Fish', th:'ฝูงปลาผิวน้ำ',       kind:'shoal',    az:36,  depth:0.03, speed:4.07,  w:34, rgb:[245,178,66]},
+  {id:'life_reef',    name:'Orange Reef Fish',   th:'ปลาแนวปะการังสีส้ม', kind:'reef',     az:144, depth:0.08, speed:3.05,  w:17, rgb:[236,106,68]},
+  {id:'life_seahorse',name:'Seahorse',           th:'ม้าน้ำ',             kind:'seahorse', az:166, depth:0.12, speed:-1.7,  w:17, rgb:[184,238,180]},
+  {id:'life_manta',   name:'Manta Ray',          th:'กระเบนราหู',         kind:'manta',    az:252, depth:0.28, speed:2.04,  w:24, rgb:[190,218,255]},
+  {id:'life_lantern', name:'Lantern Fish',       th:'ปลาตะเกียง',         kind:'lantern',  az:238, depth:0.40, speed:4.24,  w:17, rgb:[255,198,90]},
+  {id:'life_jelly',   name:'Bloom Jellyfish',    th:'แมงกะพรุน',          kind:'jelly',    az:270, depth:0.75, speed:-1.36, w:17, rgb:[238,156,242]},
+];
+const mDepth=d=>Math.round(d*MAX_M).toLocaleString('en-US');
+
+// ---------------------------------------------------------------- cue sheet
+const STATUS={
+  have:{th:'มีแล้ว'}, upgrade:{th:'มีของเดิม ควรเปลี่ยน'}, missing:{th:'ยังไม่มี'}, found:{th:'หาได้แล้ว รอใส่'}, skip:{th:'ไม่ต้องมีเสียง'}
+};
+const PRI={1:'ต้องมี',2:'ควรมี',3:'ถ้ามีเวลา'};
+const KIND={loop:'วนต่อเนื่อง (loop)',one:'เล่นครั้งเดียว (one-shot)',rand:'สุ่มเล่นเป็นระยะ',prox:'วนต่อเนื่อง ดังตามระยะใกล้ และแพนซ้ายขวา',voice:'เสียงพูด'};
+const CATS=[
+  {id:'bed',th:'บรรยากาศใต้น้ำ',blurb:'ชั้นล่างสุด ดังตลอดเวลา เปลี่ยนตามความลึก ของเดิมมีครบสามชั้นแต่ยังไม่มีใครฟังตรวจ รอบนี้หาใหม่ให้ดีกว่าเดิม'},
+  {id:'hull',th:'ตัวเรือและห้องโดยสาร',blurb:'ทำให้รู้สึกว่านั่งอยู่ในเรือ ไม่ใช่นั่งดูจอ ตอนนี้ขาดทั้งชั้น'},
+  {id:'move',th:'การเคลื่อนที่',blurb:'หมุน ดำ ลอย ข้ามโซน ทุกการขยับต้องมีเสียงตอบทันที'},
+  {id:'tool',th:'เครื่องมือ: สแกน เก็บ วิเคราะห์',blurb:'เสียงของปุ่ม 1 2 3 และผลที่ได้ ของเดิมเป็นเสียงปุ่มเกม ใช้งานได้แต่ยังไม่ให้ความรู้สึกเรือดำน้ำ รอบนี้เปลี่ยนทั้งหมด'},
+  {id:'life',th:'สิ่งมีชีวิต',blurb:'ดังขึ้นเมื่อเป้าเล็งเข้าใกล้ และมาจากซ้ายหรือขวาตามทิศของสัตว์ ผู้เล่นได้ยินก่อนเห็น ในจำลองนี้วางสัตว์ 6 ตัวของทวินไว้ตามความลึกคร่าว ๆ เพื่อทดสอบเสียงเท่านั้น'},
+  {id:'voice',th:'เสียงพากย์: ผู้ช่วย AI ในเรือ',blurb:'ทวินตอนนี้มีแค่ข้อความในกล่องบรรยาย ยังไม่มีเสียงพูด เสียงพากย์ของ DeepCore ตอนแฮกกาธอนคือเสียงอ่านของ Google Translate (gTTS) ภาษาอังกฤษ และบทเป็นของเดโมเก่า ใช้กับทวินนี้ตรง ๆ ไม่ได้ ต้องทำชุดใหม่ ดูบรีฟผู้พากย์ในแต่ละประโยค'},
+  {id:'sys',th:'ระบบ',blurb:'ต่อกล่องจริง ปิดเสียง รีเซ็ต'},
+];
+const NOW_MISSING='ยังไม่มี ตอนนี้เงียบ';
+const CUES=[
+  // bed
+  {id:'ambient_surface',cat:'bed',pri:1,st:'upgrade',kind:'loop',th:'ทะเลช่วงตื้น',when:'ความลึก 0–760 ม. (โซนตื้น) วนตลอด ครอสเฟด 0.6 วิเมื่อเปลี่ยนโซน',now:'มีแล้ว: ambient_surface.wav ผสมจากเสียงคลื่นจริง 8 คลิปกับฟองอากาศ (CC0) แต่ยังไม่มีใครฟังตรวจด้วยหู',want:'น้ำโปร่ง มีคลื่นกระทบตัวเรือด้านบนเบา ๆ ฟองอากาศเล็ก ๆ ลอยผ่าน ฟังแล้วรู้ว่ายังใกล้ผิวน้ำ',why:'เป็นเสียงแรกที่ผู้เล่นได้ยิน ต้องสว่างที่สุดในสามชั้น',spec:'20–60 วิ วนต่อได้ไม่สะดุด',kw:['underwater ambience shallow','underwater waves hull','ocean underwater loop'],gain:.5},
+  {id:'ambient_mid',cat:'bed',pri:1,st:'upgrade',kind:'loop',th:'ทะเลช่วงกลาง',when:'ความลึก 760–1,976 ม. (โซนกลาง)',now:'มีแล้ว: ambient_mid.wav ทึบลงจากชั้นตื้น',want:'ทึบลง ความถี่สูงหายไป มีเสียงสั่นต่ำ ๆ ของมวลน้ำ เงียบกว่าเดิม',why:'ความต่างระหว่างสามชั้นคือสิ่งที่บอกผู้เล่นว่ากำลังลงลึก',spec:'20–60 วิ วนได้',kw:['deep underwater ambience','underwater drone dark'],gain:.5},
+  {id:'ambient_deep',cat:'bed',pri:1,st:'upgrade',kind:'loop',th:'ทะเลลึก',when:'ความลึก 1,976–3,040 ม. (โซนลึก)',now:'มีแล้ว: ambient_deep.wav มืดที่สุดในสามชั้น',want:'เกือบเงียบ ทุ้ม หนัก เว้นที่ว่างให้เสียงตัวเรือลั่นโผล่ขึ้นมา',why:'ความเงียบในโซนลึกทำให้ทุกเสียงเล็ก ๆ ดูน่ากลัวและน่าตื่นเต้นขึ้น',spec:'20–60 วิ วนได้',kw:['abyss ambience','deep sea drone','dark underwater room tone'],gain:.5},
+  {id:'whale_distant',cat:'bed',pri:2,st:'missing',kind:'rand',rev:.9,th:'วาฬร้องไกล ๆ',when:'สุ่มทุก 35–70 วิ ในโซนตื้นและกลาง เบามาก ก้องยาว',want:'เสียงร้องของวาฬหลังค่อมจากไกล ๆ ลากขึ้นลงช้า ๆ เบาจนต้องตั้งใจฟัง',why:'บอกว่าทะเลกว้างและมีชีวิตอยู่รอบตัว ทั้งที่ยังมองไม่เห็นอะไร',nat:['real','วาฬหลังค่อมร้องเพลงจริง หาไฟล์บันทึกจากไฮโดรโฟนได้ เช็คสิทธิ์ก่อนใช้'],spec:'4–10 วิ มี 2–3 แบบ',kw:['humpback whale song','whale call distant underwater','hydrophone whale']},
+  {id:'deep_mystery',cat:'bed',pri:3,st:'missing',kind:'rand',rev:.6,th:'เสียงลึกลับจากที่ลึก',when:'สุ่มทุก 45–90 วิ เฉพาะโซนลึก',want:'เสียงครางต่ำ ยาว ไม่รู้ว่ามาจากอะไร ให้ขนลุกนิด ๆ แต่ไม่ใช่หนังผี',why:'สร้างความตื่นเต้นในโซนที่มืดและว่างที่สุด',nat:['designed','แนวเดียวกับเสียง "Bloop" ที่ NOAA บันทึกได้ในปี 1997 ซึ่งภายหลังพบว่าเป็นเสียงน้ำแข็งแตก ใช้เป็นแรงบันดาลใจได้ แต่อย่าบอกว่าเป็นเสียงสัตว์'],spec:'3–6 วิ',kw:['deep sea rumble','underwater groan low','icequake hydrophone','bloop sound']},
+  // hull
+  {id:'sub_roomtone',cat:'hull',pri:1,st:'missing',kind:'loop',th:'เสียงในห้องเรือ',when:'วนตลอดตั้งแต่กดเริ่มดำ อยู่ใต้เสียงทะเล',want:'ฮัมไฟฟ้าเบา ๆ พัดลมระบายอากาศ และบี๊บเครื่องมือเล็ก ๆ นาน ๆ ครั้ง เหมือนนั่งในห้องควบคุม',why:'เสียงนี้ทำให้ผู้เล่นรู้สึกว่าอยู่ในเรือ แทนที่จะดูทะเลผ่านจอ เป็นชั้นที่ขาดแล้วโหว่ที่สุด',spec:'30–60 วิ วนได้',kw:['submarine interior ambience','spaceship room tone hum','control room hum loop','ventilation hum'],gain:.9},
+  {id:'hull_creak',cat:'hull',pri:1,st:'missing',kind:'rand',rev:.35,th:'ตัวเรือลั่นจากแรงดัน',when:'สุ่มเอง: โซนกลางทุก 18–30 วิ, โซนลึกทุก 7–14 วิ, โซนตื้นไม่มี',want:'โลหะหนาครางและลั่นเอี๊ยด สั้นบ้างยาวบ้าง ยิ่งลึกยิ่งถี่และดัง',why:'ให้ผู้เล่นรู้สึกถึงแรงดันน้ำโดยไม่ต้องอ่านค่า ATM',spec:'1–3 วิ ต้องมี 4–6 แบบ สุ่มสลับ',kw:['submarine hull creak','metal creak stress','ship hull groan','pressure creak metal']},
+  {id:'sonar_idle',cat:'hull',pri:1,st:'missing',kind:'rand',rev:.6,th:'โซนาร์ปิงอัตโนมัติ',when:'ทุก 9–13 วิ ตลอดการดำ เสียงสะท้อนกลับเร็วขึ้นเมื่อเข้าใกล้พื้นทะเล',want:'ปิงโซนาร์คลาสสิกมีหางก้อง และเสียงสะท้อนเบา ๆ ตามมา ต้องเบาและทุ้มกว่าเสียงสแกนเจอ ผู้เล่นจะได้ไม่สับสน',why:'เป็นเสียงประจำตัวเรือดำน้ำที่ทุกคนจำได้ และให้จังหวะกับบรรยากาศ',spec:'2–4 วิ รวมหาง',kw:['sonar ping','submarine sonar','sonar ping echo']},
+  {id:'max_depth_warning',cat:'hull',pri:2,st:'missing',kind:'one',th:'ถึงความลึกสูงสุด',when:'ความลึกแตะ 3,040 ม.',want:'ตัวเรือครางหนักยาว ตามด้วยสัญญาณเตือนสองโทนเบา ๆ ไม่แหลม',spec:'2–4 วิ',kw:['submarine alarm','hull stress groan','low pressure warning beep']},
+  {id:'surface_break',cat:'hull',pri:3,st:'missing',kind:'one',th:'โผล่พ้นผิวน้ำ',when:'กลับขึ้นมาถึง 0 ม.',want:'น้ำแตกกระจาย ฟองพรั่งพรู แล้วเปลี่ยนเป็นคลื่นซัดตัวเรือ',spec:'2–3 วิ',kw:['surfacing splash','water surface break','boat waves hull']},
+  // move
+  {id:'dive_start',cat:'move',pri:1,st:'missing',kind:'one',th:'เริ่มดำ ปิดฝาเรือ',when:'กดปุ่มเริ่ม (ปุ่มแรกของทวิน)',want:'ฝาเหล็กปิดดังกึง ล็อกหมุน ลมซีลฟู่ ระบบไฟติดไล่ขึ้น แล้วจบด้วยปิงแรก',why:'ช่วงเปิดเรื่องดึงคนเข้าโลกได้ง่ายที่สุด เสียงนี้บอกว่าเราอยู่ในเรือแล้ว',spec:'3–5 วิ ประกอบจากหลายเสียงได้',kw:['hatch close metal','airlock seal hiss','power up machine','submarine hatch']},
+  {id:'descend_thrust',cat:'move',pri:1,st:'missing',kind:'loop',th:'ดำลง',when:'กดลูกศรลงค้างไว้ วนระหว่างความลึกเปลี่ยน หยุดแล้วมีหางจางลง',want:'น้ำไหลเข้าถังถ่วงเสียงกลั้ก ๆ มีฟอง และใบพัดหมุนต่ำ ๆ',why:'ผู้เล่นควรรู้สึกว่ากำลังจมลง ไม่ใช่แค่ตัวเลขเปลี่ยน',spec:'loop 3–8 วิ และหางประมาณ 1 วิ',kw:['ballast tank flooding','submarine propeller underwater','underwater motor loop'],gain:.8},
+  {id:'ascend_blow',cat:'move',pri:2,st:'missing',kind:'one',th:'ลอยขึ้น',when:'กดลูกศรขึ้น (เล่นไม่ถี่กว่าทุก 1.2 วิ)',want:'เป่าลมอัดไล่น้ำออกจากถังเสียงฟู่ยาว และฟองลอยขึ้น',spec:'1–2 วิ',kw:['ballast blow air','compressed air release','bubbles rising']},
+  {id:'turn_periscope',cat:'move',pri:1,st:'missing',kind:'one',th:'หมุนกล่อง',when:'ทุกครั้งที่หมุนผ่าน 5° ไม่ว่าจะกดลูกศร ลากเมาส์ หรือหมุนกล่องจริงที่อ่านด้วย AS5600',want:'ฟันเฟืองคลิกเบา ๆ ทุก 5° และมอเตอร์หึ่งสั้น ๆ เหมือนหมุนกล้องเพริสโคป',why:'เป็นการกระทำหลักของงานเรา ถ้าหมุนแล้วเงียบ มือกับหูไม่ต่อกัน',spec:'คลิกสั้น 30–80 มิลลิวิ มี 3–4 แบบ สุ่มสลับ',kw:['periscope rotate','ratchet click','gear click mechanical','dial click']},
+  {id:'zone_enter_mid',cat:'move',pri:1,st:'missing',kind:'one',th:'ลงสู่โซนกลาง (760 ม.)',when:'ความลึกผ่าน 760 ม. ขาลง',want:'บูมทุ้มเหมือนแรงดันกดเข้ามา พร้อมแสงหรี่ลง',why:'บอกว่าผ่านเส้นสำคัญแล้ว ทำให้การดำมีจังหวะเป็นช่วง ๆ',spec:'2–4 วิ',kw:['deep boom impact','cinematic sub drop','pressure whoosh low']},
+  {id:'zone_enter_deep',cat:'move',pri:1,st:'missing',kind:'one',th:'ลงสู่โซนลึก เปิดไฟส่อง',when:'ความลึกผ่าน 1,976 ม. ขาลง',want:'บูมหนักกว่าเดิม ตามด้วยรีเลย์ไฟดังแกร๊ก และสปอตไลต์ติดดังหึ่ง',why:'ช่วงที่มืดที่สุด เสียงเปิดไฟคือรางวัลให้ผู้เล่น',spec:'3–5 วิ',kw:['floodlight switch on','heavy relay clunk','electrical hum start','sub drop boom']},
+  {id:'zone_up',cat:'move',pri:3,st:'missing',kind:'one',th:'ขึ้นกลับโซนที่ตื้นกว่า',when:'ความลึกผ่าน 1,976 หรือ 760 ม. ขาขึ้น',want:'เสียงเบา สว่าง ไล่ขึ้น เหมือนแสงกลับมา',spec:'1–2 วิ',kw:['shimmer rise','magic rise soft','light reveal chime']},
+  // tool
+  {id:'scan_sweep',cat:'tool',pri:1,st:'missing',kind:'one',th:'กวาดสแกน',when:'กด 1 (ยกเว้นตอนเป้าอยู่บนขอบจอ) เล่นทันทีพร้อมวงคลื่นสแกน แล้วค่อยตามด้วยผล',want:'โซนาร์กวาดไล่ความถี่ขึ้น เหมือนเครื่องกำลังค้นหา',spec:'1–1.5 วิ',kw:['sonar sweep','scanner sweep sci-fi','radar scan'],dev:'ทวินตอนนี้เล่นเสียงผลทันทีที่กด ถ้าเพิ่มเสียงกวาด ต้องเลื่อนเสียงผลไปราว 0.5 วิ'},
+  {id:'scan_hit',cat:'tool',pri:1,st:'upgrade',kind:'one',rev:.4,th:'สแกนเจอ',when:'กด 1 แล้วมีสัตว์อยู่ในเป้าเล็ง',now:'มีแล้ว: scan_hit.wav (Kenney question_003) เป็นเสียงปุ่มเกม สั้นและสว่าง',want:'ปิงโซนาร์ที่มีเสียงสะท้อนกลับชัด บอกว่ามีอะไรอยู่ตรงนั้น',why:'สแกนคือการกระทำหลัก เสียงปุ่มเกมดึงผู้เล่นออกจากบรรยากาศเรือดำน้ำ',spec:'0.5–1.5 วิ',kw:['sonar ping echo','sonar contact','submarine ping return']},
+  {id:'scan_miss',cat:'tool',pri:2,st:'upgrade',kind:'one',th:'สแกนไม่เจอ',when:'กด 1 แล้วตรงเป้ามีแต่น้ำ',now:'มีแล้ว: scan_miss.wav (Kenney question_004) โทนต่ำกว่า hit',want:'ปิงเดียวกับตอนเจอ แต่ไม่มีเสียงสะท้อนกลับ ค่อย ๆ จางหายไป',spec:'0.5–1 วิ',kw:['sonar ping no echo','sonar ping fade']},
+  {id:'action_error',cat:'tool',pri:3,st:'upgrade',kind:'one',th:'ทำไม่ได้',when:'เป้าอยู่บนขอบจอ, ไม่มีอะไรให้เก็บ หรือถาดว่างตอนกดวิเคราะห์',now:'มีแล้ว: action_error.wav (Kenney minimize_008) ทุ้ม ไม่แหลม',want:'บัซเซอร์คอนโซลเรือต่ำ ๆ สองครั้ง ทุ้มและนุ่ม บอกว่าไม่ได้แต่ไม่ดุ',spec:'0.2–0.8 วิ',kw:['console denied buzz','error beep low']},
+  {id:'collect_success',cat:'tool',pri:2,st:'upgrade',kind:'one',th:'เก็บตัวอย่างสำเร็จ',when:'กด 2 แล้วมีสัตว์ตัวใหม่อยู่ในเป้า',now:'มีแล้ว: collect_success.wav (Kenney confirmation_004) เสียงยืนยันแบบเกม',want:'แขนกลยื่นดูด ช่องเก็บปิด ลมซีล แล้วโทนยืนยันสั้น ๆ',spec:'1–1.5 วิ',kw:['suction tube','mechanical arm servo','sample container seal','hydraulic click']},
+  {id:'collect_duplicate',cat:'tool',pri:3,st:'missing',kind:'one',th:'ตัวนี้เก็บไปแล้ว',when:'กด 2 กับสัตว์ที่อยู่ในถาดแล้ว',now:'ยังไม่มี ทวินใช้ action_error แทน',want:'ติ๊กติ๊กสั้น ๆ นุ่มกว่าเสียงผิด บอกว่ามีแล้วนะ',spec:'0.2–0.4 วิ',kw:['soft double beep','ui notification soft']},
+  {id:'analyze_open',cat:'tool',pri:2,st:'upgrade',kind:'one',th:'เปิดผลวิเคราะห์',when:'กด 3 เมื่อมีตัวอย่างในถาด',now:'มีแล้ว: analyze_open.wav (OwlishMedia UI_020) เสียงอ่านข้อมูลหลายจังหวะ',want:'คอมพิวเตอร์ประมวลผลรัว ๆ สั้น ๆ แล้วหน้าต่างโฮโลแกรมเปิดออก ฟังเป็นเครื่องมือวิทยาศาสตร์ ไม่ใช่เสียงเกม',spec:'0.3–1.5 วิ',kw:['data processing computer','hologram open']},
+  {id:'analyze_close',cat:'tool',pri:3,st:'missing',kind:'one',th:'ปิดหน้าผลวิเคราะห์',when:'กดปุ่ม ACKNOWLEDGE',want:'คลิกนุ่ม ๆ ของหน้าจอพับเก็บ',spec:'0.1–0.3 วิ',kw:['ui close soft','hologram close']},
+  {id:'dive_assist',cat:'tool',pri:3,st:'missing',kind:'one',th:'เปิดหรือปิดไฮไลต์สิ่งมีชีวิต',when:'กด H',want:'หึ่งโฮโลแกรมไล่ขึ้นตอนเปิด และไล่ลงตอนปิด ต้องมีสองแบบ',spec:'0.3–0.6 วิ สองไฟล์',kw:['hologram on','scanner activate','ui toggle sci-fi']},
+  {id:'first_discovery',cat:'tool',pri:2,st:'missing',kind:'one',rev:.5,th:'เจอสัตว์ชนิดใหม่ครั้งแรก',when:'สแกนเจอสัตว์ที่ยังไม่เคยเจอ เล่นซ้อนใต้เสียงสแกนเจอ',want:'คอร์ดนุ่ม ๆ ค่อย ๆ ลอยขึ้น ให้ความรู้สึกว้าว',why:'ความตื่นเต้นของการค้นพบคือหัวใจของงาน ควรฟังต่างจากการสแกนธรรมดา',spec:'2–3 วิ',kw:['discovery swell','wonder pad','cinematic reveal soft']},
+  {id:'mission_complete',cat:'tool',pri:2,st:'missing',kind:'one',rev:.4,th:'เก็บครบ 6 ตัว',when:'เก็บตัวอย่างครบทั้ง 6 ชนิด',want:'สติงเกอร์สั้น ภูมิใจแต่ไม่เอิกเกริก เข้ากับทะเลลึก',spec:'2–4 วิ',kw:['mission complete ambient','achievement soft','success stinger calm']},
+  // life
+  {id:'life_shoal',cat:'life',pri:2,st:'missing',kind:'prox',th:'ฝูงปลาผิวน้ำ (Surface Shoal Fish)',when:'เป้าเล็งเข้าใกล้ฝูงปลา ความลึกราว 90 ม.',want:'ฝูงปลาว่ายวูบผ่านเป็นระลอก มีฟองเล็ก ๆ',nat:['designed','ปลาหลายชนิดส่งเสียงได้จริง แต่เสียงวูบของทั้งฝูงเป็นเสียงออกแบบ'],spec:'loop 5–15 วิ',kw:['fish school swim underwater','underwater swish','fish swimming underwater']},
+  {id:'life_reef',cat:'life',pri:2,st:'missing',kind:'prox',th:'ปลาแนวปะการังสีส้ม (Orange Reef Fish)',when:'เป้าเล็งเข้าใกล้ ความลึกราว 240 ม.',want:'แนวปะการังเสียงกรอบแกรบ มีเสียงป๊อก ๆ ของปลาแทรก',nat:['real','เสียงกรอบแกรบในแนวปะการังมาจากกุ้งดีดขัน และปลาการ์ตูนก็ส่งเสียงป๊อกได้จริง'],spec:'loop 10–20 วิ',kw:['coral reef soundscape','snapping shrimp','clownfish sound']},
+  {id:'life_seahorse',cat:'life',pri:3,st:'missing',kind:'prox',th:'ม้าน้ำ (Seahorse)',when:'เป้าเล็งเข้าใกล้ ความลึกราว 370 ม.',want:'เสียงคลิกเล็ก ๆ ทีละสองสามครั้ง',nat:['real','ม้าน้ำส่งเสียงคลิกจริงตอนกินอาหารและตอนเกี้ยว'],spec:'loop หรือคลิกสั้น 3–4 แบบ',kw:['seahorse click','small click underwater','tiny click']},
+  {id:'life_manta',cat:'life',pri:2,st:'missing',kind:'prox',th:'กระเบนราหู (Manta Ray)',when:'เป้าเล็งเข้าใกล้ ความลึกราว 850 ม.',want:'ปีกโบกช้า ๆ เสียงวู้บทุ้มนุ่ม',nat:['designed','กระเบนราหูไม่ส่งเสียงร้อง เป็นเสียงออกแบบจากน้ำที่ปีกผลัก'],spec:'loop 6–12 วิ',kw:['underwater whoosh slow','large creature swim underwater','wing flap water']},
+  {id:'life_lantern',cat:'life',pri:2,st:'missing',kind:'prox',th:'ปลาตะเกียง (Lantern Fish)',when:'เป้าเล็งเข้าใกล้ ความลึกราว 1,200 ม.',want:'ประกายระยิบเบา ๆ ตามจังหวะแสงเรืองที่ตัว',nat:['designed','ปลาตะเกียงเรืองแสงได้จริง แต่เสียงระยิบเป็นเสียงออกแบบแทนแสง'],spec:'loop 5–10 วิ',kw:['sparkle twinkle soft','magic glitter','bioluminescence sound']},
+  {id:'life_jelly',cat:'life',pri:2,st:'missing',kind:'prox',rev:.7,th:'แมงกะพรุน (Bloom Jellyfish)',when:'เป้าเล็งเข้าใกล้ ความลึกราว 2,300 ม.',want:'เสียงแก้วใส ก้องยาว ลอยช้า ๆ ตามจังหวะที่แมงกะพรุนหุบตัว',nat:['designed','แมงกะพรุนไม่มีเสียง เป็นเสียงออกแบบให้เข้ากับการเคลื่อนไหว'],spec:'loop 8–15 วิ',kw:['glass chime soft','ethereal pad','crystal ambient']},
+  // voice
+  {id:'vo_welcome',cat:'voice',pri:1,st:'missing',kind:'voice',th:'ต้อนรับ เริ่มดำ',when:'หลังเสียงปิดฝาเรือ ตอนกดเริ่ม',line:{th:'ปิดฝาเรียบร้อย ทุกระบบพร้อม เริ่มดำลงได้',en:'Hatch sealed. All systems ready. Beginning our descent.'},twin:'Six panels on a vertex-up cube. The sea turns with the cube; the reticle stays in front of the base.'},
+  {id:'vo_zone_mid',cat:'voice',pri:1,st:'missing',kind:'voice',th:'ผ่าน 760 เมตร',when:'ลงถึงโซนกลาง',line:{th:'ผ่าน 760 เมตรแล้ว แสงจากผิวน้ำลงมาไม่ถึงตรงนี้',en:'Passing 760 metres. Sunlight does not reach this far.'},twin:'ไม่มีข้อความ มีแค่ป้ายโซนที่เปลี่ยนเป็น MID'},
+  {id:'vo_zone_deep',cat:'voice',pri:1,st:'missing',kind:'voice',th:'ผ่าน 1,976 เมตร',when:'ลงถึงโซนลึก',line:{th:'ต่ำกว่า 1,976 เมตร แสงเดียวที่เหลือคือแสงจากสิ่งมีชีวิต เปิดไฟส่อง',en:'Below 1,976 metres. The only light down here is made by living things. Floodlights on.'},twin:'ไม่มีข้อความ มีแค่ป้ายโซนที่เปลี่ยนเป็น DEEP'},
+  {id:'vo_scan_hit',cat:'voice',pri:1,st:'missing',kind:'voice',th:'สแกนเจอ',when:'หลังเสียงสแกนเจอ',line:{th:'มีสัญญาณสิ่งมีชีวิตในเป้าเล็ง',en:'Life signal in the reticle.'},twin:'Scan on face ny: Manta Ray is in the reticle. Press 2 to collect.',dev:'ห้ามบอกชื่อสัตว์ตอนสแกน ให้ผู้เล่นสังเกตเอง ชื่อค่อยเผยตอนวิเคราะห์ ตามบรีฟที่ว่าไม่เฉลยก่อนผู้ชมสังเกตเอง'},
+  {id:'vo_scan_miss',cat:'voice',pri:2,st:'missing',kind:'voice',th:'สแกนไม่เจอ',when:'หลังเสียงสแกนไม่เจอ',line:{th:'ไม่มีสัญญาณ ตรงนี้มีแต่น้ำ',en:'No signal. Open water.'},twin:'Scan on face ny: open water.'},
+  {id:'vo_on_frame',cat:'voice',pri:2,st:'missing',kind:'voice',th:'เป้าอยู่บนขอบจอ',when:'กดสแกนหรือเก็บตอนเป้าอยู่บนขอบจอ',line:{th:'เป้าเล็งอยู่บนขอบจอ หมุนต่ออีกนิด',en:'The reticle is on the frame. Turn a little further.'},twin:'The reticle is on the printed frame, not on a panel. Nothing to scan.'},
+  {id:'vo_collect',cat:'voice',pri:1,st:'missing',kind:'voice',th:'เก็บตัวอย่างแล้ว',when:'หลังเสียงเก็บสำเร็จ',line:{th:'เก็บตัวอย่างเข้าถาดแล้ว',en:'Sample secured.'},twin:'Sample stored: Manta Ray — 1 of 6 in the tray. Press 3 to analyse.'},
+  {id:'vo_duplicate',cat:'voice',pri:3,st:'missing',kind:'voice',th:'ตัวนี้อยู่ในถาดแล้ว',when:'กดเก็บสัตว์ที่เก็บไปแล้ว',line:{th:'ตัวนี้อยู่ในถาดแล้ว',en:'Already in the tray.'},twin:'Manta Ray is already in the sample tray.'},
+  {id:'vo_nothing',cat:'voice',pri:3,st:'missing',kind:'voice',th:'ไม่มีอะไรให้เก็บ',when:'กดเก็บตอนเป้าไม่มีสัตว์',line:{th:'ไม่มีอะไรในเป้าให้เก็บ',en:'Nothing in the reticle to collect.'},twin:'Nothing under the reticle to collect.'},
+  {id:'vo_tray_empty',cat:'voice',pri:3,st:'missing',kind:'voice',th:'ถาดยังว่าง',when:'กดวิเคราะห์ตอนยังไม่มีตัวอย่าง',line:{th:'ถาดยังว่าง ลองเก็บตัวอย่างก่อน',en:'The tray is empty. Collect a sample first.'},twin:'The sample tray is empty. Collect something first.'},
+  {id:'vo_analyze',cat:'voice',pri:1,st:'missing',kind:'voice',th:'อ่านผลวิเคราะห์',when:'หลังเสียงเปิดผลวิเคราะห์',line:{th:'วิเคราะห์เสร็จ พบ {names}',en:'Analysis complete: {names}.'},twin:'Analysis of 2 sample(s): Manta Ray, Seahorse.',dev:'อัดประโยคหลักหนึ่งไฟล์ และชื่อสัตว์แยกอีก 6 ไฟล์ ให้โค้ดต่อกัน หรืออัดประโยคเต็มแยกตามสัตว์ 6 ไฟล์'},
+  {id:'vo_max_depth',cat:'voice',pri:2,st:'missing',kind:'voice',th:'ถึงความลึกสูงสุด',when:'ความลึกแตะ 3,040 ม.',line:{th:'ถึงความลึกสูงสุด 3,040 เมตร แรงดันมากกว่าที่ผิวน้ำกว่า 300 เท่า',en:'Maximum depth, 3,040 metres. Over 300 times the pressure at the surface.'},twin:'ไม่มีข้อความ หน้าจอแสดง 305.0 ATM'},
+  {id:'vo_surface',cat:'voice',pri:3,st:'missing',kind:'voice',th:'ถึงผิวน้ำ',when:'กลับขึ้นมาถึง 0 ม.',line:{th:'ขึ้นถึงผิวน้ำแล้ว',en:'We have reached the surface.'},twin:'ไม่มีข้อความ'},
+  {id:'vo_complete',cat:'voice',pri:2,st:'missing',kind:'voice',th:'ภารกิจสำเร็จ',when:'เก็บครบ 6 ชนิด',line:{th:'เก็บครบทั้งหกตัวอย่าง ภารกิจสำเร็จ',en:'All six samples collected. Mission complete.'},twin:'ไม่มีข้อความพิเศษ'},
+  // sys
+  {id:'board_link',cat:'sys',pri:3,st:'missing',kind:'one',th:'กล่องจริงต่อติดหรือหลุด',when:'โหมดต่อกล่องจริง (?live=1) เมื่อ AS5600 ต่อติดหรือหลุด',want:'ต่อติด: สองโทนไล่ขึ้น, หลุด: ไล่ลงและมีซ่าวิทยุสั้น ๆ',spec:'0.3–0.8 วิ สองไฟล์',kw:['connect beep','disconnect beep','radio static short']},
+  {id:'mute_toggle',cat:'sys',pri:3,st:'skip',kind:'one',th:'ปิดหรือเปิดเสียง (M)',when:'กด M',want:'ไม่ต้องมีเสียง ผู้เล่นกดเพื่อให้เงียบ'},
+  {id:'view_reset',cat:'sys',pri:3,st:'skip',kind:'one',th:'รีเซ็ตมุม (R)',when:'กด R',want:'ไม่ต้องมีเสียง เป็นปุ่มของคนคุมเดโม'},
+];
+const byId=Object.fromEntries(CUES.map(c=>[c.id,c]));
+// Sound briefs: what the player sees and should feel at that moment, what the sound is made of,
+// what to listen to for reference, and what to stay away from.
+const BRIEF={
+  ambient_surface:{scene:'เพิ่งปิดฝาเรือและจมลงใต้ผิวน้ำ แสงแดดยังส่องลงมาเป็นลำ น้ำใส ยังได้ยินคลื่นอยู่เหนือหัว',feel:'สงบ สดใส ตื่นเต้นเล็ก ๆ เหมือนเพิ่งออกเดินทาง',layers:['คลื่นกระทบตัวเรือด้านบน ฟังผ่านเหล็กจึงทึบนิด ๆ','ฟองอากาศเล็กลอยผ่านเป็นระยะ','น้ำไหลเลียดตัวเรือเบา ๆ'],ref:'ช่วงน้ำตื้นในเกม Subnautica, สารคดี Blue Planet II ตอนแนวปะการัง',avoid:'คลื่นซัดชายหาดแบบยืนอยู่บนบก, นกนางนวล, ดนตรี'},
+  ambient_mid:{scene:'แสงหายเกือบหมด น้ำเปลี่ยนเป็นน้ำเงินคราม มองเห็นแค่รอบ ๆ เรือ',feel:'เงียบลง เริ่มรู้ว่าอยู่ไกลจากผิวน้ำ ลึกลับแต่ยังไม่น่ากลัว',layers:['เสียงต่ำที่ขยับช้า ๆ เหมือนมวลน้ำทั้งก้อน','เสียงแหลมหายไปเกือบหมด','เสียงลึก ๆ ไกล ๆ นาน ๆ ครั้ง'],ref:'เกม Subnautica ตอนลงไปถึงเขตน้ำลึก, สารคดี Blue Planet II ตอน The Deep',avoid:'ดนตรีที่มีคอร์ดหรือทำนองชัด, เสียงคลื่น'},
+  ambient_deep:{scene:'มืดสนิท เหลือแค่ไฟส่องจากเรือกับแสงเรืองของสัตว์ แรงดันราว 200–300 เท่าของผิวน้ำ',feel:'โดดเดี่ยว หนัก น่าเกรงขาม ทุกเสียงเล็ก ๆ ทำให้ใจเต้น',layers:['เกือบเงียบ เหลือแค่เสียงทุ้มหนักที่แทบไม่ได้ยิน','เว้นที่ว่างเยอะ ให้เสียงตัวเรือลั่นและเสียงลึกลับมีที่ยืน'],ref:'เกม SOMA ช่วงเดินบนก้นทะเล, เกม Iron Lung',avoid:'เสียงสยองแบบหนังผี เช่น กรีดร้อง กระซิบ'},
+  whale_distant:{scene:'ระหว่างดำลงเงียบ ๆ มีเสียงร้องมาจากที่ไกลมาก มองไม่เห็นตัว',feel:'ขนลุกแบบอัศจรรย์ใจ รู้ว่าไม่ได้อยู่คนเดียว',layers:['เสียงวาฬร้องจริงจากไฮโดรโฟน','ใส่ reverb ยาวและตัดเสียงแหลม ให้ฟังไกล'],ref:'เพลงวาฬหลังค่อมที่บันทึกด้วยไฮโดรโฟน',avoid:'วาฬร้องใกล้ ๆ ดังชัด, เสียงโลมา'},
+  deep_mystery:{scene:'ในความมืดของโซนลึก มีเสียงครางต่ำยาว ๆ มาจากที่ไหนก็ไม่รู้',feel:'สงสัย ตื่นเต้น อยากหันไปมอง',layers:['เสียงครางต่ำที่ไล่ระดับช้า ๆ','รายละเอียดช่วงเสียงกลาง ให้ลำโพงโน้ตบุ๊กได้ยิน'],ref:'เสียง Bloop ของ NOAA, เสียงสัตว์ใหญ่ไกล ๆ ใน Subnautica',avoid:'สัตว์ประหลาดคำราม, jump scare'},
+  sub_roomtone:{scene:'ผู้เล่นนั่งในห้องควบคุมแคบ ๆ รอบตัวเป็นจอและเครื่องมือ',feel:'ปลอดภัยแต่คับแคบ มีเครื่องจักรทำงานอยู่ตลอด',layers:['ฮัมไฟฟ้าต่ำ','พัดลมระบายอากาศหรือเครื่องฟอกอากาศ','บี๊บเครื่องมือเล็ก ๆ นาน ๆ ครั้ง','รีเลย์คลิกบางครั้ง'],ref:'ห้องควบคุมในหนัง Das Boot, ในยานของเกม Iron Lung, ยาน Cyclops ใน Subnautica',avoid:'เสียงคนคุย, วิทยุเปิดเพลง, บี๊บถี่จนรำคาญ'},
+  hull_creak:{scene:'น้ำกดตัวเรือจากทุกทิศ เหล็กหนาค่อย ๆ รับแรง',feel:'ตึงเครียด แอบกังวลว่าเรือจะไหวไหม',layers:['เหล็กครางยาว','เสียงลั่นเอี๊ยดสั้น ๆ','บางครั้งมีโลหะเคาะดังต๊องไกล ๆ'],ref:'หนัง Das Boot ฉากดำลึกเกินขีด, เกม SOMA',avoid:'ประตูไม้เอี๊ยด, เสียงแตกหักรุนแรง'},
+  sonar_idle:{scene:'เรือส่งคลื่นโซนาร์ออกไปสำรวจรอบตัวเป็นจังหวะ',feel:'มีจังหวะ ไม่เงียบเกินไป เหมือนเครื่องกำลังเฝ้าระวังอยู่',layers:['ปิงหลัก','หางก้องยาว','เสียงสะท้อนกลับเบา ๆ'],ref:'หนัง The Hunt for Red October, หนัง Das Boot',avoid:'ปิงเหมือนแจ้งเตือนมือถือ, ดังกว่าเสียงสแกน'},
+  max_depth_warning:{scene:'ถึงก้นทะเล 3,040 ม. ตัวเรือรับแรงดันเต็มที่',feel:'เตือนแต่ไม่ตกใจ รู้ว่านี่คือสุดทาง',layers:['ตัวเรือครางหนักยาว','สัญญาณเตือนสองโทนเบา ๆ 2–3 รอบ','อาจมีเสียงแตะพื้นทรายเบา ๆ'],ref:'หนัง Das Boot ฉากเรือจมลงไปค้างที่ก้นทะเล',avoid:'ไซเรนดังลั่น, เสียงเตือนแหลม'},
+  surface_break:{scene:'เรือพุ่งกลับขึ้นพ้นผิวน้ำ แสงแดดกลับมา',feel:'โล่ง สดชื่น ได้กลับบ้าน',layers:['น้ำแตกกระจาย','ฟองพรั่งพรู','คลื่นซัดตัวเรือ','ลมข้างบนเบา ๆ'],ref:'ฉากเรือดำน้ำโผล่ผิวน้ำในสารคดีหรือหนังเรือดำน้ำ',avoid:'เสียงคนกระโดดน้ำ'},
+  dive_start:{scene:'ผู้เล่นกดเริ่ม ฝาเรือปิด ระบบในเรือตื่นขึ้นทีละส่วน',feel:'เริ่มภารกิจ ตื่นเต้น พร้อมลุย',layers:['ฝาเหล็กหนักปิดดังกึง','วงล้อล็อกหมุน','ลมซีลฟู่','ไฟและจอติดไล่ขึ้น','ปิงแรก'],ref:'หนัง Das Boot ฉากปิดฝาเรือ, ฉากเปิดยานใน Subnautica',avoid:'ประตูรถ, เสียงเปิดเครื่องคอมพิวเตอร์'},
+  descend_thrust:{scene:'ผู้เล่นกดดำลง น้ำไหลเข้าถังถ่วง เรือเริ่มจม',feel:'กำลังเคลื่อนลงจริง ๆ รู้ได้ด้วยหู',layers:['น้ำไหลเข้าถังเสียงกลั้ก ๆ','ฟองอากาศหนีออก','ใบพัดหมุนต่ำ','หางเสียงจางลงเมื่อหยุด'],ref:'ตอนขับยาน Seamoth ดำลงใน Subnautica',avoid:'เครื่องยนต์รถ, เครื่องบิน'},
+  ascend_blow:{scene:'ผู้เล่นกดขึ้น เรือเป่าลมไล่น้ำออกจากถัง',feel:'เบาขึ้น ลอยขึ้น',layers:['ลมอัดพุ่งฟู่ยาว','ฟองใหญ่ลอยขึ้น'],ref:'เสียง emergency blow ของเรือดำน้ำจริง',avoid:'ลมรั่วจากยางรถ'},
+  turn_periscope:{scene:'ผู้เล่นใช้มือหมุนกล่อง เหมือนหมุนกล้องเพริสโคป',feel:'มือกับเสียงไปด้วยกัน รู้สึกว่ากำลังคุมเครื่องจริง ๆ',layers:['คลิกเฟืองเบา ๆ ทุก 5°','มอเตอร์หึ่งสั้น ๆ','ความหนืดของกลไก'],ref:'เสียงหมุนหน้าปัดตู้เซฟ, ฉากหมุนเพริสโคปในหนังเรือดำน้ำ',avoid:'คลิกเมาส์, คลิกปุ่มพลาสติก'},
+  zone_enter_mid:{scene:'ลงผ่าน 760 ม. แสงสุดท้ายหายไป',feel:'ข้ามเส้นเข้าอีกโลก ตื่นเต้นขึ้นอีกขั้น',layers:['บูมทุ้ม','แรงดันกดเข้ามา','โทนลากลงเหมือนแสงหรี่'],ref:'เสียง sub drop ในเทรลเลอร์หนัง',avoid:'เสียงระเบิด'},
+  zone_enter_deep:{scene:'ลงผ่าน 1,976 ม. มืดสนิท เรือเปิดไฟส่อง',feel:'เข้าส่วนที่ลึกที่สุด แล้วได้แสงกลับมาเป็นรางวัล',layers:['บูมหนัก','รีเลย์ไฟดังแกร๊ก','สปอตไลต์ติดดังหึ่ง'],ref:'ฉากเปิดไฟในยานของหนังไซไฟ',avoid:'สวิตช์ไฟบ้าน'},
+  zone_up:{scene:'ขึ้นกลับมาชั้นที่ตื้นกว่า แสงค่อย ๆ กลับมา',feel:'โล่งใจ สว่างขึ้น',layers:['โทนไล่ขึ้นเบา ๆ','ประกายเสียงสูง'],ref:'เสียง reveal นุ่ม ๆ ในเกมสำรวจ',avoid:'เสียงเลเวลอัปแบบเกมมือถือ'},
+  scan_sweep:{scene:'กด 1 เรือยิงคลื่นสแกนออกไปจากเป้าเล็ง',feel:'กำลังค้นหา ลุ้นว่าจะเจออะไร',layers:['โซนาร์กวาดไล่ขึ้น','ไฟฟ้าชาร์จ','คลื่นแผ่ออก'],ref:'เครื่องสแกนใน Subnautica, เรดาร์ในหนังไซไฟ',avoid:'เสียงปืนเลเซอร์'},
+  scan_hit:{scene:'คลื่นสแกนชนสิ่งมีชีวิตแล้วสะท้อนกลับ',feel:'เจอแล้ว ตื่นเต้น',layers:['ปิงชัด','เสียงสะท้อนกลับ 1–2 ครั้ง','โทนยืนยันเบา ๆ'],ref:'หนัง The Hunt for Red October, เสียง contact ในเกมเรือดำน้ำ',avoid:'เสียงปุ่มเกม, เสียงเก็บเหรียญ'},
+  scan_miss:{scene:'คลื่นสแกนออกไปแล้วไม่กลับมา',feel:'ไม่เจอ ลองใหม่ ไม่ได้ผิดหวังมาก',layers:['ปิงเดียวกับตอนเจอแต่ทุ้มกว่า','ไม่มีเสียงสะท้อน ค่อย ๆ จางหาย'],ref:'โซนาร์ตอนไม่มีเป้าในหนังเรือดำน้ำ',avoid:'บัซเซอร์แบบตอบผิด'},
+  action_error:{scene:'ผู้เล่นกดในจังหวะที่ทำไม่ได้',feel:'บอกว่าไม่ได้ แต่ไม่ดุ',layers:['บัซเซอร์คอนโซลต่ำ ๆ สองครั้ง'],ref:'เสียงปฏิเสธคำสั่งในห้องควบคุมยานของหนังไซไฟ',avoid:'เสียงแหลม, เสียง error ของคอมพิวเตอร์'},
+  collect_success:{scene:'แขนกลยื่นออกไปดูดตัวอย่างเข้าช่องเก็บ',feel:'สำเร็จ ได้ของมาแล้ว',layers:['เซอร์โวแขนกล','ดูดน้ำดังฟึ่บ','ช่องเก็บปิดดังชึ่ก','ลมซีล','โทนยืนยันสั้น'],ref:'แขนกลของยาน ROV เก็บตัวอย่างในสารคดีทะเลลึก',avoid:'เสียงเก็บไอเท็มแบบเกมแพลตฟอร์ม'},
+  collect_duplicate:{scene:'ผู้เล่นพยายามเก็บตัวที่มีในถาดแล้ว',feel:'บอกเบา ๆ ว่ามีแล้ว ไม่ใช่ความผิด',layers:['ติ๊กติ๊กสั้นและนุ่ม'],ref:'เสียงแจ้งเตือนเบา ๆ ของเครื่องมือแพทย์',avoid:'ใช้เสียงเดียวกับเสียงทำไม่ได้'},
+  analyze_open:{scene:'ระบบวิเคราะห์ตัวอย่าง แล้วเปิดหน้าจอผล',feel:'ได้คำตอบ รู้สึกเป็นนักวิทยาศาสตร์',layers:['คอมพิวเตอร์ประมวลผลรัว ๆ','หน้าต่างโฮโลแกรมเปิด'],ref:'เสียงหน้าจอข้อมูลในหนังหรือเกมไซไฟ',avoid:'เสียงเปิดแอปมือถือ'},
+  analyze_close:{scene:'ผู้เล่นปิดหน้าผล กลับไปสำรวจต่อ',feel:'จบรายการ ไปต่อได้',layers:['คลิกนุ่ม','โฮโลแกรมพับเก็บ'],ref:'เสียงปิดหน้าต่างในเกมไซไฟ',avoid:'ดังกว่าเสียงเปิด'},
+  dive_assist:{scene:'กด H ระบบไฮไลต์สิ่งมีชีวิตทุกตัวบนจอ',feel:'เปิดตัวช่วย เห็นชัดขึ้น',layers:['หึ่งไล่ขึ้นตอนเปิด','หึ่งไล่ลงตอนปิด'],ref:'เสียงเปิดกล้องมองกลางคืนหรือเครื่องสแกนในเกม',avoid:'ใช้เสียงเดียวกันทั้งเปิดและปิด'},
+  first_discovery:{scene:'เจอสัตว์ชนิดนี้เป็นครั้งแรก',feel:'ว้าว อัศจรรย์ใจ นี่คือหัวใจของงาน',layers:['คอร์ดนุ่มค่อย ๆ ลอยขึ้น','ประกายเสียงสูงเบา ๆ'],ref:'ดนตรีตอนค้นพบในเกม Subnautica หรือ Abzû',avoid:'แตรฉลองชัย'},
+  mission_complete:{scene:'เก็บครบทั้ง 6 ตัวอย่าง',feel:'ภูมิใจ สงบ ไม่ใช่งานปาร์ตี้',layers:['โน้ตไล่ขึ้น','คอร์ดค้างยาว','ปิงโซนาร์ปิดท้าย'],ref:'ดนตรีจบภารกิจในเกมสำรวจ',avoid:'เสียงเฮ ปรบมือ'},
+  life_shoal:{scene:'ฝูงปลานับร้อยว่ายวนผ่านหน้าเรือ',feel:'มีชีวิตชีวา คึกคัก',layers:['ครีบว่ายวูบเป็นระลอก','ฟองเล็ก','เสียงปลาเบา ๆ ถ้าหาได้'],ref:'สารคดี Blue Planet II ฉากฝูงปลา',avoid:'สาดน้ำบนผิวน้ำ'},
+  life_reef:{scene:'แนวปะการังเต็มไปด้วยปลาเล็กปลาน้อย',feel:'คึกคักเหมือนตลาดใต้น้ำ',layers:['กุ้งดีดขันดังกรอบแกรบ','ปลาการ์ตูนดังป๊อก'],ref:'เสียงแนวปะการังจากไฮโดรโฟน',avoid:'เสียงทอดน้ำมันหรือไฟไหม้ ที่ฟังคล้ายกรอบแกรบ'},
+  life_seahorse:{scene:'ม้าน้ำตัวเล็กเกาะนิ่ง ๆ แล้วงับอาหาร',feel:'น่ารัก ต้องตั้งใจฟัง',layers:['คลิกเล็ก ๆ 2–3 ครั้ง'],ref:'เสียงคลิกของม้าน้ำจากงานวิจัยที่บันทึกไว้',avoid:'คลิกดังเหมือนดีดนิ้ว'},
+  life_manta:{scene:'กระเบนราหูตัวใหญ่ร่อนผ่านช้า ๆ',feel:'สง่างาม ยิ่งใหญ่ ช้า',layers:['น้ำถูกปีกผลักดังวู้บทุ้ม','แรงน้ำไหลผ่าน'],ref:'ฉากกระเบนราหูในสารคดีทะเล',avoid:'เสียงร้อง เพราะกระเบนราหูไม่ร้อง'},
+  life_lantern:{scene:'ฝูงปลาตะเกียงกะพริบแสงในที่มืด',feel:'มหัศจรรย์ เหมือนดาวใต้น้ำ',layers:['ประกายระยิบ','เสียงแก้วเบา ๆ'],ref:'ฉากแสงเรืองในหนัง Avatar: The Way of Water',avoid:'เสียงเวทมนตร์แบบการ์ตูนเด็ก'},
+  life_jelly:{scene:'แมงกะพรุนเรืองแสงลอยหุบกางตัวช้า ๆ',feel:'ฝัน ล่องลอย สงบ',layers:['เสียงแก้วใส','pad ก้องยาวตามจังหวะหุบตัว'],ref:'บรรยากาศในเกม Abzû',avoid:'เสียงน้ำหยด'},
+  board_link:{scene:'คนคุมเดโมเสียบหรือถอดกล่องจริง',feel:'รู้ทันทีว่าต่อติดหรือหลุด',layers:['ต่อติด: สองโทนไล่ขึ้น','หลุด: สองโทนไล่ลงและซ่าวิทยุสั้น ๆ'],ref:'เสียงเชื่อมต่ออุปกรณ์ในยานของหนังไซไฟ',avoid:'เสียงเสียบ USB ของ Windows'},
+  vo_welcome:{scene:'หลังฝาเรือปิดและระบบติดครบ',feel:'เริ่มการเดินทาง มั่นใจ',say:'ชัด ช้านิด ๆ เหมือนนักบินแจ้งผู้โดยสาร'},
+  vo_zone_mid:{scene:'แสงสุดท้ายเพิ่งหายไป',feel:'ลึกลับ',say:'เบาลงกว่าปกติ เว้นจังหวะหลังคำว่า "แล้ว"'},
+  vo_zone_deep:{scene:'มืดสนิทก่อนไฟส่องติด',feel:'น่าเกรงขาม แล้วมีความหวังตอนไฟติด',say:'ช้าที่สุดในทั้งชุด เกือบกระซิบ แล้วพูดคำว่า "เปิดไฟส่อง" ชัดขึ้น'},
+  vo_scan_hit:{scene:'สแกนเจอบางอย่าง',feel:'ตื่นเต้นแต่ยังนิ่ง',say:'สั้น ไว ห้ามบอกชื่อสัตว์'},
+  vo_scan_miss:{scene:'สแกนแล้วไม่เจอ',feel:'เฉย ๆ ไม่ผิดหวัง',say:'เรียบ ๆ'},
+  vo_on_frame:{scene:'เป้าอยู่บนขอบจอ',feel:'ช่วยบอกทาง',say:'เป็นมิตร ไม่ดุ'},
+  vo_collect:{scene:'แขนกลเพิ่งเก็บตัวอย่างเข้าถาด',feel:'พอใจ',say:'สั้น มีรอยยิ้มในเสียง'},
+  vo_duplicate:{scene:'กดเก็บตัวที่มีแล้ว',feel:'บอกเบา ๆ',say:'สุภาพ นุ่ม'},
+  vo_nothing:{scene:'กดเก็บตอนเป้าว่าง',feel:'บอกข้อเท็จจริง',say:'เรียบ ๆ'},
+  vo_tray_empty:{scene:'กดวิเคราะห์ตอนยังไม่มีตัวอย่าง',feel:'แนะนำว่าทำอะไรต่อ',say:'เป็นมิตร'},
+  vo_analyze:{scene:'หน้าจอผลวิเคราะห์เปิดขึ้น',feel:'ภูมิใจ ได้คำตอบ',say:'ชัด ช้า อ่านชื่อสัตว์ให้ชัดทุกพยางค์'},
+  vo_max_depth:{scene:'ถึงก้นทะเล',feel:'จริงจัง',say:'เตือนแต่ไม่ตื่นตระหนก'},
+  vo_surface:{scene:'เรือโผล่พ้นน้ำ',feel:'โล่ง',say:'ผ่อนคลาย'},
+  vo_complete:{scene:'เก็บครบ 6 ตัวอย่าง',feel:'ภูมิใจ อบอุ่น ปิดเรื่อง',say:'ช้าลงนิด ยิ้มในเสียง'},
+};
+const VOICE_BRIEF={
+  who:'ผู้ช่วย AI ประจำเรือ เสียงเดียวตลอดเรื่อง',
+  feel:'นิ่ง มั่นใจ อุ่นนิด ๆ ไม่ใช่หุ่นยนต์แข็ง ๆ และไม่ใช่ผู้ประกาศข่าว',
+  how:['อัดเสียงคนจริงในห้องเงียบ ถือมือถือห่างปากราว 20 ซม. หรือใช้ TTS เสียงธรรมชาติ เช่นเสียงไทยแบบ neural ของ Microsoft Azure (Premwadee หรือ Niwat) แทนเสียง Google Translate','ใส่ฟิลเตอร์วิทยุเบา ๆ ตัดต่ำกว่า 300 Hz ตัดสูงกว่า 4 kHz และใส่ซ่าบาง ๆ ให้ฟังเหมือนออกจากลำโพงในเรือ','ประโยคละไม่เกิน 4 วินาที เว้นหัวท้ายไฟล์ราว 0.1 วินาที','อัดทุกประโยคในรอบเดียวกัน ระยะไมค์เดิม เสียงทั้งชุดจะได้เท่ากัน'],
+  avoid:'เสียง Google Translate ตรง ๆ (คนฟังจำได้ทันทีและหลุดจากโลกของงาน), อ่านเร็วเกิน, ใส่เอฟเฟกต์หุ่นยนต์หนักจนฟังไม่ออก'
+};
+
+const FILES={ambient_surface:'audio/ambient_surface.wav',ambient_mid:'audio/ambient_mid.wav',ambient_deep:'audio/ambient_deep.wav',scan_hit:'audio/scan_hit.wav',scan_miss:'audio/scan_miss.wav',collect_success:'audio/collect_success.wav',analyze_open:'audio/analyze_open.wav',action_error:'audio/action_error.wav'};
+const BUS={bed:'bed',hull:'hull',move:'hull',tool:'fx',life:'life',voice:'voice',sys:'fx'};
+const REV={bed:.12,hull:.3,fx:.2,life:.45,voice:.04};
+const SRC={local:'ไฟล์ทดสอบของคุณ',file:'ไฟล์ในโปรเจกต์',sketch:'เสียงร่าง',tts:'เสียงอ่านร่าง',silent:'เงียบ ยังไม่มีเสียง',loading:'กำลังโหลดไฟล์',none:'ไม่ต้องมีเสียง'};
+
+// ---------------------------------------------------------------- shared progress (db) + local test files
+const remote={};
+const localFiles={};
+const hasLocal=id=>!!(localFiles[id]&&localFiles[id].some(f=>f.buf));
+const pickLocal=id=>{const a=(localFiles[id]||[]).filter(f=>f.buf);return a.length?a[Math.floor(Math.random()*a.length)].buf:null};
+const IDB={p:null,
+  open(){if(this.p)return this.p;this.p=new Promise(res=>{try{const r=indexedDB.open('dsm-sounds',1);r.onupgradeneeded=()=>r.result.createObjectStore('files',{keyPath:'key',autoIncrement:true});r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}});return this.p},
+  async all(){const db=await this.open();if(!db)return[];return new Promise(res=>{try{const q=db.transaction('files').objectStore('files').getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>res([])}catch(e){res([])}})},
+  async add(rec){const db=await this.open();if(!db)return null;return new Promise(res=>{try{const q=db.transaction('files','readwrite').objectStore('files').add(rec);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)}catch(e){res(null)}})},
+  async del(key){const db=await this.open();if(!db)return;try{db.transaction('files','readwrite').objectStore('files').delete(key)}catch(e){}}
+};
+let DB=null, teamMode='wait', curId=null;
+const statusOf=id=>(remote[id]&&STATUS[remote[id].status])?remote[id].status:byId[id].st;
+const prefs={mode:store.get('mode','full'),tts:store.get('tts','th'),vol:store.get('vol',.8),filter:store.get('filter','all')};
+
+// ---------------------------------------------------------------- audio engine
+let AC=null, master=null, verb=null, noiseBuf=null;
+const buses={}, fileBuf={}, loops={};
+const hasSpeech='speechSynthesis' in window;
+function makeNoise(sec){const b=AC.createBuffer(1,AC.sampleRate*sec,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b}
+function makeImpulse(sec,decay){const n=Math.floor(AC.sampleRate*sec),b=AC.createBuffer(2,n,AC.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,decay)}return b}
+function audio(){
+  if(AC){if(AC.state==='suspended')AC.resume();return AC}
+  const Ctx=window.AudioContext||window.webkitAudioContext; if(!Ctx) return null;
+  AC=new Ctx();
+  master=AC.createGain(); master.gain.value=S.muted?0:prefs.vol;
+  const comp=AC.createDynamicsCompressor(); comp.threshold.value=-16; comp.knee.value=10; comp.ratio.value=4;
+  master.connect(comp); comp.connect(AC.destination);
+  verb=AC.createConvolver(); verb.buffer=makeImpulse(3.4,2.6);
+  const vr=AC.createGain(); vr.gain.value=.8; verb.connect(vr); vr.connect(master);
+  noiseBuf=makeNoise(3);
+  for(const [b,s] of Object.entries(REV)){const g=AC.createGain();g.connect(master);const sg=AC.createGain();sg.gain.value=s;g.connect(sg);sg.connect(verb);buses[b]=g}
+  loadFiles(); decodeAllLocal();
+  return AC;
+}
+async function loadFiles(){
+  await Promise.all(Object.entries(FILES).map(async([id,url])=>{
+    try{const r=await fetch(url);if(!r.ok)throw new Error(r.status);fileBuf[id]=await AC.decodeAudioData(await r.arrayBuffer())}catch(e){fileBuf[id]=null}
+  }));
+  refreshLoops(); renderSheet();
+}
+function out(bus,gain=1,pan=0,rev=0){
+  const g=AC.createGain(); g.gain.value=gain; let tail=g;
+  if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=pan;g.connect(p);tail=p;g.panner=p}
+  tail.connect(buses[bus]);
+  if(rev){const r=AC.createGain();r.gain.value=rev;tail.connect(r);r.connect(verb)}
+  return g;
+}
+function envGain(T,a,d,peak){const g=AC.createGain();g.gain.setValueAtTime(.0001,T);g.gain.exponentialRampToValueAtTime(Math.max(peak,.0002),T+a);g.gain.exponentialRampToValueAtTime(.0001,T+a+d);return g}
+function tone(dest,{type='sine',f=440,f2=0,t=0,a=.005,d=.3,peak=.3,glide=0,lp=0}){
+  const T=AC.currentTime+Math.max(0,t), o=AC.createOscillator(); o.type=type;
+  o.frequency.setValueAtTime(f,T); if(f2) o.frequency.exponentialRampToValueAtTime(f2,T+(glide||a+d));
+  const g=envGain(T,a,d,peak);
+  if(lp){const fl=AC.createBiquadFilter();fl.type='lowpass';fl.frequency.value=lp;o.connect(fl);fl.connect(g)} else o.connect(g);
+  g.connect(dest); o.start(T); o.stop(T+a+d+.05);
+}
+function nz(dest,{t=0,a=.005,d=.3,peak=.3,type='bandpass',f=1000,f2=0,q=1,glide=0}){
+  const T=AC.currentTime+Math.max(0,t), s=AC.createBufferSource(); s.buffer=noiseBuf; s.loop=true;
+  const fl=AC.createBiquadFilter(); fl.type=type; fl.Q.value=q; fl.frequency.setValueAtTime(f,T);
+  if(f2) fl.frequency.exponentialRampToValueAtTime(f2,T+(glide||a+d));
+  const g=envGain(T,a,d,peak); s.connect(fl); fl.connect(g); g.connect(dest);
+  s.start(T,Math.random()*2); s.stop(T+a+d+.05);
+}
+function ping(dest,{f=1400,t=0,peak=.3,dur=1.4,lp=0}){tone(dest,{f,t,a:.004,d:dur,peak,lp});tone(dest,{f:f*2.01,t,a:.004,d:dur*.3,peak:peak*.12})}
+function bubbles(dest,{t=0,n=8,spread=.6,peak=.12,fLo=350,fHi=1100}={}){for(let i=0;i<n;i++){const f=rand(fLo,fHi);tone(dest,{f,f2:f*rand(1.8,2.8),t:t+Math.random()*spread,a:.004,d:rand(.05,.11),peak:peak*rand(.4,1)})}}
+function clang(dest,{t=0,base=140,peak=.4,d=1.8}={}){[1,2.76,5.4,8.93,13.3].forEach((m,i)=>tone(dest,{f:base*m,t,a:.002,d:d/(1+i*.5),peak:peak/(1+i*.7)}));nz(dest,{t,a:.001,d:.06,peak:peak*.8,type:'lowpass',f:2500})}
+function boom(dest,{t=0,peak=.6,dur=2.2,f=90}={}){tone(dest,{f,f2:f*.45,t,a:.02,d:dur,peak});tone(dest,{type:'triangle',f:f*2,f2:f*.9,t,a:.02,d:dur*.6,peak:peak*.35});nz(dest,{t,a:.6,d:dur*.8,peak:peak*.5,type:'lowpass',f:320,f2:120})}
+function creak(dest,{t=0,len=1.2,f=170,peak=4}={}){
+  const T=AC.currentTime+t, s=AC.createBufferSource(); s.buffer=noiseBuf; s.loop=true;
+  const bp=AC.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=22; bp.frequency.setValueAtTime(f,T); bp.frequency.linearRampToValueAtTime(f*rand(.7,1.2),T+len);
+  const bp2=AC.createBiquadFilter(); bp2.type='bandpass'; bp2.Q.value=14; bp2.frequency.value=f*2.7;
+  const am=AC.createGain(); am.gain.value=.5;
+  const lfo=AC.createOscillator(); lfo.type='square'; lfo.frequency.setValueAtTime(rand(12,22),T); lfo.frequency.linearRampToValueAtTime(rand(20,45),T+len);
+  const lg=AC.createGain(); lg.gain.value=.5; lfo.connect(lg); lg.connect(am.gain);
+  const env=AC.createGain(); env.gain.setValueAtTime(.0001,T); env.gain.exponentialRampToValueAtTime(peak,T+.08); env.gain.setValueAtTime(peak,T+len*.7); env.gain.exponentialRampToValueAtTime(.0001,T+len);
+  s.connect(bp); s.connect(bp2); bp.connect(am); bp2.connect(am); am.connect(env); env.connect(dest);
+  s.start(T,Math.random()); s.stop(T+len+.05); lfo.start(T); lfo.stop(T+len+.05);
+}
+function whale(dest){
+  const T=AC.currentTime, o=AC.createOscillator(); o.type='sine';
+  const pts=[[0,rand(160,220)],[1.1,rand(380,460)],[2,rand(250,300)],[3.1,rand(420,520)],[4.2,rand(180,230)]];
+  o.frequency.setValueAtTime(pts[0][1],T); pts.slice(1).forEach(([t,f])=>o.frequency.exponentialRampToValueAtTime(f,T+t));
+  const vib=AC.createOscillator(); vib.frequency.value=5.5; const vg=AC.createGain(); vg.gain.value=9; vib.connect(vg); vg.connect(o.frequency);
+  const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1400;
+  const g=AC.createGain(); g.gain.setValueAtTime(.0001,T); g.gain.exponentialRampToValueAtTime(.09,T+.6); g.gain.setValueAtTime(.09,T+3.6); g.gain.exponentialRampToValueAtTime(.0001,T+4.6);
+  o.connect(lp); lp.connect(g); g.connect(dest); o.start(T); vib.start(T); o.stop(T+4.8); vib.stop(T+4.8);
+}
+// One-shot sketches: rough synthetic stand-ins that show the idea, never the final sound.
+const SK={
+  sonar_idle:(d,o)=>{ping(d,{f:1180,peak:.2,dur:1.8});ping(d,{f:1180,t:o.echo??.8,peak:.07,dur:1.4})},
+  scan_hit:d=>{ping(d,{f:1560,peak:.32,dur:1.3});ping(d,{f:1560,t:.28,peak:.16,dur:1});ping(d,{f:1560,t:.52,peak:.07,dur:.8})},
+  scan_miss:d=>ping(d,{f:820,peak:.2,dur:1.1,lp:1400}),
+  scan_sweep:d=>{nz(d,{a:.5,d:.9,peak:.5,type:'bandpass',f:300,f2:3200,q:3,glide:1.3});tone(d,{type:'triangle',f:420,f2:1300,a:.3,d:1,peak:.06,glide:1.3})},
+  hull_creak:d=>{const n=Math.random()<.5?1:2;for(let i=0;i<n;i++)creak(d,{t:i*rand(.2,.7),len:rand(.6,1.8),f:rand(120,260),peak:rand(3,6)});if(Math.random()<.4)tone(d,{type:'sawtooth',f:rand(48,60),f2:rand(40,50),a:.2,d:1.5,peak:.05,lp:320})},
+  whale_distant:d=>whale(d),
+  deep_mystery:d=>{tone(d,{type:'sawtooth',f:55,f2:38,a:1.2,d:3.5,peak:.12,lp:380});tone(d,{f:110,f2:70,a:1.2,d:3,peak:.08});nz(d,{a:1.5,d:3,peak:.25,type:'lowpass',f:260,f2:120})},
+  max_depth_warning:d=>{tone(d,{type:'sawtooth',f:46,f2:34,a:.3,d:3,peak:.14,lp:420});creak(d,{len:2.2,f:140,peak:6});[0,.55,1.1].forEach(t=>{tone(d,{type:'triangle',f:660,t:t+.3,a:.02,d:.22,peak:.08});tone(d,{type:'triangle',f:520,t:t+.57,a:.02,d:.22,peak:.08})})},
+  surface_break:d=>{nz(d,{a:.02,d:1.1,peak:.6,type:'lowpass',f:7000,f2:500});bubbles(d,{n:18,spread:.9,peak:.12});nz(d,{t:.9,a:.5,d:1.6,peak:.25,type:'bandpass',f:500,f2:900,q:.7})},
+  dive_start:d=>{clang(d,{base:120,peak:.35});clang(d,{t:.4,base:260,peak:.12,d:.5});nz(d,{t:.6,a:.05,d:.9,peak:.25,type:'highpass',f:2500});tone(d,{type:'triangle',f:160,f2:1100,t:1.1,a:.6,d:.9,peak:.06,glide:1.4});[0,.12,.24].forEach((x,i)=>tone(d,{f:1400+i*300,t:2.2+x,a:.005,d:.08,peak:.05}));ping(d,{f:1180,t:2.9,peak:.2,dur:1.8})},
+  ascend_blow:d=>{nz(d,{a:.08,d:1.3,peak:.3,type:'highpass',f:1800,f2:900});bubbles(d,{t:.1,n:14,spread:1.1,peak:.1,fLo:500,fHi:1500})},
+  turn_periscope:d=>{nz(d,{a:.001,d:.018,peak:.35,type:'highpass',f:2500});tone(d,{f:rand(1900,2600),a:.001,d:.025,peak:.05});tone(d,{type:'square',f:rand(90,120),a:.002,d:.03,peak:.02,lp:600})},
+  zone_enter_mid:d=>boom(d,{f:95,peak:.55,dur:2.6}),
+  zone_enter_deep:d=>{boom(d,{f:80,peak:.65,dur:3});clang(d,{t:1.3,base:90,peak:.2,d:.6});nz(d,{t:1.3,a:.002,d:.07,peak:.4,type:'lowpass',f:1800});tone(d,{type:'sawtooth',f:100,t:1.45,a:.05,d:1.4,peak:.04,lp:1200});tone(d,{type:'sawtooth',f:200,t:1.45,a:.05,d:1.2,peak:.02,lp:2000})},
+  zone_up:d=>{[880,1175,1568,2093].forEach((f,i)=>tone(d,{f,f2:f*1.5,t:i*.12,a:.2,d:1.2,peak:.04}));nz(d,{a:.6,d:.8,peak:.12,type:'highpass',f:3000})},
+  action_error:d=>[0,.14].forEach(t=>tone(d,{type:'square',f:140,t,a:.005,d:.1,peak:.08,lp:900})),
+  collect_success:d=>{[0,.07,.14].forEach(t=>nz(d,{t,a:.001,d:.012,peak:.3,type:'highpass',f:3000}));nz(d,{t:.2,a:.02,d:.35,peak:.35,type:'bandpass',f:600,f2:200,q:1.5});tone(d,{f:95,t:.5,a:.005,d:.25,peak:.25});nz(d,{t:.55,a:.02,d:.5,peak:.18,type:'highpass',f:3500});tone(d,{f:1320,t:.95,a:.005,d:.25,peak:.07});tone(d,{f:1760,t:1.05,a:.005,d:.35,peak:.06})},
+  collect_duplicate:d=>[0,.09].forEach(t=>tone(d,{f:1250,t,a:.003,d:.05,peak:.07})),
+  analyze_close:d=>{tone(d,{f:900,f2:600,a:.003,d:.09,peak:.06});nz(d,{a:.001,d:.02,peak:.1,type:'highpass',f:4000})},
+  dive_assist:(d,o)=>{const up=o.on!==false;tone(d,{type:'triangle',f:up?300:900,f2:up?900:300,a:.03,d:.35,peak:.07,glide:.35});tone(d,{f:up?1800:1200,t:.3,a:.005,d:.12,peak:.03})},
+  first_discovery:d=>[261.6,392,523.3,659.3,784].forEach((f,i)=>{tone(d,{f,t:.1+i*.05,a:.9,d:2.6,peak:.035});tone(d,{f:f*1.003,t:.1+i*.05,a:.9,d:2.6,peak:.025})}),
+  mission_complete:d=>{[392,523.3,659.3,784,1046.5].forEach((f,i)=>tone(d,{type:'triangle',f,t:i*.13,a:.01,d:1.4,peak:.07}));[261.6,392,523.3].forEach(f=>tone(d,{f,t:.6,a:.8,d:2.8,peak:.04}))},
+  board_link:(d,o)=>{const up=o.on!==false;tone(d,{f:up?880:1320,a:.005,d:.12,peak:.07});tone(d,{f:up?1320:880,t:.14,a:.005,d:.18,peak:.07});if(!up)nz(d,{t:.3,a:.01,d:.4,peak:.12,type:'bandpass',f:2500,q:.8})},
+};
+const grainLoop=fn=>d=>{const st={next:0};return{stop(){},grain(){fn(d,st)}}};
+function motorLoop(d){
+  const nodes=[], og=AC.createGain(); og.gain.value=.07;
+  const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=520; lp.connect(og); og.connect(d);
+  [62,93.5].forEach(f=>{const o=AC.createOscillator();o.type='sawtooth';o.frequency.value=f;o.connect(lp);nodes.push(o)});
+  const lfo=AC.createOscillator(); lfo.frequency.value=7; const lg=AC.createGain(); lg.gain.value=.03; lfo.connect(lg); lg.connect(og.gain); nodes.push(lfo);
+  const s=AC.createBufferSource(); s.buffer=noiseBuf; s.loop=true; const bp=AC.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=700; bp.Q.value=.8;
+  const ng=AC.createGain(); ng.gain.value=.12; s.connect(bp); bp.connect(ng); ng.connect(d); nodes.push(s);
+  nodes.forEach(n=>n.start());
+  let next=0;
+  return{stop(){nodes.forEach(n=>{try{n.stop()}catch(e){}})},grain(){if(AC.currentTime>next){bubbles(d,{n:3,spread:.25,peak:.08,fLo:250,fHi:700});next=AC.currentTime+rand(.25,.6)}}};
+}
+function roomLoop(d){
+  const nodes=[];
+  const add=(type,f,gain,lp)=>{const o=AC.createOscillator();o.type=type;o.frequency.value=f;const g=AC.createGain();g.gain.value=gain;if(lp){const fl=AC.createBiquadFilter();fl.type='lowpass';fl.frequency.value=lp;o.connect(fl);fl.connect(g)}else o.connect(g);g.connect(d);nodes.push(o)};
+  add('sine',50,.08); add('sine',100,.05); add('sawtooth',150,.012,700); add('sine',300,.012);
+  const s=AC.createBufferSource(); s.buffer=noiseBuf; s.loop=true;
+  const hp=AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=180; const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1300;
+  const g=AC.createGain(); g.gain.value=.05; s.connect(hp); hp.connect(lp); lp.connect(g); g.connect(d); nodes.push(s);
+  nodes.forEach(n=>n.start());
+  let next=AC.currentTime+rand(3,6);
+  return{stop(){nodes.forEach(n=>{try{n.stop()}catch(e){}})},grain(){if(AC.currentTime>next){tone(d,{f:rand(1800,2600),a:.003,d:.05,peak:.03});if(Math.random()<.6)tone(d,{f:rand(1800,2600),t:.12,a:.003,d:.05,peak:.025});next=AC.currentTime+rand(6,11)}}};
+}
+const LOOPSK={
+  sub_roomtone:roomLoop,
+  descend_thrust:motorLoop,
+  life_shoal:grainLoop(d=>{if(Math.random()<.07)nz(d,{a:.04,d:rand(.12,.25),peak:.3,type:'bandpass',f:rand(1200,1800),f2:rand(2200,3200),q:2});if(Math.random()<.03)bubbles(d,{n:4,spread:.3,peak:.06})}),
+  life_reef:grainLoop(d=>{const k=2+Math.floor(Math.random()*4);for(let i=0;i<k;i++)nz(d,{t:Math.random()*.06,a:.0005,d:.003,peak:rand(.1,.45),type:'highpass',f:2800});if(Math.random()<.035)tone(d,{f:rand(500,800),f2:rand(300,450),a:.003,d:.04,peak:.12})}),
+  life_seahorse:grainLoop(d=>{if(Math.random()<.035){const n=2+Math.floor(Math.random()*2);for(let i=0;i<n;i++)tone(d,{f:rand(2800,3600),t:i*.085,a:.0008,d:.006,peak:.35})}}),
+  life_manta:grainLoop((d,st)=>{if(AC.currentTime>st.next){nz(d,{a:.9,d:1.3,peak:.45,type:'bandpass',f:320,f2:900,q:1.1,glide:1});st.next=AC.currentTime+rand(2.6,3.4)}}),
+  life_lantern:grainLoop(d=>{if(Math.random()<.22)tone(d,{f:rand(2600,5200),a:.002,d:rand(.03,.08),peak:.05})}),
+  life_jelly:grainLoop((d,st)=>{if(AC.currentTime>st.next){const b=[1046.5,1318.5,1568,2093][Math.floor(Math.random()*4)];tone(d,{f:b,a:.02,d:2.6,peak:.06});tone(d,{f:b*1.5,t:.05,a:.02,d:1.8,peak:.03});st.next=AC.currentTime+rand(1.6,3)}}),
+};
+const hasSketch=id=>!!(SK[id]||LOOPSK[id]);
+const isLoop=c=>c.kind==='loop'||c.kind==='prox';
+
+// Which sound actually plays for a cue right now.
+function sourceFor(id){
+  const c=byId[id], st=statusOf(id);
+  if(st==='skip') return 'none';
+  if(hasLocal(id)) return 'local';
+  if(c.cat==='voice') return (prefs.mode==='full'&&prefs.tts!=='off'&&hasSpeech)?'tts':'silent';
+  const hasFile=!!FILES[id];
+  if(prefs.mode==='full'&&(st!=='have'||!hasFile)&&hasSketch(id)) return 'sketch';
+  if(hasFile) return fileBuf[id]?'file':(fileBuf[id]===null?'silent':'loading');
+  return 'silent';
+}
+
+function ensureLoop(id){
+  const want=sourceFor(id); let L=loops[id];
+  if(L&&L.src===want) return L;
+  const gain=L?L.gain:0, pan=L?L.pan:0;
+  if(L) L.kill();
+  const c=byId[id], o=out(BUS[c.cat],0,0,c.rev||0);
+  L={src:want,out:o,gain,pan,kill(){o.gain.setTargetAtTime(0,AC.currentTime,.05);setTimeout(()=>o.disconnect(),400)}};
+  if(want==='local'||want==='file'){
+    const s=AC.createBufferSource(); s.buffer=want==='local'?pickLocal(id):fileBuf[id]; s.loop=true;
+    const trim=AC.createGain(); trim.gain.value=want==='file'?(c.gain??.7):1; s.connect(trim); trim.connect(o); s.start();
+    L.kill=()=>{o.gain.setTargetAtTime(0,AC.currentTime,.05);setTimeout(()=>{try{s.stop()}catch(e){}o.disconnect()},400)};
+  }else if(want==='sketch'&&LOOPSK[id]){
+    const trim=AC.createGain(); trim.gain.value=c.gain??1; trim.connect(o);
+    const h=LOOPSK[id](trim); L.grain=h.grain;
+    L.kill=()=>{o.gain.setTargetAtTime(0,AC.currentTime,.05);setTimeout(()=>{h.stop();o.disconnect()},400)};
+  }
+  o.gain.value=gain; if(o.panner) o.panner.pan.value=pan;
+  loops[id]=L; return L;
+}
+function levelLoop(id,g,pan=0,tc=.15){
+  if(!AC) return; const L=ensureLoop(id); L.gain=g; L.pan=pan; const T=AC.currentTime;
+  L.out.gain.setTargetAtTime(g,T,tc); if(L.out.panner) L.out.panner.pan.setTargetAtTime(pan,T,.1);
+}
+function refreshLoops(){ if(!AC) return; for(const id of Object.keys(loops)) ensureLoop(id); }
+setInterval(()=>{ if(!AC) return; for(const L of Object.values(loops)) if(L.grain&&L.gain>.03) L.grain(); },60);
+
+function duck(on){ if(!AC) return; const T=AC.currentTime; buses.bed.gain.setTargetAtTime(on?.45:1,T,.08); buses.life.gain.setTargetAtTime(on?.6:1,T,.08); buses.hull.gain.setTargetAtTime(on?.7:1,T,.08); }
+
+function playOne(id,o={}){
+  const c=byId[id], src=sourceFor(id);
+  if(!AC||S.muted) return src;
+  if(src==='local'||src==='file'||src==='sketch'){
+    const d=out(BUS[c.cat],o.gain??1,o.pan??0,c.rev||0);
+    if(src==='sketch'){ if(SK[id]) SK[id](d,o); }
+    else{ const s=AC.createBufferSource(); s.buffer=src==='local'?pickLocal(id):fileBuf[id]; if(src==='file') d.gain.value=(o.gain??1)*(c.gain??.7); s.connect(d); s.start(); }
+  }
+  return src;
+}
+function fire(id,o={}){ const src=playOne(id,o); event(id,src,o); return src; }
+
+// ---------------------------------------------------------------- voice
+let voiceSrc=null;
+const fill=(s,v)=>s.replace(/\{(\w+)\}/g,(m,k)=>v[k]??m);
+function pickVoice(lang){ if(!hasSpeech) return null; const p=lang.slice(0,2).toLowerCase(); return speechSynthesis.getVoices().find(v=>(v.lang||'').toLowerCase().startsWith(p))||null; }
+function sayTTS(th,en,lang){
+  if(!hasSpeech) return; const useEn=lang==='en', code=useEn?'en-US':'th-TH', u=new SpeechSynthesisUtterance(useEn?en:th);
+  u.lang=code; const v=pickVoice(code); if(v) u.voice=v; u.rate=1; u.pitch=.95; u.volume=clamp(prefs.vol+.15,0,1);
+  u.onstart=()=>duck(true); u.onend=u.onerror=()=>duck(false); speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+function speakLine(id,vars={}){
+  const c=byId[id], th=fill(c.line.th,vars.th||{}), en=fill(c.line.en,vars.en||{});
+  showSub(id,th,en);
+  const src=sourceFor(id);
+  if(voiceSrc){try{voiceSrc.stop()}catch(e){}voiceSrc=null}
+  if(hasSpeech) speechSynthesis.cancel();
+  if(AC&&!S.muted){
+    if(src==='local'){const s=AC.createBufferSource();s.buffer=pickLocal(id);s.connect(out('voice',1,0,0));duck(true);s.onended=()=>duck(false);s.start();voiceSrc=s}
+    else if(src==='tts') sayTTS(th,en,prefs.tts);
+  }
+  event(id,src,{});
+}
+function showSub(id,th,en){
+  $('#sub-th').textContent=th; $('#sub-en').textContent=en;
+  const st=statusOf(id), src=sourceFor(id);
+  $('#sub-chip').innerHTML=`<button class="chip st-${st}" data-open="${id}" title="เปิดรายละเอียดเสียงพากย์นี้"><i class="dot"></i><span>เสียงพากย์: ${esc(STATUS[st].th)}${src==='tts'?' · ใช้เสียงอ่านร่าง':''}</span></button>`;
+}
+function checkVoices(){
+  const h=$('#tts-hint'); if(!hasSpeech){h.hidden=false;h.textContent='เบราว์เซอร์นี้อ่านออกเสียงไม่ได้';return}
+  const vs=speechSynthesis.getVoices(); if(!vs.length) return;
+  if(prefs.tts==='th'&&!pickVoice('th-TH')){h.hidden=false;h.textContent='เครื่องนี้ไม่มีเสียงอ่านภาษาไทย ลองเลือก English'} else h.hidden=true;
+}
+if(hasSpeech){speechSynthesis.onvoiceschanged=checkVoices;setTimeout(checkVoices,400)}
+
+// ---------------------------------------------------------------- sim state
+const S={started:false,t0:0,depth:0.1,yaw:0,zone:'surface',collected:[],found:new Set(),highlight:false,highlightUntil:0,
+  sweepStart:-1e9,collectFlash:-1e9,lastDown:-1e9,lastUp:-1e9,lastBlow:-1e9,floods:false,floodLvl:0,muted:false,lastTick:0,analyzeOpen:false};
+const timers={ping:0,creak:0,whale:0,mystery:0};
+const nearCue={};
+function zoneOrder(z){return z==='surface'?0:z==='mid'?1:2}
+function updateZone(){
+  const [a,b]=ZB,h=ZH,d=S.depth; let z=S.zone;
+  if(z==='surface'&&d>a+h) z='mid'; else if(z==='mid'&&d<a-h) z='surface'; else if(z==='mid'&&d>b+h) z='deep'; else if(z==='deep'&&d<b-h) z='mid';
+  if(z===S.zone) return;
+  const prev=S.zone; S.zone=z; onZone(prev,z); updateZone();
+}
+function onZone(prev,z){
+  if(!S.started){S.floods=z==='deep';return}
+  levelLoop('ambient_'+prev,0,0,.25); levelLoop('ambient_'+z,1,0,.25); event('ambient_'+z,sourceFor('ambient_'+z),{});
+  const now=performance.now();
+  if(zoneOrder(z)>zoneOrder(prev)){
+    if(z==='mid'){fire('zone_enter_mid');setTimeout(()=>speakLine('vo_zone_mid'),900)}
+    else{fire('zone_enter_deep');setTimeout(()=>{S.floods=true},1300);setTimeout(()=>speakLine('vo_zone_deep'),1000);timers.mystery=now+15000;timers.creak=Math.min(timers.creak,now+5000)}
+  }else{fire('zone_up');if(prev==='deep')S.floods=false}
+}
+function setDepth(v){
+  const prev=S.depth; v=clamp(Math.round(v*1000)/1000,0,1); if(v===prev) return;
+  S.depth=v; const now=performance.now();
+  if(S.started){
+    if(v>prev) S.lastDown=now; else { S.lastUp=now; if(now-S.lastBlow>1200){fire('ascend_blow');S.lastBlow=now} }
+    if(v===1&&prev<1){fire('max_depth_warning');setTimeout(()=>speakLine('vo_max_depth'),700)}
+    if(v===0&&prev>0){fire('surface_break');setTimeout(()=>speakLine('vo_surface'),900)}
+  }
+  updateZone();
+}
+function setYaw(v){
+  const prev=S.yaw; S.yaw=((v%360)+360)%360;
+  if(!S.started) return;
+  if(Math.floor(prev/5)!==Math.floor(S.yaw/5)){const now=performance.now();if(now-S.lastTick>35){S.lastTick=now;fire('turn_periscope',{gain:.9})}}
+}
+function hitLife(){
+  let best=-1,bd=1e9;
+  LIFE.forEach((L,i)=>{const dA=Math.abs(wrapD(L.azNow-S.yaw)),dD=Math.abs(L.depth-S.depth);if(dA<=L.w/2+4&&dD<=.045){const s=dA/30+dD/.05;if(s<bd){bd=s;best=i}}});
+  return best;
+}
+function doScan(){
+  if(!S.started) return;
+  if(!onPanel(S.yaw)){fire('action_error');speakLine('vo_on_frame');return}
+  const now=performance.now(); S.sweepStart=now; S.highlightUntil=now+10000;
+  fire('scan_sweep');
+  const i=hitLife();
+  setTimeout(()=>{
+    if(i<0){fire('scan_miss');speakLine('vo_scan_miss');return}
+    const L=LIFE[i]; fire('scan_hit',{life:i});
+    if(!S.found.has(L.id)){S.found.add(L.id);fire('first_discovery',{life:i})}
+    speakLine('vo_scan_hit');
+  },500);
+}
+function doCollect(){
+  if(!S.started) return;
+  if(!onPanel(S.yaw)){fire('action_error');speakLine('vo_on_frame');return}
+  const i=hitLife();
+  if(i<0){fire('action_error');speakLine('vo_nothing');return}
+  const L=LIFE[i];
+  if(S.collected.some(c=>c.id===L.id)){fire('collect_duplicate');speakLine('vo_duplicate');return}
+  S.collected.push({id:L.id,depth:S.depth,face:faceAt(S.yaw)}); S.collectFlash=performance.now();
+  fire('collect_success'); setTimeout(()=>speakLine('vo_collect'),600);
+  if(S.collected.length===LIFE.length) setTimeout(()=>{fire('mission_complete');speakLine('vo_complete')},2200);
+}
+function doAnalyze(){
+  if(!S.started) return;
+  if(!S.collected.length){fire('action_error');speakLine('vo_tray_empty');return}
+  fire('analyze_open');
+  const items=S.collected.map(c=>LIFE.find(L=>L.id===c.id));
+  $('#pop-list').innerHTML=S.collected.map((c,k)=>`<li>${esc(items[k].name)} · ${esc(items[k].th)} — จอ ${c.face}, ${mDepth(c.depth)} ม.</li>`).join('');
+  $('#pop-h').textContent=`ANALYSIS · ${S.collected.length} / ${LIFE.length}`;
+  $('#pop').hidden=false; S.analyzeOpen=true;
+  setTimeout(()=>speakLine('vo_analyze',{th:{names:items.map(x=>x.th).join(' ')},en:{names:items.map(x=>x.name).join(', ')}}),900);
+}
+function closeAnalyze(){ if(!S.analyzeOpen) return; $('#pop').hidden=true; S.analyzeOpen=false; if(S.started) fire('analyze_close'); }
+function toggleAssist(){ if(!S.started) return; S.highlight=!S.highlight; fire('dive_assist',{on:S.highlight}); }
+function toggleMute(){
+  S.muted=!S.muted; if(master) master.gain.setTargetAtTime(S.muted?0:prefs.vol,AC.currentTime,.05);
+  if(S.muted&&hasSpeech) speechSynthesis.cancel(); event('mute_toggle','none',{}); toast(S.muted?'ปิดเสียงแล้ว กด M อีกครั้งเพื่อเปิด':'เปิดเสียงแล้ว');
+}
+function start(){
+  if(S.started) return;
+  if(!audio()){toast('เบราว์เซอร์นี้เล่นเสียงไม่ได้');}
+  S.started=true; S.t0=performance.now(); $('#intro').hidden=true;
+  const now=performance.now(); timers.ping=now+4500; timers.creak=now+9000; timers.whale=now+12000; timers.mystery=now+15000;
+  S.floods=S.zone==='deep';
+  if(AC){ levelLoop('ambient_'+S.zone,1,0,.4); levelLoop('sub_roomtone',1,0,.4); levelLoop('descend_thrust',0); LIFE.forEach(L=>levelLoop(L.id,0)); }
+  event('ambient_'+S.zone,sourceFor('ambient_'+S.zone),{}); event('sub_roomtone',sourceFor('sub_roomtone'),{});
+  fire('dive_start');
+  setTimeout(()=>speakLine('vo_welcome'),2300);
+}
+function schedule(now){
+  if(!S.started) return;
+  if(now>timers.ping){fire('sonar_idle',{echo:.15+(1-S.depth)*1.1});timers.ping=now+rand(9000,13000)}
+  if(S.zone==='surface') timers.creak=Math.max(timers.creak,now+4000);
+  else if(now>timers.creak){fire('hull_creak',{pan:rand(-.7,.7)});timers.creak=now+(S.zone==='deep'?rand(7000,14000):rand(18000,30000))}
+  if(S.zone!=='deep'&&now>timers.whale){fire('whale_distant',{pan:rand(-.8,.8)});timers.whale=now+rand(35000,70000)}
+  if(S.zone==='deep'&&now>timers.mystery){fire('deep_mystery',{pan:rand(-.5,.5)});timers.mystery=now+rand(45000,90000)}
+}
+
+// ---------------------------------------------------------------- markers + event log
+const LOG=[], lastMark={};
+const fmtT=ms=>{const s=Math.max(0,Math.floor(ms/1000));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+function event(id,src,o){
+  const now=performance.now(), last=LOG[0];
+  if(last&&last.id===id&&now-last.at<2000){last.n++;last.at=now;last.src=src}
+  else{LOG.unshift({id,src,t:S.started?fmtT(now-S.t0):'--:--',n:1,at:now});if(LOG.length>40)LOG.pop()}
+  renderLog(); marker(id,src,o);
+}
+function markerPos(c,o){
+  if(o&&o.life!=null){const L=LIFE[o.life];return[clamp(sx(L.azNow)/W,.08,.92),clamp(sy(L.depth)/H-.06,.1,.9)]}
+  switch(c.cat){
+    case 'bed': return[rand(.14,.4),rand(.2,.34)];
+    case 'hull': return[rand(.12,.88),rand(.78,.9)];
+    case 'move': return[rand(.35,.65),.84];
+    case 'tool': return[.5,.36];
+    case 'life': return[.5,.3];
+    case 'voice': return[.5,.95];
+    default: return[.82,.28];
+  }
+}
+function marker(id,src,o){
+  const now=performance.now(); if(now-(lastMark[id]||0)<900) return; lastMark[id]=now;
+  const c=byId[id], st=statusOf(id), [x,y]=markerPos(c,o);
+  const el=document.createElement('div'); el.className='mk st-'+st; el.style.left=(x*100)+'%'; el.style.top=(y*100)+'%';
+  el.innerHTML=`<i class="dot"></i><span style="color:var(--ink)">${esc(c.th)}</span><small>${esc(src==='silent'?'เงียบ · ยังไม่มีเสียง':STATUS[st].th)}</small>`;
+  $('#markers').appendChild(el); setTimeout(()=>el.remove(),2900);
+}
+function renderLog(){
+  const ol=$('#log');
+  if(!LOG.length){ol.innerHTML='<li class="empty">ยังไม่มีเหตุการณ์ ลองดำลง หมุน หรือกดสแกน</li>';return}
+  ol.innerHTML=LOG.slice(0,24).map(e=>{const c=byId[e.id],st=statusOf(e.id);return `<li><button data-open="${e.id}"><span class="tm">${e.t}</span><i class="dot st-${st}"></i><span class="nm">${esc(c.th)}${e.n>1?' ×'+e.n:''}</span><span class="sr">${esc(SRC[e.src]||'')}</span></button></li>`}).join('');
+}
+
+// ---------------------------------------------------------------- rack (what is sounding now)
+let rackKey='';
+function dirText(dA){return Math.abs(dA)<8?'ตรงหน้า':dA<0?'ทางซ้าย':'ทางขวา'}
+function rackRows(now){
+  if(!S.started) return [];
+  const rows=[{id:'ambient_'+S.zone,g:1,x:ZONE_TH[S.zone]},{id:'sub_roomtone',g:1,x:'ตลอดการดำ'}];
+  if(now-S.lastDown<260) rows.push({id:'descend_thrust',g:1,x:'กำลังดำลง'});
+  LIFE.forEach(L=>{if(L.prox>.03)rows.push({id:L.id,g:L.prox,x:dirText(L.dA)+' · ใกล้ '+Math.round(L.prox*100)+'%'})});
+  return rows;
+}
+function renderRack(now){
+  const rows=rackRows(now), key=rows.map(r=>r.id+sourceFor(r.id)+statusOf(r.id)).join('|'), box=$('#rack');
+  if(key!==rackKey){
+    rackKey=key;
+    box.innerHTML=rows.length?rows.map(r=>{const c=byId[r.id],st=statusOf(r.id),src=sourceFor(r.id);return `<button class="lay st-${st}" data-open="${r.id}"><i class="dot"></i><span class="t"><b style="color:var(--ink)">${esc(c.th)}</b><small data-x="${r.id}"></small></span><span class="meter${src==='silent'?' silent':''}"><i data-m="${r.id}"></i></span></button>`}).join(''):'<p class="empty">ยังไม่มีเสียง กดเริ่มดำน้ำก่อน</p>';
+  }
+  rows.forEach(r=>{const src=sourceFor(r.id),m=box.querySelector(`[data-m="${r.id}"]`),x=box.querySelector(`[data-x="${r.id}"]`);
+    if(m) m.style.width=(src==='silent'?100:clamp(r.g*(S.muted?0:.8+.2*Math.sin(now/260+r.id.length)),0,1)*100)+'%';
+    if(x) x.textContent=r.x+' · '+SRC[src];});
+}
+
+// ---------------------------------------------------------------- canvas
+const cv=$('#view'), g2=cv.getContext('2d'); let W=1,H=1;
+function resize(){const r=cv.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));cv.width=W*dpr;cv.height=H*dpr;g2.setTransform(dpr,0,0,dpr,0,0)}
+new ResizeObserver(resize).observe(cv); resize();
+const FOV=50, VSPAN=.1;
+const sx=az=>W/2+wrapD(az-S.yaw)/FOV*(W/2);
+const sy=d=>H/2+(d-S.depth)/VSPAN*(H/2);
+const WATER=[[-.2,[40,140,170]],[0,[40,140,170]],[.08,[24,104,138]],[.25,[14,66,98]],[.45,[9,38,64]],[.65,[5,20,38]],[1.2,[2,7,12]]];
+function waterAt(d){for(let i=1;i<WATER.length;i++){if(d<=WATER[i][0]){const[d0,c0]=WATER[i-1],[d1,c1]=WATER[i],k=clamp((d-d0)/(d1-d0),0,1);return c0.map((v,j)=>Math.round(v+(c1[j]-v)*k))}}return WATER[WATER.length-1][1]}
+const rgba=(c,a=1)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const SNOW=Array.from({length:130},()=>({x:Math.random(),y:Math.random(),z:rand(.3,1),r:rand(.6,1.8)}));
+const BUB=[];
+let lastT=performance.now(), lastYaw=0, lastDepth=S.depth;
+
+function fishShape(len,col,wig){g2.fillStyle=col;g2.beginPath();g2.ellipse(0,0,len,len*.38,0,0,Math.PI*2);g2.fill();g2.beginPath();g2.moveTo(-len*.85,0);g2.lineTo(-len*1.45,-len*.42+wig);g2.lineTo(-len*1.45,len*.42+wig);g2.closePath();g2.fill();g2.fillStyle='rgba(8,16,20,.85)';g2.beginPath();g2.arc(len*.55,-len*.08,Math.max(1,len*.09),0,7);g2.fill()}
+function glow(r,col,a){const gr=g2.createRadialGradient(0,0,0,0,0,r);gr.addColorStop(0,rgba(col,a));gr.addColorStop(1,rgba(col,0));g2.fillStyle=gr;g2.beginPath();g2.arc(0,0,r,0,7);g2.fill()}
+function drawLife(L,t,s){
+  const x=sx(L.azNow), y=sy(L.depth); if(x<-120||x>W+120||y<-120||y>H+120) return;
+  const base=clamp(1.15-L.depth*1.5,.22,1), lit=S.floodLvl*clamp(1-Math.hypot(x-W/2,y-H*.58)/(W*.45),0,1)*.85, a=clamp(base+lit,.2,1);
+  const col=rgba(L.rgb), dir=Math.sign(L.speed)||1;
+  g2.save(); g2.translate(x,y); g2.scale(s,s);
+  if(L.kind==='lantern'||L.kind==='jelly'){g2.save();g2.globalCompositeOperation='lighter';glow(L.kind==='jelly'?40:26,L.rgb,.35+.15*Math.sin(t*2.2));g2.restore()}
+  g2.globalAlpha=a;
+  if(L.kind==='shoal'){const off=[[0,0],[14,-8],[-12,-6],[22,6],[-20,8],[6,12],[-4,-15]];g2.scale(dir,1);off.forEach(([ox,oy],k)=>{g2.save();g2.translate(ox+Math.sin(t*2+k)*2,oy+Math.cos(t*1.7+k)*2);fishShape(7,col,Math.sin(t*9+k)*2);g2.restore()})}
+  else if(L.kind==='reef'){g2.scale(dir,1);g2.save();g2.beginPath();g2.ellipse(0,0,14,5.4,0,0,Math.PI*2);g2.clip();g2.fillStyle=col;g2.fillRect(-15,-6,30,12);g2.fillStyle='rgba(250,250,245,.9)';g2.fillRect(2,-6,3.5,12);g2.fillRect(-7,-6,3,12);g2.restore();g2.fillStyle=col;g2.beginPath();g2.moveTo(-12,0);g2.lineTo(-20,-6+Math.sin(t*8)*1.5);g2.lineTo(-20,6+Math.sin(t*8)*1.5);g2.closePath();g2.fill()}
+  else if(L.kind==='seahorse'){g2.translate(0,Math.sin(t*1.8)*3);g2.scale(-dir,1);g2.strokeStyle=col;g2.lineWidth=4.5;g2.lineCap='round';g2.beginPath();g2.moveTo(0,-14);g2.bezierCurveTo(9,-12,7,-3,1,1);g2.bezierCurveTo(-6,6,4,13,6,17);g2.bezierCurveTo(8,23,0,25,-2,21);g2.stroke();g2.beginPath();g2.moveTo(0,-14);g2.lineTo(-8,-17);g2.stroke();g2.fillStyle='rgba(8,16,20,.85)';g2.beginPath();g2.arc(1,-14,1.2,0,7);g2.fill()}
+  else if(L.kind==='manta'){const f=Math.sin(t*1.6);g2.scale(dir,1);g2.fillStyle=col;g2.beginPath();g2.moveTo(22,0);g2.quadraticCurveTo(2,-6-f*8,-6,-26-f*5);g2.quadraticCurveTo(-4,-7,-18,0);g2.quadraticCurveTo(-4,7,-6,26+f*5);g2.quadraticCurveTo(2,6+f*8,22,0);g2.fill();g2.strokeStyle=col;g2.lineWidth=1.2;g2.beginPath();g2.moveTo(-18,0);g2.lineTo(-40,Math.sin(t*2)*3);g2.stroke()}
+  else if(L.kind==='lantern'){g2.scale(dir,1);fishShape(10,col,Math.sin(t*8)*1.5);g2.globalCompositeOperation='lighter';for(let k=0;k<4;k++){const on=.5+.5*Math.sin(t*4+k*1.3);g2.fillStyle=`rgba(150,230,255,${.3+on*.6})`;g2.beginPath();g2.arc(-5+k*4,3,1.4,0,7);g2.fill()}}
+  else if(L.kind==='jelly'){const p=Math.sin(t*2);g2.fillStyle=rgba(L.rgb,.75);g2.beginPath();g2.ellipse(0,0,14+p*1.5,11-p*1.5,0,Math.PI,0);g2.closePath();g2.fill();g2.strokeStyle=rgba(L.rgb,.6);g2.lineWidth=1.2;for(let k=0;k<5;k++){const x0=-10+k*5;g2.beginPath();g2.moveTo(x0,0);for(let j=1;j<=6;j++)g2.lineTo(x0+Math.sin(t*2.5+j*.8+k)*2.5,j*4.5);g2.stroke()}}
+  g2.restore();
+  const hl=S.highlight||performance.now()<S.highlightUntil;
+  if(hl){g2.save();g2.strokeStyle='rgba(217,184,120,.85)';g2.setLineDash([4,4]);g2.lineWidth=1.3;g2.beginPath();g2.arc(x,y,30*s,0,7);g2.stroke();g2.restore()}
+}
+function frame(now){
+  const t=now/1000, dt=Math.min(.1,(now-lastT)/1000); lastT=now;
+  const dYaw=wrapD(S.yaw-lastYaw), dDep=S.depth-lastDepth; lastYaw=S.yaw; lastDepth=S.depth;
+  S.floodLvl+=((S.floods?1:0)-S.floodLvl)*Math.min(1,dt*2.5);
+  LIFE.forEach(L=>{L.azNow=((L.az+L.speed*t)%360+360)%360;L.dA=wrapD(L.azNow-S.yaw);const d=Math.hypot(L.dA/45,(L.depth-S.depth)/.12);L.prox=Math.pow(clamp(1-d,0,1),1.4)});
+  // water
+  const top=S.depth-VSPAN, bot=S.depth+VSPAN, gr=g2.createLinearGradient(0,0,0,H);
+  for(let i=0;i<=6;i++){const d=top+(bot-top)*i/6;gr.addColorStop(i/6,rgba(waterAt(d)))}
+  g2.fillStyle=gr; g2.fillRect(0,0,W,H);
+  const y0=sy(0);
+  if(y0>0){const wv=x=>y0+Math.sin(x*.03+t*1.6+S.yaw*.05)*3+Math.sin(x*.011-t)*2;const sk=g2.createLinearGradient(0,0,0,y0);sk.addColorStop(0,'rgb(118,168,188)');sk.addColorStop(1,'rgb(178,216,228)');g2.fillStyle=sk;g2.beginPath();g2.moveTo(0,0);g2.lineTo(W,0);for(let x=W;x>=0;x-=8)g2.lineTo(x,wv(x));g2.closePath();g2.fill();g2.strokeStyle='rgba(240,250,252,.55)';g2.lineWidth=1.5;g2.beginPath();for(let x=0;x<=W;x+=8)x?g2.lineTo(x,wv(x)):g2.moveTo(x,wv(x));g2.stroke()}
+  // light rays
+  const rayA=clamp(1-S.depth/.3,0,1)*.15;
+  if(rayA>.005){g2.save();g2.globalCompositeOperation='lighter';const yT=Math.max(0,y0);for(let i=0;i<7;i++){const x=sx(i*52+10);if(x<-W*.3||x>W*1.3)continue;const sw=Math.sin(t*.4+i)*18,lg=g2.createLinearGradient(0,yT,0,H);lg.addColorStop(0,`rgba(190,235,245,${rayA})`);lg.addColorStop(1,'rgba(190,235,245,0)');g2.fillStyle=lg;g2.beginPath();g2.moveTo(x-14+sw,yT);g2.lineTo(x+14+sw,yT);g2.lineTo(x+90+sw*2,H);g2.lineTo(x+30+sw*2,H);g2.closePath();g2.fill()}g2.restore()}
+  // floodlights in the deep zone
+  if(S.floodLvl>.01){g2.save();g2.globalCompositeOperation='lighter';const fg=g2.createRadialGradient(W/2,H*.58,0,W/2,H*.58,W*.5);fg.addColorStop(0,`rgba(150,195,210,${.2*S.floodLvl})`);fg.addColorStop(1,'rgba(150,195,210,0)');g2.fillStyle=fg;g2.fillRect(0,0,W,H);g2.restore()}
+  // marine snow
+  const snowA=.1+S.depth*.55;
+  g2.fillStyle=S.depth>.5?'rgba(190,230,235,1)':'rgba(230,240,240,1)';
+  SNOW.forEach(p=>{p.y+=dt*.015*p.z-dDep/(2*VSPAN)*p.z;p.x-=dYaw/(2*FOV)*p.z;p.x=((p.x%1)+1)%1;p.y=((p.y%1)+1)%1;g2.globalAlpha=snowA*p.z;g2.beginPath();g2.arc(p.x*W,p.y*H,p.r,0,7);g2.fill()});
+  g2.globalAlpha=1;
+  // bubbles while moving
+  if(now-S.lastDown<260||now-S.lastUp<260){for(let k=0;k<3;k++)BUB.push({x:Math.random(),y:1.02,v:rand(.18,.4),r:rand(1.5,4),w:Math.random()*6})}
+  g2.strokeStyle='rgba(225,245,250,.55)';g2.lineWidth=1;
+  for(let i=BUB.length-1;i>=0;i--){const b=BUB[i];b.y-=b.v*dt;if(b.y<-.05){BUB.splice(i,1);continue}g2.beginPath();g2.arc(b.x*W+Math.sin(t*3+b.w)*3,b.y*H,b.r,0,7);g2.stroke()}
+  if(BUB.length>220) BUB.splice(0,BUB.length-220);
+  // life
+  const s=Math.min(W,H)/340;
+  LIFE.forEach(L=>drawLife(L,t,s));
+  // cube frames between panels, fixed to the sea
+  for(let k=0;k<6;k++){const c=30+60*k,x1=sx(c-FRAME/2),x2=sx(c+FRAME/2);if(x2<x1||x2<0||x1>W)continue;g2.fillStyle='rgba(3,9,12,.9)';g2.fillRect(x1,0,x2-x1,H);g2.fillStyle='rgba(217,184,120,.22)';g2.fillRect(x1,0,1,H);g2.fillRect(x2-1,0,1,H)}
+  g2.font='500 11px "IBM Plex Mono",monospace';g2.textAlign='center';g2.fillStyle='rgba(217,184,120,.6)';
+  for(let k=0;k<6;k++){const x=sx(k*60);if(x>20&&x<W-20)g2.fillText(FACE_IDS[k],x,H-12)}
+  // scan sweep and collect flash
+  const ks=(now-S.sweepStart)/1400;
+  if(ks>=0&&ks<1){g2.strokeStyle=`rgba(99,214,207,${(1-ks)*.85})`;g2.lineWidth=2;g2.beginPath();g2.arc(W/2,H/2,ks*W*.7,0,7);g2.stroke()}
+  const kc=(now-S.collectFlash)/700;
+  if(kc>=0&&kc<1){g2.fillStyle=`rgba(217,184,120,${(1-kc)*.35})`;g2.beginPath();g2.arc(W/2,H/2,20+kc*40,0,7);g2.fill()}
+  // reticle
+  const on=onPanel(S.yaw), rc=on?'rgba(217,184,120,.95)':'rgba(255,107,107,.9)', R=22;
+  g2.strokeStyle=rc;g2.lineWidth=1.6;g2.beginPath();
+  [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([a,b])=>{g2.moveTo(W/2+a*R,H/2+b*R-b*8);g2.lineTo(W/2+a*R,H/2+b*R);g2.lineTo(W/2+a*R-a*8,H/2+b*R)});
+  g2.stroke();g2.fillStyle=rc;g2.beginPath();g2.arc(W/2,H/2,1.8,0,7);g2.fill();
+  if(!on){g2.font='500 11px "IBM Plex Sans Thai",sans-serif';g2.fillText('เป้าอยู่บนขอบจอ',W/2,H/2+R+16)}
+  // vignette
+  const vg=g2.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.72);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');g2.fillStyle=vg;g2.fillRect(0,0,W,H);
+
+  // sound levels that follow the picture
+  if(S.started&&AC){
+    levelLoop('descend_thrust',now-S.lastDown<260?1:0,0,now-S.lastDown<260?.08:.3);
+    LIFE.forEach(L=>{
+      levelLoop(L.id,L.prox*.9,clamp(L.dA/55,-1,1),.12);
+      if(L.prox>.3&&!nearCue[L.id]){nearCue[L.id]=true;event(L.id,sourceFor(L.id),{life:LIFE.indexOf(L)})}
+      else if(L.prox<.1) nearCue[L.id]=false;
+    });
+  }
+  schedule(now);
+  hud(); renderRack(now);
+  requestAnimationFrame(frame);
+}
+let hudKey='';
+function hud(){
+  const m=Math.round(S.depth*MAX_M), key=[m,S.zone,Math.round(S.yaw),S.collected.length].join('|'); if(key===hudKey) return; hudKey=key;
+  $('#h-depth').textContent=m.toLocaleString('en-US');
+  const z=$('#h-zone'); z.textContent=ZONE_TH[S.zone]; z.style.color=ZONE_COL[S.zone];
+  $('#h-yaw').textContent=Math.round(S.yaw)+'°';
+  $('#h-atm').textContent=(1+m/10).toFixed(1)+' ATM';
+  $('#h-temp').textContent=(28-24*clamp(S.depth*1.6,0,1)).toFixed(1)+'°C';
+  $('#h-face').textContent=onPanel(S.yaw)?faceAt(S.yaw):'ขอบ';
+  $('#h-tray').textContent=`ถาดตัวอย่าง ${S.collected.length} / ${LIFE.length}`;
+}
+
+// ---------------------------------------------------------------- input
+let drag=null;
+cv.addEventListener('pointerdown',e=>{drag={x:e.clientX};cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(!drag)return;setYaw(S.yaw+(e.clientX-drag.x)*.4);drag.x=e.clientX});
+const endDrag=()=>{drag=null}; cv.addEventListener('pointerup',endDrag); cv.addEventListener('pointercancel',endDrag);
+const ACT={up:()=>setDepth(S.depth-DEPTH_STEP),down:()=>setDepth(S.depth+DEPTH_STEP),left:()=>setYaw(S.yaw-HEADING_STEP),right:()=>setYaw(S.yaw+HEADING_STEP),scan:doScan,collect:doCollect,analyze:doAnalyze,assist:toggleAssist};
+document.querySelectorAll('.key').forEach(b=>{
+  const k=b.dataset.k, rep=['up','down','left','right'].includes(k); let iv=null;
+  b.addEventListener('pointerdown',e=>{if(!S.started)start();ACT[k]();if(rep){clearInterval(iv);iv=setInterval(ACT[k],90)}});
+  const stop=()=>{clearInterval(iv);iv=null}; b.addEventListener('pointerup',stop); b.addEventListener('pointerleave',stop); b.addEventListener('pointercancel',stop);
+  b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(!S.started)start();ACT[k]()}});
+});
+window.addEventListener('keydown',e=>{
+  if(e.target instanceof Element&&e.target.closest('input,select,textarea')) return;
+  if(e.key==='Escape'){if(!$('#drawer').hidden){closeDrawer();return}if(S.analyzeOpen){closeAnalyze();return}}
+  if(!$('#drawer').hidden) return;
+  if(!S.started) return;
+  switch(e.code){
+    case 'ArrowUp': e.preventDefault(); ACT.up(); break;
+    case 'ArrowDown': e.preventDefault(); ACT.down(); break;
+    case 'ArrowLeft': e.preventDefault(); ACT.left(); break;
+    case 'ArrowRight': e.preventDefault(); ACT.right(); break;
+    case 'Digit1': case 'Numpad1': e.preventDefault(); doScan(); break;
+    case 'Digit2': case 'Numpad2': e.preventDefault(); doCollect(); break;
+    case 'Digit3': case 'Numpad3': e.preventDefault(); doAnalyze(); break;
+    case 'KeyH': toggleAssist(); break;
+    case 'KeyM': toggleMute(); break;
+    case 'KeyR': S.yaw=0; event('view_reset','none',{}); break;
+  }
+});
+$('#btn-start').addEventListener('click',start);
+$('#pop-close').addEventListener('click',closeAnalyze);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(b)openDrawer(b.dataset.open)});
+
+// ---------------------------------------------------------------- header controls
+function setMode(m){prefs.mode=m;store.set('mode',m);$('#m-now').setAttribute('aria-pressed',m==='now');$('#m-full').setAttribute('aria-pressed',m==='full');refreshLoops();rackKey='';if(m==='now'&&hasSpeech)speechSynthesis.cancel();if(curId)renderDrawer()}
+$('#m-now').addEventListener('click',()=>{setMode('now');toast('ฟังแบบตอนนี้: เล่นเฉพาะไฟล์ที่มีจริง ส่วนที่ขาดจะเงียบ')});
+$('#m-full').addEventListener('click',()=>{setMode('full');toast('ฟังแบบเต็มตัว: ส่วนที่ขาดใช้เสียงร่างแทน')});
+$('#tts').value=prefs.tts; $('#tts').addEventListener('change',e=>{prefs.tts=e.target.value;store.set('tts',prefs.tts);checkVoices();rackKey=''});
+$('#vol').value=prefs.vol; $('#vol').addEventListener('input',e=>{prefs.vol=+e.target.value;store.set('vol',prefs.vol);if(master&&!S.muted)master.gain.setTargetAtTime(prefs.vol,AC.currentTime,.05)});
+setMode(prefs.mode);
+
+// ---------------------------------------------------------------- sheet
+const FILTERS=[['all','ทั้งหมด',()=>true],['need','ต้องหา',s=>s==='missing'||s==='upgrade'],['found','รอใส่',s=>s==='found'],['have','มีแล้ว',s=>s==='have'],['skip','ไม่ต้องมี',s=>s==='skip']];
+function renderFilters(){
+  $('#filters').innerHTML=FILTERS.map(([k,th,fn])=>`<button data-f="${k}" aria-pressed="${prefs.filter===k}">${th}<b>${CUES.filter(c=>fn(statusOf(c.id))).length}</b></button>`).join('');
+}
+$('#filters').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(!b)return;prefs.filter=b.dataset.f;store.set('filter',prefs.filter);renderSheet()});
+function renderSheet(){
+  renderFilters(); renderProgress();
+  const fn=FILTERS.find(f=>f[0]===prefs.filter)?.[2]||(()=>true);
+  let html='';
+  for(const cat of CATS){
+    const all=CUES.filter(c=>c.cat===cat.id), list=all.filter(c=>fn(statusOf(c.id))); if(!list.length) continue;
+    const ready=all.filter(c=>['have','found'].includes(statusOf(c.id))).length, need=all.filter(c=>['missing','upgrade'].includes(statusOf(c.id))).length;
+    html+=`<div class="grp-h"><h3>${esc(cat.th)}<small>พร้อม ${ready} · ต้องหา ${need}</small></h3><p>${esc(cat.blurb)}</p></div>`;
+    html+=list.map(c=>{const st=statusOf(c.id),r=remote[c.id];return `<button class="cue" data-open="${c.id}"><i class="dot st-${st}" title="${esc(STATUS[st].th)}"></i><span class="t"><b>${esc(c.th)}</b><small>${esc(c.when)}</small><code>${c.id}</code></span><span class="tags"><span class="pri p${c.pri}">${PRI[c.pri]}</span><span class="chip st-${st}" style="font-size:10.5px;padding:0 7px"><span>${esc(STATUS[st].th)}</span></span>${(localFiles[c.id]||[]).length?'<span class="badge">ไฟล์ทดสอบ '+localFiles[c.id].length+'</span>':''}${r&&r.link?'<span class="badge">มีลิงก์</span>':''}</span></button>`}).join('');
+  }
+  $('#sheet').innerHTML=html||'<p class="empty" style="padding:14px 6px">ไม่มีเสียงในสถานะนี้</p>';
+}
+function renderProgress(){
+  const act=CUES.filter(c=>statusOf(c.id)!=='skip'), n=k=>act.filter(c=>statusOf(c.id)===k).length;
+  const ready=n('have')+n('found'), p1=act.filter(c=>c.pri===1&&['missing','upgrade'].includes(statusOf(c.id))).length;
+  $('#p-ready').textContent=ready; $('#p-total').textContent=act.length;
+  $('#p-p1').textContent=p1?`กลุ่ม "ต้องมี" ยังขาด ${p1}`:'กลุ่ม "ต้องมี" ครบแล้ว';
+  $('#p-bar').innerHTML=[['have','var(--ok)'],['found','var(--found)'],['upgrade','var(--up)'],['missing','var(--miss)']].map(([k,c])=>`<i style="width:${n(k)/act.length*100}%;background:${c}" title="${STATUS[k].th} ${n(k)}"></i>`).join('');
+}
+$('#copy-list').addEventListener('click',()=>{
+  const d=new Date(), lines=[`Deep Sphere · เสียงที่ยังต้องหา (${d.getDate()}/${d.getMonth()+1})`,''];
+  [1,2,3].forEach(p=>{const list=CUES.filter(c=>c.pri===p&&['missing','upgrade'].includes(statusOf(c.id)));if(!list.length)return;lines.push(`== ${PRI[p]} ==`);list.forEach(c=>{lines.push(`- ${c.id} · ${c.th}${statusOf(c.id)==='upgrade'?' (มีของเดิม ควรเปลี่ยน)':''}`);lines.push(`  เล่นเมื่อ: ${c.when}`);if(c.line)lines.push(`  บท: ${c.line.th} / ${c.line.en}`);if(c.want)lines.push(`  อยากได้: ${c.want}`);const b=BRIEF[c.id];if(b){if(b.feel)lines.push(`  ความรู้สึก: ${b.feel}`);if(b.layers)lines.push(`  ส่วนประกอบ: ${b.layers.join(' / ')}`);if(b.say)lines.push(`  วิธีพูด: ${b.say}`);if(b.ref)lines.push(`  ไปฟังอ้างอิง: ${b.ref}`);if(b.avoid)lines.push(`  ห้าม: ${b.avoid}`)}if(c.kw)lines.push(`  คำค้น: ${c.kw.join(', ')}`)});lines.push('')});
+  const text=lines.join('\n');
+  const fallback=()=>{openCopyBox(text)};
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(()=>toast('คัดลอกแล้ว วางในแชตให้เพื่อนได้เลย'),fallback); else fallback();
+});
+function openCopyBox(text){
+  curId=null; $('#d-pos').textContent='รายการที่ยังขาด';
+  $('#d-body').innerHTML=`<div class="sec"><h3>คัดลอกข้อความนี้</h3><p class="why">คัดลอกอัตโนมัติไม่ได้ในหน้าต่างนี้ ข้อความถูกเลือกไว้แล้ว กด Ctrl+C หรือแตะค้างเพื่อคัดลอก</p></div><textarea class="copyout" id="copyout" readonly></textarea>`;
+  $('#copyout').value=text; $('#drawer').hidden=false; $('#scrim').hidden=false; $('#copyout').focus(); $('#copyout').select();
+}
+
+// ---------------------------------------------------------------- drawer
+function openDrawer(id){ if(!byId[id]) return; curId=id; renderDrawer(); $('#drawer').hidden=false; $('#scrim').hidden=false; $('#d-close').focus(); }
+function closeDrawer(){ $('#drawer').hidden=true; $('#scrim').hidden=true; curId=null; }
+$('#d-close').addEventListener('click',closeDrawer); $('#scrim').addEventListener('click',closeDrawer);
+const search=(k,site)=>site==='fs'?`https://freesound.org/search/?q=${encodeURIComponent(k)}`:`https://pixabay.com/sound-effects/search/${encodeURIComponent(k)}/`;
+function briefHtml(c){
+  const b=BRIEF[c.id]; if(!b) return '';
+  const rows=[];
+  if(b.scene) rows.push(['ฉาก',esc(b.scene)]);
+  if(b.feel) rows.push(['ความรู้สึก',esc(b.feel)]);
+  if(b.say) rows.push(['วิธีพูด',esc(b.say)]);
+  if(b.layers) rows.push(['ส่วนประกอบ','<ul>'+b.layers.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>']);
+  if(b.ref) rows.push(['ไปฟังอ้างอิง',esc(b.ref)]);
+  if(b.avoid) rows.push(['ห้าม',`<span class="avoid">${esc(b.avoid)}</span>`]);
+  return `<div class="sec"><h3>บรีฟเสียง</h3><dl class="brief">${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>`;
+}
+function voiceBriefHtml(){
+  const v=VOICE_BRIEF;
+  return `<div class="sec"><h3>บรีฟผู้พากย์ ใช้กับทุกประโยค</h3><dl class="brief"><dt>ใคร</dt><dd>${esc(v.who)}</dd><dt>น้ำเสียง</dt><dd>${esc(v.feel)}</dd><dt>วิธีทำ</dt><dd><ul>${v.how.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></dd><dt>ห้าม</dt><dd><span class="avoid">${esc(v.avoid)}</span></dd></dl></div>`;
+}
+function renderDrawer(){
+  const c=byId[curId]; if(!c) return; const st=statusOf(c.id), src=sourceFor(c.id), r=remote[c.id]||{}, cat=CATS.find(x=>x.id===c.cat);
+  const idx=CUES.indexOf(c); $('#d-pos').textContent=`${cat.th} · ${idx+1} / ${CUES.length}`;
+  const files=localFiles[c.id]||[];
+  const plays=[];
+  if(st!=='skip'){
+    plays.push(`<button data-play="scene">ลองในฉาก</button>`);
+    plays.push(`<button data-play="live">ฟังแบบที่จำลองเล่นตอนนี้</button>`);
+    if(c.cat==='voice'){ if(hasSpeech) plays.push(`<button data-play="tts">เสียงอ่านร่าง ${prefs.tts==='en'?'EN':'ไทย'}</button>`); }
+    else{ if(FILES[c.id]) plays.push(`<button data-play="file">ของเดิม</button>`); if(hasSketch(c.id)) plays.push(`<button data-play="sketch">เสียงร่างของสิ่งที่ควรเป็น</button>`); }
+    if(files.length) plays.push(`<button data-play="local">ของใหม่ที่ใส่</button>`);
+  }
+  const slot=st==='skip'?'':`<div class="slot" id="d-drop">
+      <h3>ช่องใส่เสียง</h3>
+      <p>ลากไฟล์มาวางตรงนี้ หรือกดเลือกไฟล์ ใส่ได้หลายไฟล์ ถ้ามีหลายไฟล์ จำลองจะสุ่มเล่นสลับกัน แล้วกด "ลองในฉาก" เพื่อฟังในจังหวะจริง ไฟล์เก็บไว้ในเบราว์เซอร์เครื่องนี้ ปิดแล้วเปิดใหม่ก็ยังอยู่ แต่คนอื่นไม่เห็น</p>
+      ${files.length?`<ul class="files">${files.map((f,i)=>`<li><span title="${esc(f.name)}">${esc(f.name)}</span><button data-lplay="${i}">ฟัง</button><button data-ldel="${i}">เอาออก</button></li>`).join('')}</ul>`:''}
+      <div class="rowbtn"><label class="btn" for="d-file">เลือกไฟล์เสียง</label><input id="d-file" class="sr-only" type="file" accept="audio/*" multiple>${files.length&&FILES[c.id]?'<span class="saved">เทียบกับของเดิมได้ด้วยปุ่ม "ของเดิม" และ "ของใหม่ที่ใส่"</span>':''}</div>
+    </div>`;
+  const nat=c.nat?`<p class="nat ${c.nat[0]}">${c.nat[0]==='real'?'มีเสียงจริงในธรรมชาติ: ':'เสียงออกแบบ: '}${esc(c.nat[1])}</p>`:'';
+  const script=c.line?`<div class="sec"><h3>บทพูด</h3><blockquote lang="th">${esc(c.line.th)}</blockquote><blockquote class="en" lang="en">${esc(c.line.en)}</blockquote><p class="old">ทวินตอนนี้แสดงข้อความ: ${esc(c.twin)}</p></div>`:'';
+  const kw=c.kw?`<div class="sec"><h3>คำค้น (ภาษาอังกฤษ)</h3><ul class="kw">${c.kw.map(k=>`<li><span>${esc(k)}</span><a href="${search(k,'fs')}" target="_blank" rel="noopener">Freesound</a><a href="${search(k,'px')}" target="_blank" rel="noopener">Pixabay</a></li>`).join('')}</ul></div>`:'';
+  const ro=teamMode==='ro'?'disabled':'';
+  const team=teamMode==='on'||teamMode==='ro'?`
+    <div class="box">
+      <div class="field"><label for="d-status">สถานะ</label><select id="d-status" ${ro}>${Object.keys(STATUS).map(k=>`<option value="${k}" ${k===st?'selected':''}>${STATUS[k].th}</option>`).join('')}</select></div>
+      <div class="field"><label for="d-link">ลิงก์ไฟล์ที่เจอ</label><input id="d-link" type="url" placeholder="https://freesound.org/…" value="${esc(r.link||'')}" ${ro}></div>
+      <div class="field"><label for="d-note">โน้ต</label><textarea id="d-note" rows="3" placeholder="เช่น ใช้ช่วง 0:03–0:06, CC0, ผู้สร้าง …" ${ro}>${esc(r.note||'')}</textarea></div>
+      <div class="rowbtn">${teamMode==='on'?'<button class="btn" id="d-save">บันทึก</button>':''}<span class="saved" id="d-saved">${teamMode==='ro'?'คุณดูได้อย่างเดียว ขอให้เจ้าของหน้าเชิญเป็นผู้แก้ไขทางอีเมลก่อน':r.updatedAt?'บันทึกล่าสุด '+new Date(r.updatedAt).toLocaleString('th-TH'):'ยังไม่มีใครบันทึก'}</span></div>
+    </div>`:`<div class="box"><p>${teamMode==='wait'?'กำลังเชื่อมบันทึกร่วม…':'บันทึกร่วมใช้ไม่ได้ในหน้านี้ ใช้คัดลอกรายการที่ยังขาดส่งในแชตแทน'}</p></div>`;
+  $('#d-body').innerHTML=`
+    <div class="dh">
+      <div class="meta"><span class="chip st-${st}"><i class="dot"></i><span>${esc(STATUS[st].th)}</span></span><span class="pri p${c.pri}">${PRI[c.pri]}</span><span>${esc(KIND[c.kind])}</span></div>
+      <h2>${esc(c.th)}</h2>
+      <span class="cid"><code>${c.id}</code><button id="d-copyid">คัดลอก ID</button></span>
+    </div>
+    ${plays.length?`<div class="plays">${plays.join('')}</div>`:''}
+    ${slot}
+    <dl class="facts">
+      <dt>เล่นเมื่อ</dt><dd>${esc(c.when)}</dd>
+      <dt>ตอนนี้</dt><dd>${esc(c.now||(st==='skip'?'ไม่ต้องมีเสียง':NOW_MISSING))}</dd>
+      <dt>ในจำลอง</dt><dd>${esc(SRC[src])}</dd>
+      ${c.spec?`<dt>สเปก</dt><dd>${esc(c.spec)}</dd>`:''}
+    </dl>
+    ${c.want?`<div class="sec"><h3>เสียงที่ควรเป็น</h3><p>${esc(c.want)}</p>${c.why?`<p class="why">ทำไม: ${esc(c.why)}</p>`:''}</div>`:''}
+    ${script}${briefHtml(c)}${c.cat==='voice'?voiceBriefHtml():''}${nat}${kw}
+    ${c.dev?`<p class="dev">หมายเหตุ: ${esc(c.dev)}</p>`:''}
+    <div class="sec"><h3>ความคืบหน้าของทีม</h3>${team}</div>`;
+}
+const dBody=$('#d-body');
+dBody.addEventListener('click',async e=>{
+  const p=e.target.closest('[data-play]'); if(p){ if(p.dataset.play==='scene') tryInScene(curId); else preview(curId,p.dataset.play); return }
+  const lp=e.target.closest('[data-lplay]'); if(lp){ if(!audio()) return; await decodeAllLocal(); preview(curId,'local',+lp.dataset.lplay); return }
+  const ld=e.target.closest('[data-ldel]'); if(ld){ removeLocal(curId,+ld.dataset.ldel); return }
+  if(e.target.id==='d-copyid'){const id=curId;try{await navigator.clipboard.writeText(id);toast('คัดลอก '+id+' แล้ว')}catch(err){toast('คัดลอกไม่ได้ เลือกข้อความ ID แทน')}return}
+  if(e.target.id==='d-save') saveTeam();
+});
+dBody.addEventListener('change',e=>{ if(e.target.id==='d-file'&&e.target.files&&e.target.files.length&&curId) addLocalFiles(curId,[...e.target.files]); });
+dBody.addEventListener('dragover',e=>{const z=e.target.closest('#d-drop');if(!z)return;e.preventDefault();z.classList.add('over')});
+dBody.addEventListener('dragleave',e=>{const z=e.target.closest('#d-drop');if(z&&!z.contains(e.relatedTarget))z.classList.remove('over')});
+dBody.addEventListener('drop',e=>{const z=e.target.closest('#d-drop');if(!z)return;e.preventDefault();z.classList.remove('over');if(e.dataTransfer&&e.dataTransfer.files.length&&curId)addLocalFiles(curId,[...e.dataTransfer.files])});
+// Drop a file straight onto a row of the list.
+const sheetEl=$('#sheet');
+window.addEventListener('dragover',e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files'))e.preventDefault()});
+window.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files.length)e.preventDefault()});
+sheetEl.addEventListener('dragover',e=>{const r=e.target.closest('.cue');if(!r)return;e.preventDefault();sheetEl.querySelectorAll('.cue.over').forEach(x=>{if(x!==r)x.classList.remove('over')});r.classList.add('over')});
+sheetEl.addEventListener('dragleave',e=>{const r=e.target.closest('.cue');if(r&&!r.contains(e.relatedTarget))r.classList.remove('over')});
+sheetEl.addEventListener('drop',e=>{const r=e.target.closest('.cue');if(!r)return;e.preventDefault();r.classList.remove('over');const fs=e.dataTransfer&&e.dataTransfer.files;if(fs&&fs.length&&statusOf(r.dataset.open)!=='skip'){addLocalFiles(r.dataset.open,[...fs]);openDrawer(r.dataset.open)}});
+
+async function addLocalFiles(id,list){
+  if(!audio()){toast('เบราว์เซอร์นี้เล่นเสียงไม่ได้');return}
+  let ok=0,bad=0;
+  for(const f of list){
+    if(f.size>25e6){bad++;continue}
+    try{const raw=await f.arrayBuffer();const buf=await AC.decodeAudioData(raw.slice(0));const key=await IDB.add({id,name:f.name,data:raw});(localFiles[id]=localFiles[id]||[]).push({key,name:f.name,raw,buf});ok++}
+    catch(err){bad++}
+  }
+  refreshLoops(); rackKey=''; renderSheet(); if(curId===id) renderDrawer();
+  toast(ok?`ใส่แล้ว ${ok} ไฟล์ กด "ลองในฉาก" เพื่อฟังในจังหวะจริง`+(bad?` · เปิดไม่ได้ ${bad} ไฟล์`:''):'เปิดไฟล์ไม่ได้ ลองไฟล์ WAV หรือ MP3 ขนาดไม่เกิน 25 MB');
+}
+function removeLocal(id,i){
+  const a=localFiles[id]||[], f=a[i]; if(!f) return;
+  if(f.key!=null) IDB.del(f.key);
+  a.splice(i,1); if(!a.length) delete localFiles[id];
+  refreshLoops(); rackKey=''; renderSheet(); renderDrawer();
+}
+async function decodeAllLocal(){
+  if(!AC) return; let n=0;
+  for(const a of Object.values(localFiles)) for(const f of a) if(!f.buf&&f.raw){try{f.buf=await AC.decodeAudioData(f.raw.slice(0));n++}catch(err){}}
+  if(n){refreshLoops();rackKey='';renderSheet();if(curId&&!$('#drawer').hidden)renderDrawer()}
+}
+function preview(id,mode,idx){
+  if(!audio()){toast('เบราว์เซอร์นี้เล่นเสียงไม่ได้');return}
+  const c=byId[id]; if(mode==='live') mode=sourceFor(id);
+  const localBufAt=()=>idx!=null?((localFiles[id]||[])[idx]||{}).buf:pickLocal(id);
+  if(mode==='local'&&!localBufAt()){toast('ยังไม่มีไฟล์ใหม่ในช่องนี้ หรือไฟล์ยังเปิดไม่เสร็จ');return}
+  if(c.cat==='voice'){
+    const th=fill(c.line.th,{names:'กระเบนราหู'}), en=fill(c.line.en,{names:'Manta Ray'});
+    if(mode==='silent'){toast('ตอนนี้ยังไม่มีเสียงพากย์นี้ ในโหมดตอนนี้จะเงียบ');return}
+    showSub(id,th,en);
+    if(mode==='local'){const s=AC.createBufferSource();s.buffer=localBufAt();s.connect(out('voice',1,0,0));duck(true);s.onended=()=>duck(false);s.start();return}
+    sayTTS(th,en,prefs.tts==='en'?'en':'th'); return;
+  }
+  if(mode==='silent'||mode==='none'){toast('ตอนนี้ยังไม่มีเสียงนี้ ในจำลองจะเงียบ');return}
+  if(mode==='loading'){toast('ไฟล์ยังโหลดไม่เสร็จ ลองอีกครั้ง');return}
+  const d=out(BUS[c.cat],1,0,c.rev||0), T=AC.currentTime;
+  const buf=mode==='local'?localBufAt():mode==='file'?fileBuf[id]:null;
+  if(mode==='file'&&!buf){toast('ไฟล์ยังโหลดไม่เสร็จ ลองอีกครั้ง');return}
+  if(buf){const s=AC.createBufferSource();s.buffer=buf;s.connect(d);if(mode==='file')d.gain.value=c.gain??.7;s.start();if(isLoop(c)){d.gain.setValueAtTime(d.gain.value,T+5);d.gain.linearRampToValueAtTime(.0001,T+6);s.stop(T+6.1)}return}
+  if(SK[id]){SK[id](d,{on:true,echo:.6});return}
+  if(LOOPSK[id]){const h=LOOPSK[id](d);const iv=setInterval(()=>h.grain&&h.grain(),60);setTimeout(()=>{clearInterval(iv);d.gain.setTargetAtTime(.0001,AC.currentTime,.2);setTimeout(()=>h.stop(),900)},5000)}
+}
+
+// ---------------------------------------------------------------- try a cue at its real moment in the dive
+const zoneFor=d=>d<ZB[0]?'surface':d<ZB[1]?'mid':'deep';
+function jumpTo(d,yaw){
+  S.depth=clamp(Math.round(d*1000)/1000,0,1); if(yaw!=null) S.yaw=((yaw%360)+360)%360;
+  const z=zoneFor(S.depth);
+  if(z!==S.zone){const p=S.zone;S.zone=z;S.floods=z==='deep';if(S.started&&AC){levelLoop('ambient_'+p,0,0,.25);levelLoop('ambient_'+z,1,0,.25)}}
+}
+function stepDepth(to){return new Promise(res=>{let n=0;const iv=setInterval(()=>{if(Math.abs(to-S.depth)<DEPTH_STEP/2||++n>80){clearInterval(iv);res();return}setDepth(S.depth+Math.sign(to-S.depth)*DEPTH_STEP)},90)})}
+const nearestLife=()=>LIFE.reduce((a,b)=>Math.abs(b.depth-S.depth)<Math.abs(a.depth-S.depth)?b:a);
+const aimAt=L=>jumpTo(L.depth,L.azNow??L.az);
+const SCENE={
+  ambient_surface:()=>jumpTo(.1), ambient_mid:()=>jumpTo(.45), ambient_deep:()=>jumpTo(.85),
+  sub_roomtone:()=>toast('เสียงนี้ดังตลอดการดำ ดูที่แถบ "ตอนนี้กำลังดัง"'),
+  hull_creak:()=>{if(S.zone==='surface')jumpTo(.85);fire('hull_creak',{pan:rand(-.6,.6)})},
+  sonar_idle:()=>fire('sonar_idle',{echo:.15+(1-S.depth)*1.1}),
+  whale_distant:()=>{if(S.zone==='deep')jumpTo(.45);fire('whale_distant',{pan:rand(-.8,.8)})},
+  deep_mystery:()=>{jumpTo(.85);fire('deep_mystery',{pan:rand(-.5,.5)})},
+  max_depth_warning:()=>{jumpTo(.94);stepDepth(1)},
+  surface_break:()=>{jumpTo(.06);stepDepth(0)},
+  dive_start:()=>fire('dive_start'),
+  descend_thrust:()=>stepDepth(Math.min(1,S.depth+.16)),
+  ascend_blow:()=>{if(S.depth<.05)jumpTo(.1);setDepth(S.depth-DEPTH_STEP)},
+  turn_periscope:()=>{let n=0;const iv=setInterval(()=>{setYaw(S.yaw+HEADING_STEP);if(++n>=10)clearInterval(iv)},90)},
+  zone_enter_mid:()=>{jumpTo(.2);stepDepth(.32)},
+  zone_enter_deep:()=>{jumpTo(.6);stepDepth(.72)},
+  zone_up:()=>{jumpTo(.72);stepDepth(.6)},
+  scan_sweep:()=>{aimAt(nearestLife());doScan()},
+  scan_hit:()=>{aimAt(nearestLife());doScan()},
+  first_discovery:()=>{const L=nearestLife();S.found.delete(L.id);aimAt(L);doScan()},
+  scan_miss:()=>{jumpTo(.55,0);doScan()},
+  action_error:()=>{jumpTo(S.depth,30);doScan()},
+  collect_success:()=>{const L=nearestLife();S.collected=S.collected.filter(x=>x.id!==L.id);aimAt(L);doCollect()},
+  collect_duplicate:()=>{const L=nearestLife();aimAt(L);if(!S.collected.some(x=>x.id===L.id))S.collected.push({id:L.id,depth:L.depth,face:faceAt(S.yaw)});doCollect()},
+  analyze_open:()=>{if(!S.collected.length){const L=nearestLife();S.collected.push({id:L.id,depth:L.depth,face:faceAt(L.az)})}doAnalyze()},
+  analyze_close:()=>{SCENE.analyze_open();setTimeout(closeAnalyze,2400)},
+  dive_assist:()=>toggleAssist(),
+  mission_complete:()=>{fire('mission_complete');setTimeout(()=>speakLine('vo_complete'),400)},
+  board_link:()=>{fire('board_link',{on:true});setTimeout(()=>fire('board_link',{on:false}),1400)},
+  vo_welcome:()=>{fire('dive_start');setTimeout(()=>speakLine('vo_welcome'),2300)},
+  vo_nothing:()=>{jumpTo(.55,0);doCollect()},
+  vo_tray_empty:()=>{fire('action_error');speakLine('vo_tray_empty')},
+};
+LIFE.forEach(L=>{SCENE[L.id]=()=>aimAt(L)});
+Object.assign(SCENE,{vo_zone_mid:SCENE.zone_enter_mid,vo_zone_deep:SCENE.zone_enter_deep,vo_scan_hit:SCENE.scan_hit,vo_scan_miss:SCENE.scan_miss,vo_on_frame:SCENE.action_error,vo_collect:SCENE.collect_success,vo_duplicate:SCENE.collect_duplicate,vo_analyze:SCENE.analyze_open,vo_max_depth:SCENE.max_depth_warning,vo_surface:SCENE.surface_break,vo_complete:SCENE.mission_complete});
+async function tryInScene(id){
+  const c=byId[id]; if(!c) return;
+  closeDrawer(); $('#scope').scrollIntoView({behavior:'smooth',block:'center'});
+  if(!S.started){ start(); if(id==='dive_start'||id==='vo_welcome') return; await new Promise(r=>setTimeout(r,3200)); }
+  toast('เล่นในฉาก: '+c.th);
+  const fn=SCENE[id]; if(fn){fn();return}
+  if(c.cat==='voice') speakLine(id); else fire(id);
+}
+async function saveTeam(){
+  if(!DB||!curId) return; const id=curId, btn=$('#d-save'), msg=$('#d-saved');
+  const body={status:$('#d-status').value,link:$('#d-link').value.trim().slice(0,500),note:$('#d-note').value.trim().slice(0,2000),updatedAt:new Date().toISOString()};
+  btn.disabled=true; msg.textContent='กำลังบันทึก…';
+  try{await DB.doc('cues/'+id).set(body);remote[id]=body;msg.textContent='บันทึกแล้ว';renderSheet();rackKey=''}
+  catch(err){if(err&&err.code==='not_granted'){teamMode='ro';setTeamState();renderDrawer()}else msg.textContent='บันทึกไม่สำเร็จ ลองอีกครั้ง'}
+  finally{if(btn)btn.disabled=false}
+}
+function setTeamState(){
+  $('#team-state').textContent={wait:'กำลังเชื่อมบันทึกร่วม…',on:'บันทึกร่วมเปิดอยู่: สถานะ ลิงก์ และโน้ตที่บันทึก ทุกคนที่เปิดหน้านี้เห็นเหมือนกัน',ro:'ดูได้อย่างเดียว: ขอให้เจ้าของเชิญเป็นผู้แก้ไขเพื่อบันทึกสถานะ',off:'บันทึกร่วมใช้ไม่ได้ในหน้านี้ ใช้ปุ่มคัดลอกรายการแทน'}[teamMode];
+}
+
+// ---------------------------------------------------------------- toast
+let toastT=0;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},2600)}
+
+// ---------------------------------------------------------------- boot
+setTeamState(); renderSheet(); renderLog();
+IDB.all().then(recs=>{recs.forEach(r=>{if(!byId[r.id]||!r.data)return;(localFiles[r.id]=localFiles[r.id]||[]).push({key:r.key,name:r.name,raw:r.data,buf:null})});if(recs.length){renderSheet();if(AC)decodeAllLocal()}});
+requestAnimationFrame(frame);
+(async()=>{
+  const use=window.claude&&window.claude.use; if(!use){teamMode='off';setTeamState();if(curId)renderDrawer();return}
+  let db=null; try{db=await window.claude.use('db')}catch(e){db=null}
+  if(!db){teamMode='off';setTeamState();if(curId)renderDrawer();return}
+  DB=db; teamMode='on'; setTeamState();
+  db.collection('cues').onSnapshot(snap=>{
+    snap.docChanges().forEach(ch=>{if(ch.type==='removed')delete remote[ch.doc.id];else remote[ch.doc.id]=ch.doc.data()});
+    renderSheet(); rackKey=''; if(curId&&!$('#drawer').hidden) renderDrawer();
+  },err=>{if(err&&err.code==='not_granted'){teamMode='ro';setTeamState()}});
+})();
+</script>
+
+</body></html>

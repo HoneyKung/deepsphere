@@ -1,0 +1,474 @@
+{
+  "schema_version": 1,
+  "generated_by": "tools/make_vectors.py",
+  "scene": {
+    "u_offset": 0.0,
+    "vertical_scale": 0.28,
+    "depth_min_center": 0.1,
+    "depth_max_center": 0.9
+  },
+  "aim_world": [
+    0.0,
+    -1.0,
+    0.0
+  ],
+  "active_image": {
+    "left": 0.03,
+    "top": 0.03,
+    "right": 0.97,
+    "bottom": 0.97
+  },
+  "mount": [
+    [
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "face_order": [
+    "px",
+    "nx",
+    "py",
+    "ny",
+    "pz",
+    "nz"
+  ],
+  "background": [
+    {
+      "face": "px",
+      "local_u": 0.5,
+      "local_v": 0.5,
+      "depth_norm": 0.35,
+      "u": 0.0,
+      "v": 0.38
+    },
+    {
+      "face": "px",
+      "local_u": 0.06,
+      "local_v": 0.94,
+      "depth_norm": 0.0,
+      "u": 0.8851450632786287,
+      "v": 0.15203312125585988
+    },
+    {
+      "face": "nx",
+      "local_u": 0.5,
+      "local_v": 0.5,
+      "depth_norm": 1.0,
+      "u": 0.5,
+      "v": 0.9
+    },
+    {
+      "face": "py",
+      "local_u": 0.2,
+      "local_v": 0.8,
+      "depth_norm": 0.35,
+      "u": 0.16398956518868468,
+      "v": 0.42235097688665507
+    },
+    {
+      "face": "ny",
+      "local_u": 0.8,
+      "local_v": 0.2,
+      "depth_norm": 0.62,
+      "u": 0.8360104348113153,
+      "v": 0.553649023113345
+    },
+    {
+      "face": "pz",
+      "local_u": 0.5,
+      "local_v": 0.5,
+      "depth_norm": 0.5,
+      "u": 0.0,
+      "v": 0.36
+    },
+    {
+      "face": "nz",
+      "local_u": 0.5,
+      "local_v": 0.5,
+      "depth_norm": 0.5,
+      "u": 0.0,
+      "v": 0.64
+    },
+    {
+      "face": "pz",
+      "local_u": 0.03,
+      "local_v": 0.03,
+      "depth_norm": 0.9,
+      "u": 0.375,
+      "v": 0.7625191195469952
+    },
+    {
+      "face": "nz",
+      "local_u": 0.97,
+      "local_v": 0.97,
+      "depth_norm": 0.1,
+      "u": 0.625,
+      "v": 0.2374808804530048
+    }
+  ],
+  "reticle": [
+    {
+      "yaw_deg": 0.0,
+      "depth_norm": 0.35,
+      "face": "ny",
+      "local_u": 0.5,
+      "local_v": 0.5,
+      "u": 0.75,
+      "v": 0.38,
+      "visible": true,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 0.1,
+      "depth_norm": 0.35,
+      "face": "ny",
+      "local_u": 0.4991273344879056,
+      "local_v": 0.5,
+      "u": 0.7497222222222222,
+      "v": 0.38,
+      "visible": true,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 45.0,
+      "depth_norm": 0.35,
+      "face": "nx",
+      "local_u": 1.0,
+      "local_v": 0.5,
+      "u": 0.625,
+      "v": 0.38,
+      "visible": false,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 89.9,
+      "depth_norm": 0.35,
+      "face": "nx",
+      "local_u": 0.5008726655120944,
+      "local_v": 0.5,
+      "u": 0.5002777777777778,
+      "v": 0.38,
+      "visible": true,
+      "target_id": "luna04_jellyfish"
+    },
+    {
+      "yaw_deg": 90.0,
+      "depth_norm": 0.35,
+      "face": "nx",
+      "local_u": 0.5,
+      "local_v": 0.5,
+      "u": 0.5,
+      "v": 0.38,
+      "visible": true,
+      "target_id": "luna04_jellyfish"
+    },
+    {
+      "yaw_deg": 90.1,
+      "depth_norm": 0.35,
+      "face": "nx",
+      "local_u": 0.4991273344879057,
+      "local_v": 0.5,
+      "u": 0.49972222222222223,
+      "v": 0.38,
+      "visible": true,
+      "target_id": "luna04_jellyfish"
+    },
+    {
+      "yaw_deg": 135.0,
+      "depth_norm": 0.5,
+      "face": "nx",
+      "local_u": 1.1102230246251565e-16,
+      "local_v": 0.5,
+      "u": 0.375,
+      "v": 0.5,
+      "visible": false,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 180.0,
+      "depth_norm": 0.5,
+      "face": "py",
+      "local_u": 0.5000000000000001,
+      "local_v": 0.5,
+      "u": 0.25000000000000006,
+      "v": 0.5,
+      "visible": true,
+      "target_id": "luna04_manta_ray"
+    },
+    {
+      "yaw_deg": 225.0,
+      "depth_norm": 0.5,
+      "face": "py",
+      "local_u": 1.6653345369377348e-16,
+      "local_v": 0.5,
+      "u": 0.12500000000000003,
+      "v": 0.5,
+      "visible": false,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 270.0,
+      "depth_norm": 0.62,
+      "face": "px",
+      "local_u": 0.5000000000000001,
+      "local_v": 0.5,
+      "u": 2.923628874389532e-17,
+      "v": 0.596,
+      "visible": true,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 315.0,
+      "depth_norm": 0.62,
+      "face": "px",
+      "local_u": 2.220446049250313e-16,
+      "local_v": 0.5,
+      "u": 0.875,
+      "v": 0.596,
+      "visible": false,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 359.9,
+      "depth_norm": 0.35,
+      "face": "ny",
+      "local_u": 0.5008726655120944,
+      "local_v": 0.5,
+      "u": 0.7502777777777778,
+      "v": 0.38,
+      "visible": true,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 360.0,
+      "depth_norm": 0.35,
+      "face": "ny",
+      "local_u": 0.5,
+      "local_v": 0.5,
+      "u": 0.75,
+      "v": 0.38,
+      "visible": true,
+      "target_id": null
+    },
+    {
+      "yaw_deg": -0.1,
+      "depth_norm": 0.35,
+      "face": "ny",
+      "local_u": 0.5008726655120944,
+      "local_v": 0.5,
+      "u": 0.7502777777777778,
+      "v": 0.38,
+      "visible": true,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 720.5,
+      "depth_norm": 0.35,
+      "face": "ny",
+      "local_u": 0.4956365661046206,
+      "local_v": 0.5,
+      "u": 0.7486111111111111,
+      "v": 0.38,
+      "visible": true,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 30.0,
+      "depth_norm": 0.0,
+      "face": "ny",
+      "local_u": 0.2113248654051872,
+      "local_v": 0.5,
+      "u": 0.6666666666666667,
+      "v": 0.1,
+      "visible": true,
+      "target_id": null
+    },
+    {
+      "yaw_deg": 30.0,
+      "depth_norm": 1.0,
+      "face": "ny",
+      "local_u": 0.2113248654051872,
+      "local_v": 0.5,
+      "u": 0.6666666666666667,
+      "v": 0.9,
+      "visible": true,
+      "target_id": "luna04_seahorse_shape"
+    },
+    {
+      "yaw_deg": 258.046875,
+      "depth_norm": 0.08984374999999999,
+      "face": "px",
+      "local_u": 0.6058508120119916,
+      "local_v": 0.5,
+      "u": 0.033203124999999986,
+      "v": 0.171875,
+      "visible": true,
+      "target_id": "luna04_surface_fish_seam"
+    },
+    {
+      "yaw_deg": 6.328125,
+      "depth_norm": 0.09960937499999999,
+      "face": "ny",
+      "local_u": 0.4445510442020435,
+      "local_v": 0.5,
+      "u": 0.732421875,
+      "v": 0.1796875,
+      "visible": true,
+      "target_id": "luna04_orange_reef_fish"
+    },
+    {
+      "yaw_deg": 149.765625,
+      "depth_norm": 0.3681640625,
+      "face": "py",
+      "local_u": 0.791408682667488,
+      "local_v": 0.5,
+      "u": 0.333984375,
+      "v": 0.39453125,
+      "visible": true,
+      "target_id": "luna04_manta_ray"
+    },
+    {
+      "yaw_deg": 62.9296875,
+      "depth_norm": 0.392578125,
+      "face": "nx",
+      "local_u": 0.7555360995229676,
+      "local_v": 0.5,
+      "u": 0.5751953125,
+      "v": 0.4140625,
+      "visible": true,
+      "target_id": "luna04_jellyfish"
+    },
+    {
+      "yaw_deg": 203.90625,
+      "depth_norm": 0.91015625,
+      "face": "py",
+      "local_u": 0.2783652430545679,
+      "local_v": 0.5,
+      "u": 0.18359375000000006,
+      "v": 0.828125,
+      "visible": true,
+      "target_id": "luna04_lantern_fish"
+    },
+    {
+      "yaw_deg": 27.421875,
+      "depth_norm": 0.900390625,
+      "face": "ny",
+      "local_u": 0.24058238255001213,
+      "local_v": 0.5,
+      "u": 0.673828125,
+      "v": 0.8203125,
+      "visible": true,
+      "target_id": "luna04_seahorse_shape"
+    },
+    {
+      "yaw_deg": 251.046875,
+      "depth_norm": 0.08984374999999999,
+      "face": "px",
+      "local_u": 0.671706374906605,
+      "local_v": 0.5,
+      "u": 0.0526475694444445,
+      "v": 0.171875,
+      "visible": true,
+      "target_id": "luna04_surface_fish_seam"
+    },
+    {
+      "yaw_deg": 265.046875,
+      "depth_norm": 0.08984374999999999,
+      "face": "px",
+      "local_u": 0.5433321685628021,
+      "local_v": 0.5,
+      "u": 0.013758680555555621,
+      "v": 0.171875,
+      "visible": true,
+      "target_id": "luna04_surface_fish_seam"
+    },
+    {
+      "yaw_deg": 258.046875,
+      "depth_norm": 0.6,
+      "face": "px",
+      "local_u": 0.6058508120119916,
+      "local_v": 0.5,
+      "u": 0.033203124999999986,
+      "v": 0.58,
+      "visible": true,
+      "target_id": null
+    }
+  ],
+  "rgb565": [
+    {
+      "rgb": [
+        0,
+        0,
+        0
+      ],
+      "packed": 0
+    },
+    {
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "packed": 65535
+    },
+    {
+      "rgb": [
+        255,
+        0,
+        0
+      ],
+      "packed": 63488
+    },
+    {
+      "rgb": [
+        0,
+        255,
+        0
+      ],
+      "packed": 2016
+    },
+    {
+      "rgb": [
+        0,
+        0,
+        255
+      ],
+      "packed": 31
+    },
+    {
+      "rgb": [
+        18,
+        90,
+        200
+      ],
+      "packed": 4824
+    },
+    {
+      "rgb": [
+        185,
+        237,
+        242
+      ],
+      "packed": 46973
+    },
+    {
+      "rgb": [
+        8,
+        28,
+        53
+      ],
+      "packed": 2278
+    }
+  ]
+}

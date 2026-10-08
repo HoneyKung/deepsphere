@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "asset_pack": "luna-04-ocean-atlas",
+  "content": "LUNA-04 original illustrated ocean panorama",
+  "width": 1024,
+  "height": 512,
+  "pixel_format": "RGB565",
+  "byte_order": "big_endian",
+  "rgb565_bytes": 1048576,
+  "package_sha256": "9b562d4f618d3295cff8af4cf4cac6c420f43af5d2cad98e89f8858ab3dc53b4",
+  "sha256_rgb565": "28918fdcc785c3274d82fa14d45e2e09e28eb2d7d7bd42a4a55cf4756f4c4cee",
+  "targets_sha256": "63cfde98f85d4a411bccf1204fc96578d6daf9b9531a3ebbff9e1d25ec3ab37b",
+  "source_art": "assets/source/sea_atlas_luna04_master.png",
+  "source_composition": "assets/source/sea_atlas_luna04_composition.json",
+  "conversion": "resize source art to output_size with Lanczos, then quantize RGB888 to RGB565 once",
+  "metadata_status": "illustrated_subject_metadata",
+  "subject_count": 6
+}

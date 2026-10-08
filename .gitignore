@@ -1,0 +1,16 @@
+# build and tool caches
+.pio/
+.platformio-core/
+.pytest_cache/
+.venv-validation/
+.zig-global-cache/
+.zig-local-cache/
+.zig-tmp/
+__pycache__/
+*.pyc
+.vscode/
+
+# scratch, experiments and local backups (kept on the laptop, not published)
+tmp/
+twin_backup_*/
+assets/audio/temp/

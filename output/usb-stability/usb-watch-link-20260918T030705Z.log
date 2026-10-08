@@ -1,0 +1,56 @@
+2026-09-18T03:07:05.952+00:00	panel_check: five-panel bring-up, 8 MHz SPI, no PSRAM, no atlas
+2026-09-18T03:07:05.954+00:00	panel_check: build Sep 18 2026 10:06:52, boot diag-fede6369
+2026-09-18T03:07:05.955+00:00	panel_check: reset reason 0, free heap 370936
+2026-09-18T03:07:06.991+00:00	selftest SDA1 gpio1 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.991+00:00	selftest SCL2 gpio2 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.992+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.992+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.994+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.995+00:00	selftest RST gpio10 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.995+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.996+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.996+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.997+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.998+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.999+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:06.999+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:07:07.000+00:00	as5600: scanning I2C on SDA=GPIO1 SCL=GPIO2 ...
+2026-09-18T03:07:07.002+00:00	as5600: device answers at 0x36
+2026-09-18T03:07:07.017+00:00	probe 100000 Hz: addr=2 regwrite=2 bytes=2 raw=0
+2026-09-18T03:07:07.024+00:00	probe  50000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:07:07.032+00:00	probe  25000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:07:07.041+00:00	probe  10000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:07:07.253+00:00	panel_check: shared reset pulsed
+2026-09-18T03:07:07.254+00:00	panel_check: bringing up px on CS 8 ...
+2026-09-18T03:07:07.583+00:00	panel_check: px painted, free heap 368816
+2026-09-18T03:07:08.083+00:00	panel_check: bringing up nx on CS 13 ...
+2026-09-18T03:07:08.413+00:00	panel_check: nx painted, free heap 368720
+2026-09-18T03:07:08.914+00:00	panel_check: bringing up py on CS 4 ...
+2026-09-18T03:07:09.243+00:00	panel_check: py painted, free heap 368624
+2026-09-18T03:07:09.744+00:00	panel_check: bringing up ny on CS 5 ...
+2026-09-18T03:07:10.075+00:00	panel_check: ny painted, free heap 368528
+2026-09-18T03:07:10.575+00:00	panel_check: bringing up pz on CS 6 ...
+2026-09-18T03:07:10.908+00:00	panel_check: pz painted, free heap 368432
+2026-09-18T03:07:11.407+00:00	panel_check: all five brought up; now cycling colours forever
+2026-09-18T03:07:12.052+00:00	panel_check: cycle 0, boot diag-fede6369, uptime_ms 6816, free heap 368432
+2026-09-18T03:07:12.053+00:00	as5600: read failed
+2026-09-18T03:07:12.060+00:00	[  6822][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+2026-09-18T03:07:12.065+00:00	probe 100000 Hz: addr=2 regwrite=2 bytes=0 raw=0
+2026-09-18T03:07:12.072+00:00	probe  50000 Hz: addr=2 regwrite=2 bytes=2 raw=0
+2026-09-18T03:07:12.079+00:00	probe  25000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:07:12.088+00:00	probe  10000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:07:13.136+00:00	panel_check: cycle 1, boot diag-fede6369, uptime_ms 7899, free heap 368432
+2026-09-18T03:07:13.137+00:00	as5600: read failed
+2026-09-18T03:07:14.182+00:00	panel_check: cycle 2, boot diag-fede6369, uptime_ms 8946, free heap 368432
+2026-09-18T03:07:14.183+00:00	as5600: read failed
+2026-09-18T03:07:15.230+00:00	panel_check: cycle 3, boot diag-fede6369, uptime_ms 9993, free heap 368432
+2026-09-18T03:07:15.232+00:00	as5600: read failed
+2026-09-18T03:07:16.277+00:00	panel_check: cycle 0, boot diag-fede6369, uptime_ms 11040, free heap 368432
+2026-09-18T03:07:16.279+00:00	as5600: read failed
+2026-09-18T03:07:16.283+00:00	[ 11046][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+2026-09-18T03:07:16.289+00:00	probe 100000 Hz: addr=2 regwrite=2 bytes=0 raw=0
+2026-09-18T03:07:16.297+00:00	probe  50000 Hz: addr=2 regwrite=2 bytes=2 raw=0
+2026-09-18T03:07:16.303+00:00	probe  25000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:07:16.312+00:00	probe  10000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:07:17.359+00:00	panel_check: cycle 1, boot diag-fede6369, uptime_ms 12122, free heap 368432
+2026-09-18T03:07:17.360+00:00	as5600: read failed

@@ -1,0 +1,52 @@
+2026-09-17T20:43:12.290+00:00	panel_check: five-panel bring-up, 8 MHz SPI, no PSRAM, no atlas
+2026-09-17T20:43:12.292+00:00	panel_check: build Sep 18 2026 03:42:23, boot diag-6772ca2f
+2026-09-17T20:43:12.293+00:00	panel_check: reset reason 0, free heap 370936
+2026-09-17T20:43:13.329+00:00	selftest SDA1 gpio1 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.330+00:00	selftest SCL2 gpio2 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.330+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.331+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.332+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.332+00:00	selftest RST gpio10 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.333+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.333+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.333+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.334+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.334+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.335+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.336+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T20:43:13.336+00:00	as5600: scanning I2C on SDA=GPIO1 SCL=GPIO2 ...
+2026-09-17T20:43:13.349+00:00	as5600: NOT FOUND at 0x36 - check VCC/GND/SDA(GPIO1)/SCL(GPIO2)
+2026-09-17T20:43:13.559+00:00	panel_check: shared reset pulsed
+2026-09-17T20:43:13.561+00:00	panel_check: bringing up px on CS 8 ...
+2026-09-17T20:43:13.889+00:00	panel_check: px painted, free heap 368816
+2026-09-17T20:43:14.390+00:00	panel_check: bringing up nx on CS 13 ...
+2026-09-17T20:43:14.720+00:00	panel_check: nx painted, free heap 368720
+2026-09-17T20:43:15.221+00:00	panel_check: bringing up py on CS 4 ...
+2026-09-17T20:43:15.550+00:00	panel_check: py painted, free heap 368624
+2026-09-17T20:43:16.052+00:00	panel_check: bringing up ny on CS 5 ...
+2026-09-17T20:43:16.381+00:00	panel_check: ny painted, free heap 368528
+2026-09-17T20:43:16.881+00:00	panel_check: bringing up pz on CS 6 ...
+2026-09-17T20:43:17.212+00:00	panel_check: pz painted, free heap 368432
+2026-09-17T20:43:17.714+00:00	panel_check: all five brought up; now cycling colours forever
+2026-09-17T20:43:18.360+00:00	panel_check: cycle 0, boot diag-6772ca2f, uptime_ms 6788, free heap 368432
+2026-09-17T20:43:18.362+00:00	as5600: not found
+2026-09-17T20:43:19.409+00:00	panel_check: cycle 1, boot diag-6772ca2f, uptime_ms 7835, free heap 368432
+2026-09-17T20:43:19.411+00:00	as5600: not found
+2026-09-17T20:43:20.454+00:00	panel_check: cycle 2, boot diag-6772ca2f, uptime_ms 8882, free heap 368432
+2026-09-17T20:43:20.456+00:00	as5600: not found
+2026-09-17T20:43:21.501+00:00	panel_check: cycle 3, boot diag-6772ca2f, uptime_ms 9929, free heap 368432
+2026-09-17T20:43:21.502+00:00	as5600: not found
+2026-09-17T20:43:22.547+00:00	panel_check: cycle 0, boot diag-6772ca2f, uptime_ms 10975, free heap 368432
+2026-09-17T20:43:22.549+00:00	as5600: not found
+2026-09-17T20:43:23.595+00:00	panel_check: cycle 1, boot diag-6772ca2f, uptime_ms 12022, free heap 368432
+2026-09-17T20:43:23.597+00:00	as5600: not found
+2026-09-17T20:43:24.641+00:00	panel_check: cycle 2, boot diag-6772ca2f, uptime_ms 13069, free heap 368432
+2026-09-17T20:43:24.642+00:00	as5600: not found
+2026-09-17T20:43:25.688+00:00	panel_check: cycle 3, boot diag-6772ca2f, uptime_ms 14116, free heap 368432
+2026-09-17T20:43:25.691+00:00	as5600: not found
+2026-09-17T20:43:26.735+00:00	panel_check: cycle 0, boot diag-6772ca2f, uptime_ms 15163, free heap 368432
+2026-09-17T20:43:26.737+00:00	as5600: not found
+2026-09-17T20:43:27.782+00:00	panel_check: cycle 1, boot diag-6772ca2f, uptime_ms 16210, free heap 368432
+2026-09-17T20:43:27.783+00:00	as5600: not found
+2026-09-17T20:43:28.829+00:00	panel_check: cycle 2, boot diag-6772ca2f, uptime_ms 17257, free heap 368432
+2026-09-17T20:43:28.830+00:00	as5600: not found

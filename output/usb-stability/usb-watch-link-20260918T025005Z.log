@@ -1,0 +1,38 @@
+2026-09-18T02:50:08.062+00:00	panel_check: five-panel bring-up, 8 MHz SPI, no PSRAM, no atlas
+2026-09-18T02:50:08.062+00:00	panel_check: build Sep 18 2026 09:49:53, boot diag-10f8956f
+2026-09-18T02:50:08.063+00:00	panel_check: reset reason 0, free heap 370936
+2026-09-18T02:50:09.101+00:00	selftest SDA1 gpio1 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.103+00:00	selftest SCL2 gpio2 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.104+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.104+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.105+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.106+00:00	selftest RST gpio10 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.106+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.106+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.109+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.110+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.112+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.112+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.113+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T02:50:09.113+00:00	as5600: scanning I2C on SDA=GPIO1 SCL=GPIO2 ...
+2026-09-18T02:50:09.120+00:00	as5600: NOT FOUND at 0x36 - check VCC/GND/SDA(GPIO1)/SCL(GPIO2)
+2026-09-18T02:50:09.332+00:00	panel_check: shared reset pulsed
+2026-09-18T02:50:09.333+00:00	panel_check: bringing up px on CS 8 ...
+2026-09-18T02:50:09.661+00:00	panel_check: px painted, free heap 368816
+2026-09-18T02:50:10.162+00:00	panel_check: bringing up nx on CS 13 ...
+2026-09-18T02:50:10.492+00:00	panel_check: nx painted, free heap 368720
+2026-09-18T02:50:10.992+00:00	panel_check: bringing up py on CS 4 ...
+2026-09-18T02:50:11.323+00:00	panel_check: py painted, free heap 368624
+2026-09-18T02:50:11.823+00:00	panel_check: bringing up ny on CS 5 ...
+2026-09-18T02:50:12.152+00:00	panel_check: ny painted, free heap 368528
+2026-09-18T02:50:12.652+00:00	panel_check: bringing up pz on CS 6 ...
+2026-09-18T02:50:12.982+00:00	panel_check: pz painted, free heap 368432
+2026-09-18T02:50:13.483+00:00	panel_check: all five brought up; now cycling colours forever
+2026-09-18T02:50:14.129+00:00	panel_check: cycle 0, boot diag-10f8956f, uptime_ms 6786, free heap 368432
+2026-09-18T02:50:14.129+00:00	as5600: not found
+2026-09-18T02:50:15.177+00:00	panel_check: cycle 1, boot diag-10f8956f, uptime_ms 7833, free heap 368432
+2026-09-18T02:50:15.178+00:00	as5600: not found
+2026-09-18T02:50:16.223+00:00	panel_check: cycle 2, boot diag-10f8956f, uptime_ms 8880, free heap 368432
+2026-09-18T02:50:16.225+00:00	as5600: not found
+2026-09-18T02:50:17.270+00:00	panel_check: cycle 3, boot diag-10f8956f, uptime_ms 9927, free heap 368432
+2026-09-18T02:50:17.270+00:00	as5600: not found

@@ -1,0 +1,209 @@
+{
+  "net": {
+    "output": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-six-face-net-deep.png",
+    "layout": {
+      "nx": [
+        0,
+        1
+      ],
+      "pz": [
+        1,
+        1
+      ],
+      "px": [
+        2,
+        1
+      ],
+      "nz": [
+        3,
+        1
+      ],
+      "py": [
+        1,
+        0
+      ],
+      "ny": [
+        1,
+        2
+      ]
+    },
+    "turns_quarter_clockwise": {
+      "pz": 0,
+      "nx": 0,
+      "px": 0,
+      "nz": 0,
+      "py": 2,
+      "ny": 0
+    },
+    "foldability": {
+      "foldable": true,
+      "turns_quarter_clockwise": {
+        "pz": 0,
+        "nx": 0,
+        "px": 0,
+        "nz": 0,
+        "py": 2,
+        "ny": 0
+      },
+      "shared_edges": [
+        {
+          "faces": [
+            "nx",
+            "pz"
+          ],
+          "sides": [
+            "right",
+            "left"
+          ],
+          "shared_edge_matches": true
+        },
+        {
+          "faces": [
+            "pz",
+            "px"
+          ],
+          "sides": [
+            "right",
+            "left"
+          ],
+          "shared_edge_matches": true
+        },
+        {
+          "faces": [
+            "pz",
+            "ny"
+          ],
+          "sides": [
+            "bottom",
+            "top"
+          ],
+          "shared_edge_matches": true
+        },
+        {
+          "faces": [
+            "px",
+            "nz"
+          ],
+          "sides": [
+            "right",
+            "left"
+          ],
+          "shared_edge_matches": true
+        },
+        {
+          "faces": [
+            "py",
+            "pz"
+          ],
+          "sides": [
+            "bottom",
+            "top"
+          ],
+          "shared_edge_matches": true
+        }
+      ]
+    },
+    "face_edge_mm": 50.0,
+    "opening_mm": 30.0,
+    "frame_mm": 10.0,
+    "opening_ratio": 0.6,
+    "enabled_faces": [
+      "nx",
+      "ny",
+      "px",
+      "py",
+      "pz"
+    ],
+    "faces_without_a_panel": [
+      "nz"
+    ],
+    "cs_gpio_by_face": {
+      "nx": 13,
+      "pz": 6,
+      "px": 8,
+      "nz": 17,
+      "py": 4,
+      "ny": 5
+    }
+  },
+  "assembled": {
+    "output": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-six-face-assembled-deep.png",
+    "visible_faces_in_projection": [
+      "px",
+      "py",
+      "pz"
+    ],
+    "face_edge_mm": 50.0,
+    "opening_mm": 30.0,
+    "frame_mm": 10.0,
+    "opening_ratio": 0.6,
+    "texture_source_uv": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0
+      ],
+      [
+        1.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "mount_label": "identity test fixture"
+  },
+  "corner_upright": {
+    "output": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-six-face-corner-upright-deep.png",
+    "visible_faces_in_projection": [
+      "nz",
+      "px",
+      "py"
+    ],
+    "face_edge_mm": 50.0,
+    "opening_mm": 30.0,
+    "frame_mm": 10.0,
+    "opening_ratio": 0.6,
+    "texture_source_uv": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0
+      ],
+      [
+        1.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "mount_label": "corner-upright concept fixture (not confirmed mount)"
+  },
+  "calibration": {
+    "output": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-six-face-calibration-deep.png",
+    "module_fact": "diagnostic UP points left, opposite connector edge",
+    "holder_template": "local UP top; header right; GND top pin, then VCC/SCL/SDA/RST/DC/CS/BL",
+    "world_orientation": "unresolved",
+    "final_mount_field": "UNKNOWN",
+    "scope": "one tested diagnostic module template; not six-unit confirmation"
+  },
+  "face_samples_240": [
+    "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-face-px-deep-240.png",
+    "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-face-nx-deep-240.png",
+    "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-face-py-deep-240.png",
+    "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-face-ny-deep-240.png",
+    "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-face-pz-deep-240.png",
+    "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\output\\preview-face-nz-deep-240.png"
+  ],
+  "depth_norm": 0.8,
+  "depth_label": "deep"
+}

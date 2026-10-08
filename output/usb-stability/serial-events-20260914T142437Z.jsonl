@@ -1,0 +1,3 @@
+{"at": "2026-09-14T14:24:37.028+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:24:37.033+00:00", "event": "open_success", "port": "COM6", "dtr": true, "rts": false, "opens": 1}
+{"at": "2026-09-14T14:34:37.086+00:00", "event": "close", "port": "COM6", "reason": "stopped by request"}

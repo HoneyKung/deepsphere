@@ -1,0 +1,17 @@
+{"at": "2026-09-14T14:19:48.022+00:00", "event": "watch_start", "port": "COM6", "mode": "cycles", "cycles": 3, "gap_seconds": 15.0, "dtr": true, "rts": false}
+{"at": "2026-09-14T14:19:48.026+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:19:48.031+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-14T14:19:48.293+00:00", "event": "close", "port": "COM6", "reason": "identity read"}
+{"at": "2026-09-14T14:19:48.294+00:00", "event": "cycle_result", "port": "COM6", "cycle": 1, "outcome": "identity read", "session": "s3-af6e27ac-342-6ff9263a", "type": "heartbeat", "uptime_ms": 348201, "heartbeat": 339, "reset_reason": 0, "reset_reason_name": "unknown", "stage": "loop_running", "firmware_env": "esp32-s3-zero", "firmware_build": "Sep 14 2026 21:10:43"}
+{"at": "2026-09-14T14:19:48.296+00:00", "event": "gap_start", "port": "COM6", "seconds": 15.0, "note": "nothing holds the port during the gap"}
+{"at": "2026-09-14T14:20:03.297+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:20:03.302+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-14T14:20:03.307+00:00", "event": "close", "port": "COM6", "reason": "identity read"}
+{"at": "2026-09-14T14:20:03.308+00:00", "event": "cycle_result", "port": "COM6", "cycle": 2, "outcome": "identity read", "session": "s3-af6e27ac-342-6ff9263a", "type": "heartbeat", "uptime_ms": 363216, "heartbeat": 354, "reset_reason": 0, "reset_reason_name": "unknown", "stage": "loop_running", "firmware_env": "esp32-s3-zero", "firmware_build": "Sep 14 2026 21:10:43"}
+{"at": "2026-09-14T14:20:03.309+00:00", "event": "gap_start", "port": "COM6", "seconds": 15.0, "note": "nothing holds the port during the gap"}
+{"at": "2026-09-14T14:20:18.310+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:20:18.314+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-14T14:20:18.323+00:00", "event": "close", "port": "COM6", "reason": "identity read"}
+{"at": "2026-09-14T14:20:18.323+00:00", "event": "cycle_result", "port": "COM6", "cycle": 3, "outcome": "identity read", "session": "s3-af6e27ac-342-6ff9263a", "type": "heartbeat", "uptime_ms": 378232, "heartbeat": 369, "reset_reason": 0, "reset_reason_name": "unknown", "stage": "loop_running", "firmware_env": "esp32-s3-zero", "firmware_build": "Sep 14 2026 21:10:43"}
+{"at": "2026-09-14T14:20:18.324+00:00", "event": "verdict", "port": "COM6", "text": "same session and uptime kept pace: the board ran through the gaps", "session": "s3-af6e27ac-342-6ff9263a", "wall_elapsed_ms": 30285, "uptime_grew_ms": 30031}
+{"at": "2026-09-14T14:20:18.325+00:00", "event": "watch_end", "port": "COM6", "watch_start": 1, "open_attempt": 3, "open_success": 3, "close": 3, "cycle_result": 3, "gap_start": 2, "verdict": 1}

@@ -1,0 +1,313 @@
+{
+ "schema": 1,
+ "date": "2026-10-02",
+ "note": "ตารางกฎเสียงทั้งหมด (ใครเล่นเมื่อไหร่ ห่างกี่วินาที) ตัวเลขเป็นวินาทีเว้นแต่ระบุ · ตัวกำกับเสียงต้องอ่านค่าจากไฟล์นี้ (ปรับได้โดยไม่แก้โค้ด) · ผู้ใช้บอกว่าเสียงวนซ้อนกัน ไม่มีช่วงเงียบ จึงลดของต่อเนื่องเหลือแค่ทะเล และทุกอย่างอื่นต้องมีเงื่อนไขหรือเว้นระยะ",
+ "global": {
+  "atmosphere_min_gap_s": 10,
+  "no_atmosphere_first_s_of_phrase": 3,
+  "voice_min_gap_s": 4,
+  "foreground_priority": [
+   "voice",
+   "discovery_or_home_or_zone_chime",
+   "animal_phrase",
+   "music_lead",
+   "tool_oneshot",
+   "atmosphere"
+  ],
+  "foreground_note": "ตัวนำเดียวต่อช่วงเวลา ตัวอื่นลด ~4 dB · เสียงตอบสนองมือ (tool_oneshot) เล่นทันทีเสมอ ห้ามถูกทิ้ง",
+  "music_rest_ratio_target": [
+   0.25,
+   0.35
+  ],
+  "max_continuous_loops_at_once": 2
+ },
+ "rules": [
+  {
+   "cue": "ambient_<zone>",
+   "type": "continuous",
+   "when": "ทุกเวลา ตามโซน",
+   "detail": "ลูปวนต่อเนื่องแต่ระดับ 'หายใจ' ±2.5 dB คาบ 25–40 วิ (สุ่มคาบ), เริ่มจากตำแหน่งสุ่มทุกรอบ + ครอสเฟดรอยต่อ 4 วิ, ข้ามโซนครอสเฟด 3 วิ, ช่วงเพลง Rest ยกขึ้น +1.5 dB",
+   "interval_s": null
+  },
+  {
+   "cue": "music (invite/shallow/mid/deep)",
+   "type": "cycle",
+   "when": "วงจร Rest→Enter→Phrase→Exit",
+   "detail": "Rest ตื้น 10–18 / กลาง 14–24 / ลึก 18–30 · Phrase ตื้น 24–40 / กลาง 28–44 / ลึก 32–48 · pad เข้า 4–5 วิ · lead เข้า +6 วิ ออกก่อนจบ 6 วิ · เริ่มเกมเว้น Rest 8 วิ · ข้ามโซนเว้น Rest 4–8 วิ",
+   "interval_s": null
+  },
+  {
+   "cue": "sub_roomtone",
+   "type": "swell_cycle",
+   "when": "ทุกเวลา แต่ไม่ต่อเนื่อง",
+   "detail": "ระดับพื้น 0.2→ขึ้น 0.35 ใน 6 วิ ค้าง 10–20 วิ→ลงเหลือ 0.08 ใน 6 วิ ค้าง 12–25 วิ สลับกัน · ช่วงเพลง Phrase = 0.08–0.12 · เริ่มจากตำแหน่งสุ่ม",
+   "interval_s": [
+    16,
+    45
+   ]
+  },
+  {
+   "cue": "hull_creak",
+   "type": "random",
+   "when": "โซนกลาง/ลึกเท่านั้น (ตื้นไม่มี)",
+   "detail": "ไฟล์เดียวต่อครั้ง ห้ามซ้ำตัวเดิมติดกัน",
+   "interval_s": {
+    "mid": [
+     25,
+     45
+    ],
+    "deep": [
+     15,
+     30
+    ]
+   }
+  },
+  {
+   "cue": "whale_distant",
+   "type": "random",
+   "when": "โซนตื้นและกลาง",
+   "detail": "ชอบเล่นช่วงเพลง Rest",
+   "interval_s": [
+    90,
+    180
+   ]
+  },
+  {
+   "cue": "deep_mystery",
+   "type": "random",
+   "when": "โซนลึกเท่านั้น ช่วงเพลง Rest",
+   "detail": "หายาก",
+   "interval_s": [
+    120,
+    240
+   ]
+  },
+  {
+   "cue": "music sparkle stem",
+   "type": "random_window",
+   "when": "เฉพาะในช่วง Phrase",
+   "detail": "เปิด 4–8 วิ ปิด 6–14 วิ สลับ",
+   "interval_s": [
+    10,
+    22
+   ]
+  },
+  {
+   "cue": "descend_bubble_pop (ใหม่ แทนลูป descend_bubbles)",
+   "type": "random_while_moving",
+   "when": "เฉพาะตอนกำลังเปลี่ยนความลึกลง",
+   "detail": "ฟองเดี่ยวสั้น ๆ 4 แบบสุ่ม ระดับเบา หยุดทันทีเมื่อหยุดดำ · ห้ามใช้ descend_bubbles แบบลูปอีก",
+   "interval_s": [
+    1.5,
+    4
+   ]
+  },
+  {
+   "cue": "descend_thrust",
+   "type": "while_moving",
+   "when": "เฉพาะตอนกดลูกศรลง/ความลึกกำลังเปลี่ยน",
+   "detail": "เฟดเข้า 0.3 วิ ออก 0.6 วิ เมื่อหยุด · ระดับตามความเร็ว · เริ่มจากตำแหน่งสุ่ม · สลับไฟล์ 1/2 ทุกครั้งที่กดใหม่ · ลดเพลง/ทะเล 2 dB ขณะดำ",
+   "interval_s": null
+  },
+  {
+   "cue": "ascend_blow",
+   "type": "player",
+   "when": "ลอยขึ้น",
+   "detail": "สุ่ม 2 ไฟล์",
+   "interval_s": {
+    "min_gap": 1.2
+   }
+  },
+  {
+   "cue": "turn_periscope",
+   "type": "player",
+   "when": "ทุก 5° ที่หมุน",
+   "detail": "สุ่ม 4 แบบ · ถ้าหมุนเร็วเกิน 10 คลิกต่อวินาที ให้เล่นเว้นตัว (ไม่เกิน 10/วินาที)",
+   "interval_s": {
+    "min_gap": 0.04,
+    "max_per_s": 10
+   }
+  },
+  {
+   "cue": "dive_start",
+   "type": "player",
+   "when": "กดเริ่ม ครั้งเดียว",
+   "detail": "สุ่ม 3 ไฟล์",
+   "interval_s": null
+  },
+  {
+   "cue": "scan_sweep→scan_hit/scan_miss",
+   "type": "player",
+   "when": "กด 1",
+   "detail": "sweep ทันที ผลตามหลัง ~0.5 วิ · กดซ้ำเว้น ≥0.8 วิ",
+   "interval_s": {
+    "min_gap": 0.8
+   }
+  },
+  {
+   "cue": "sonar_idle",
+   "type": "after_scan",
+   "when": "ช่วง 10 วิหลังกด 1 เท่านั้น",
+   "detail": "ปิง 2 ครั้ง ห่าง 4–6 วิ ไม่ปิดอัตโนมัติตลอด (โหมดปิงตลอดอยู่ใน ?audio=debug)",
+   "interval_s": [
+    4,
+    6
+   ]
+  },
+  {
+   "cue": "collect_success/duplicate/action_error",
+   "type": "player",
+   "when": "กด 2 / กดผิดเงื่อนไข",
+   "detail": "เล่นทันทีเสมอ",
+   "interval_s": null
+  },
+  {
+   "cue": "analyze_open/analyze_close, dive_assist_on/off",
+   "type": "player",
+   "when": "กด 3 / ปิดหน้าต่าง / กด H",
+   "detail": "เล่นทันที",
+   "interval_s": null
+  },
+  {
+   "cue": "zone_enter_mid / zone_enter_deep / zone_up",
+   "type": "event",
+   "when": "ข้าม 760 / 1,976 ม.",
+   "detail": "hysteresis ±0.01 ของความลึก + cooldown 20 วิต่อเส้น + bridge เพลง",
+   "interval_s": {
+    "cooldown": 20
+   }
+  },
+  {
+   "cue": "max_depth_warning",
+   "type": "event",
+   "when": "ถึง 3,040 ม.",
+   "detail": "ครั้งเดียวต่อการถึง เปิดใหม่ได้เมื่อขึ้นห่าง ≥5% ของความลึก",
+   "interval_s": null
+  },
+  {
+   "cue": "surface_break",
+   "type": "event",
+   "when": "ขึ้นมาถึง 0 ม. จากด้านล่างเท่านั้น",
+   "detail": "ห้ามดังตอนเริ่มที่ 0 · cooldown 30 วิ",
+   "interval_s": {
+    "cooldown": 30
+   }
+  },
+  {
+   "cue": "first_discovery",
+   "type": "event",
+   "when": "สแกนเจอสัตว์ชนิดนั้นครั้งแรก (มีได้สูงสุด 6 ครั้งทั้งเกม)",
+   "detail": "ใช้ชุดเดียวเมื่อเกิดติดกับ collect/complete (mission_complete > first_discovery > collect_success)",
+   "interval_s": null
+  },
+  {
+   "cue": "mission_complete",
+   "type": "event",
+   "when": "เก็บครบ 6 ชนิด ครั้งเดียว",
+   "detail": "",
+   "interval_s": null
+  },
+  {
+   "cue": "board_link_on/off",
+   "type": "event",
+   "when": "โหมด ?live=1 บอร์ดต่อติด/หลุด",
+   "detail": "cooldown 5 วิ",
+   "interval_s": {
+    "cooldown": 5
+   }
+  },
+  {
+   "cue": "life_<animal>_glimpse",
+   "type": "animal_only",
+   "when": "เป้าเล็งเข้าใกล้สัตว์ตัวนั้นในรัศมีสนใจ R (R ≈ 1.5 เท่าความกว้างตัวสัตว์ในภาพ)",
+   "detail": "เล่น 1 ครั้งต่อการเข้าใกล้ · เปิดใหม่เมื่อเป้าออกห่าง >2R หรือผ่านไป 20 วิ · ทั้งเกมเล่นได้ทีละ 1 ตัว ห่างกันอย่างน้อย 6 วิ · ระดับตามระยะ 40–100% แพนตามทิศ · ไม่มีสัตว์ใกล้ = ไม่มีเสียงสัตว์เลย · ไม่เล่นขณะพากย์",
+   "interval_s": {
+    "per_animal_cooldown": 20,
+    "global_min_gap": 6
+   }
+  },
+  {
+   "cue": "life_<animal>_known",
+   "type": "animal_only",
+   "when": "สแกนเจอสัตว์ตัวนั้นสำเร็จเท่านั้น",
+   "detail": "ต่อจากปิงผล ก่อนพากย์",
+   "interval_s": null
+  },
+  {
+   "cue": "life_<animal>_memory",
+   "type": "animal_only",
+   "when": "(1) เปิดวิเคราะห์ (เล่นเฉพาะตัวที่เก็บล่าสุด 1 ตัว) (2) กลับมาเจอตัวที่เก็บไปแล้ว หลังผ่าน ≥30 วิ",
+   "detail": "",
+   "interval_s": {
+    "cooldown": 30
+   }
+  },
+  {
+   "cue": "vo_welcome",
+   "type": "voice",
+   "when": "กดเริ่ม (หลัง dive_start ~0.75 วิ)",
+   "detail": "ครั้งเดียว",
+   "interval_s": null
+  },
+  {
+   "cue": "vo_zone_mid / vo_zone_deep",
+   "type": "voice",
+   "when": "ข้ามโซนขาลง",
+   "detail": "ครั้งเดียวต่อการข้าม cooldown 60 วิ ขาขึ้นไม่พูด",
+   "interval_s": {
+    "cooldown": 60
+   }
+  },
+  {
+   "cue": "vo_scan_hit",
+   "type": "voice",
+   "when": "สแกนเจอ",
+   "detail": "3 ครั้งแรกพูด แล้วพูดทุกครั้งที่ 2 (เสียงปิงพออยู่แล้ว)",
+   "interval_s": null
+  },
+  {
+   "cue": "vo_scan_miss",
+   "type": "voice",
+   "when": "สแกนไม่เจอ",
+   "detail": "พูดครั้งที่ 1 แล้วทุกครั้งที่ 4 (ที่เหลือเสียงปิงพอ)",
+   "interval_s": null
+  },
+  {
+   "cue": "vo_collect",
+   "type": "voice",
+   "when": "เก็บสำเร็จ",
+   "detail": "พูดเฉพาะ 2 ครั้งแรก ที่เหลือใช้เสียงยืนยันอย่างเดียว",
+   "interval_s": null
+  },
+  {
+   "cue": "vo_duplicate / vo_nothing / vo_tray_empty",
+   "type": "voice",
+   "when": "กดผิดเงื่อนไข",
+   "detail": "cooldown 20 วิต่อประโยค",
+   "interval_s": {
+    "cooldown": 20
+   }
+  },
+  {
+   "cue": "vo_on_frame",
+   "type": "voice",
+   "when": "ไม่ใช้",
+   "detail": "ผู้ใช้เลือกบอกด้วยเส้นเขียวบนภาพแทน (LUNA-15 ข้อ B)",
+   "interval_s": null
+  },
+  {
+   "cue": "vo_analyze (+ชื่อสัตว์)",
+   "type": "voice",
+   "when": "เปิดวิเคราะห์ทุกครั้ง",
+   "detail": "ต่อชื่อสัตว์ในถาดตามลำดับ",
+   "interval_s": null
+  },
+  {
+   "cue": "vo_max_depth / vo_surface / vo_complete",
+   "type": "voice",
+   "when": "ถึงลึกสุด / ขึ้นถึงผิวน้ำ / เก็บครบ",
+   "detail": "ครั้งเดียวต่อเหตุการณ์",
+   "interval_s": null
+  }
+ ]
+}

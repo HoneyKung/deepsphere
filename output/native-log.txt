@@ -1,0 +1,7 @@
+PASS: 1413 checks, 0 failures
+background: 343 of 343 samples bit-exact with Python
+PASS live ocean: 2412 checks, 0 failures
+build: C:\Users\Acer\Downloads\oceanX\prototype-v1\.venv-validation\Scripts\python.exe -m ziglang c++ -std=c++17 -O1 -w C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\native\test_cube_math.cpp C:\Users\Acer\Downloads\oceanX\prototype-v1\firmware\src\math\cube_math.cpp -I C:\Users\Acer\Downloads\oceanX\prototype-v1\firmware\src -I C:\Users\Acer\Downloads\oceanX\prototype-v1\firmware\include -I C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\native -o C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\native\cube_math_test.exe
+run: C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\native\cube_math_test.exe
+build: C:\Users\Acer\Downloads\oceanX\prototype-v1\.venv-validation\Scripts\python.exe -m ziglang c++ -std=c++17 -O1 -w C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\native\test_live_ocean.cpp C:\Users\Acer\Downloads\oceanX\prototype-v1\firmware\src\math\cube_math.cpp -I C:\Users\Acer\Downloads\oceanX\prototype-v1\firmware\src -I C:\Users\Acer\Downloads\oceanX\prototype-v1\firmware\include -I C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\native -o C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\native\live_ocean_test.exe
+run: C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\native\live_ocean_test.exe

@@ -1,0 +1,5 @@
+{"at": "2026-09-17T17:43:51.709+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 3600.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-17T17:43:51.710+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:43:51.712+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-17T17:43:52.966+00:00", "event": "board_session_changed", "port": "COM6", "previous": null, "session": "s3-af6e27ac-337-c6873072", "type": "log"}
+{"at": "2026-09-17T17:43:52.969+00:00", "event": "board_dropped_line_bytes", "port": "COM6", "total": 4, "note": "the board could not fit a whole line in the USB FIFO"}

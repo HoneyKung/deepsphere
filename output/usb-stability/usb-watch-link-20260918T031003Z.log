@@ -1,0 +1,50 @@
+2026-09-18T03:10:03.656+00:00	panel_check: cycle 3, boot diag-fede6369, uptime_ms 178422, free heap 368432
+2026-09-18T03:10:03.657+00:00	as5600: read failed
+2026-09-18T03:10:04.702+00:00	panel_check: cycle 0, boot diag-fede6369, uptime_ms 179469, free heap 368432
+2026-09-18T03:10:04.704+00:00	as5600: read failed
+2026-09-18T03:10:04.708+00:00	[179475][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+2026-09-18T03:10:04.714+00:00	probe 100000 Hz: addr=2 regwrite=2 bytes=0 raw=0
+2026-09-18T03:10:04.722+00:00	probe  50000 Hz: addr=2 regwrite=2 bytes=2 raw=0
+2026-09-18T03:10:04.728+00:00	probe  25000 Hz: addr=2 regwrite=0 bytes=2 raw=40
+2026-09-18T03:10:04.737+00:00	probe  10000 Hz: addr=2 regwrite=0 bytes=2 raw=1770
+2026-09-18T03:10:05.785+00:00	panel_check: cycle 1, boot diag-fede6369, uptime_ms 180551, free heap 368432
+2026-09-18T03:10:05.787+00:00	as5600: read failed
+2026-09-18T03:10:06.831+00:00	panel_check: cycle 2, boot diag-fede6369, uptime_ms 181598, free heap 368432
+2026-09-18T03:10:06.834+00:00	as5600: read failed
+2026-09-18T03:10:07.878+00:00	panel_check: cycle 3, boot diag-fede6369, uptime_ms 182645, free heap 368432
+2026-09-18T03:10:07.880+00:00	as5600: read failed
+2026-09-18T03:10:08.924+00:00	panel_check: cycle 0, boot diag-fede6369, uptime_ms 183692, free heap 368432
+2026-09-18T03:10:08.925+00:00	as5600: read failed
+2026-09-18T03:10:08.931+00:00	[183698][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+2026-09-18T03:10:08.936+00:00	probe 100000 Hz: addr=2 regwrite=2 bytes=0 raw=0
+2026-09-18T03:10:08.943+00:00	probe  50000 Hz: addr=2 regwrite=2 bytes=2 raw=0
+2026-09-18T03:10:08.951+00:00	probe  25000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:10:08.960+00:00	probe  10000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:10:10.007+00:00	panel_check: cycle 1, boot diag-fede6369, uptime_ms 184774, free heap 368432
+2026-09-18T03:10:10.009+00:00	as5600: read failed
+2026-09-18T03:10:11.054+00:00	panel_check: cycle 2, boot diag-fede6369, uptime_ms 185821, free heap 368432
+2026-09-18T03:10:11.055+00:00	as5600: read failed
+2026-09-18T03:10:12.101+00:00	panel_check: cycle 3, boot diag-fede6369, uptime_ms 186868, free heap 368432
+2026-09-18T03:10:12.102+00:00	as5600: read failed
+2026-09-18T03:10:13.149+00:00	panel_check: cycle 0, boot diag-fede6369, uptime_ms 187915, free heap 368432
+2026-09-18T03:10:13.151+00:00	as5600: read failed
+2026-09-18T03:10:13.153+00:00	[187921][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+2026-09-18T03:10:13.160+00:00	probe 100000 Hz: addr=2 regwrite=2 bytes=0 raw=0
+2026-09-18T03:10:13.166+00:00	probe  50000 Hz: addr=2 regwrite=2 bytes=2 raw=0
+2026-09-18T03:10:13.174+00:00	probe  25000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:10:13.183+00:00	probe  10000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:10:14.229+00:00	panel_check: cycle 1, boot diag-fede6369, uptime_ms 188997, free heap 368432
+2026-09-18T03:10:14.230+00:00	as5600: read failed
+2026-09-18T03:10:15.277+00:00	panel_check: cycle 2, boot diag-fede6369, uptime_ms 190044, free heap 368432
+2026-09-18T03:10:15.278+00:00	as5600: read failed
+2026-09-18T03:10:16.323+00:00	panel_check: cycle 3, boot diag-fede6369, uptime_ms 191091, free heap 368432
+2026-09-18T03:10:16.325+00:00	as5600: read failed
+2026-09-18T03:10:17.370+00:00	panel_check: cycle 0, boot diag-fede6369, uptime_ms 192138, free heap 368432
+2026-09-18T03:10:17.372+00:00	as5600: read failed
+2026-09-18T03:10:17.377+00:00	[192144][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+2026-09-18T03:10:17.384+00:00	probe 100000 Hz: addr=2 regwrite=2 bytes=0 raw=0
+2026-09-18T03:10:17.390+00:00	probe  50000 Hz: addr=2 regwrite=2 bytes=2 raw=0
+2026-09-18T03:10:17.397+00:00	probe  25000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:10:17.405+00:00	probe  10000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:10:18.452+00:00	panel_check: cycle 1, boot diag-fede6369, uptime_ms 193219, free heap 368432
+2026-09-18T03:10:18.454+00:00	as5600: read failed

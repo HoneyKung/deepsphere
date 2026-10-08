@@ -1,0 +1,23 @@
+{"at": "2026-09-14T14:13:56.083+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 300.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-14T14:13:56.084+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:13:56.084+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-14T14:13:57.085+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:13:57.088+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-14T14:13:57.446+00:00", "event": "read_error", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-14T14:13:57.448+00:00", "event": "close", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-14T14:13:57.452+00:00", "event": "reopen_wait", "port": "COM6", "seconds": 1.0}
+{"at": "2026-09-14T14:13:58.453+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:13:58.458+00:00", "event": "open_error", "port": "COM6", "reason": "Cannot configure port, something went wrong. Original message: OSError(22, 'A device which does not exist was specified.', None, 433)"}
+{"at": "2026-09-14T14:13:59.461+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:13:59.468+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-14T14:13:59.585+00:00", "event": "read_error", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-14T14:13:59.588+00:00", "event": "close", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-14T14:13:59.589+00:00", "event": "reopen_wait", "port": "COM6", "seconds": 1.0}
+{"at": "2026-09-14T14:14:00.594+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:14:00.597+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-14T14:14:01.600+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-14T14:14:01.605+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-14T14:14:01.938+00:00", "event": "board_session_changed", "port": "COM6", "previous": null, "session": "s3-af6e27ac-342-6ff9263a", "type": "log"}
+{"at": "2026-09-14T14:14:08.631+00:00", "event": "quiet_gap", "port": "COM6", "seconds": 3.55, "note": "no line for longer than the heartbeat interval"}
+{"at": "2026-09-14T14:19:26.088+00:00", "event": "close", "port": "COM6", "reason": "window elapsed"}
+{"at": "2026-09-14T14:19:26.090+00:00", "event": "watch_end", "port": "COM6", "boots_observed": 1, "damaged_lines": 0, "board_reported_truncations": 0, "last_session": "s3-af6e27ac-342-6ff9263a", "watch_start": 1, "open_attempt": 6, "open_error": 3, "open_success": 3, "read_error": 2, "close": 3, "reopen_wait": 2, "board_session_changed": 1, "quiet_gap": 1}

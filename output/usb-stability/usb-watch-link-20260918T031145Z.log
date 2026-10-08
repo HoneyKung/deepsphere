@@ -1,0 +1,72 @@
+2026-09-18T03:11:46.315+00:00	panel_check: five-panel bring-up, 8 MHz SPI, no PSRAM, no atlas
+2026-09-18T03:11:46.316+00:00	panel_check: build Sep 18 2026 10:11:32, boot diag-80d9a3ae
+2026-09-18T03:11:46.317+00:00	panel_check: reset reason 0, free heap 370936
+2026-09-18T03:11:47.355+00:00	selftest SDA1 gpio1 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.356+00:00	selftest SCL2 gpio2 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.357+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.357+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.358+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.359+00:00	selftest RST gpio10 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.359+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.359+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.360+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.361+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.362+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.363+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.364+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-18T03:11:47.364+00:00	as5600: scanning I2C on SDA=GPIO1 SCL=GPIO2 ...
+2026-09-18T03:11:47.365+00:00	as5600: device answers at 0x36
+2026-09-18T03:11:47.375+00:00	watch  0 t=1774ms addr=0 ANSWERS
+2026-09-18T03:11:47.626+00:00	watch  1 t=2026ms addr=2 silent
+2026-09-18T03:11:47.876+00:00	watch  2 t=2277ms addr=2 silent
+2026-09-18T03:11:48.127+00:00	watch  3 t=2528ms addr=2 silent
+2026-09-18T03:11:48.379+00:00	watch  4 t=2779ms addr=2 silent
+2026-09-18T03:11:48.629+00:00	watch  5 t=3030ms addr=2 silent
+2026-09-18T03:11:48.879+00:00	watch  6 t=3280ms addr=2 silent
+2026-09-18T03:11:49.131+00:00	watch  7 t=3531ms addr=2 silent
+2026-09-18T03:11:49.381+00:00	watch  8 t=3782ms addr=2 silent
+2026-09-18T03:11:49.632+00:00	watch  9 t=4033ms addr=2 silent
+2026-09-18T03:11:49.883+00:00	watch 10 t=4284ms addr=2 silent
+2026-09-18T03:11:50.134+00:00	watch 11 t=4535ms addr=2 silent
+2026-09-18T03:11:50.386+00:00	watch 12 t=4786ms addr=2 silent
+2026-09-18T03:11:50.637+00:00	watch 13 t=5037ms addr=2 silent
+2026-09-18T03:11:50.888+00:00	watch 14 t=5288ms addr=2 silent
+2026-09-18T03:11:51.139+00:00	watch 15 t=5539ms addr=2 silent
+2026-09-18T03:11:51.390+00:00	watch 16 t=5790ms addr=2 silent
+2026-09-18T03:11:51.640+00:00	watch 17 t=6041ms addr=2 silent
+2026-09-18T03:11:51.892+00:00	watch 18 t=6292ms addr=2 silent
+2026-09-18T03:11:52.142+00:00	watch 19 t=6542ms addr=2 silent
+2026-09-18T03:11:52.393+00:00	watch 20 t=6793ms addr=2 silent
+2026-09-18T03:11:52.644+00:00	watch 21 t=7044ms addr=2 silent
+2026-09-18T03:11:52.895+00:00	watch 22 t=7295ms addr=2 silent
+2026-09-18T03:11:53.146+00:00	watch 23 t=7546ms addr=2 silent
+2026-09-18T03:11:53.402+00:00	[  7802][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+2026-09-18T03:11:53.408+00:00	probe 100000 Hz: addr=2 regwrite=2 bytes=0 raw=0
+2026-09-18T03:11:53.416+00:00	probe  50000 Hz: addr=2 regwrite=2 bytes=2 raw=0
+2026-09-18T03:11:53.423+00:00	probe  25000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:11:53.432+00:00	probe  10000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:11:53.645+00:00	panel_check: shared reset pulsed
+2026-09-18T03:11:53.647+00:00	panel_check: bringing up px on CS 8 ...
+2026-09-18T03:11:53.974+00:00	panel_check: px painted, free heap 368816
+2026-09-18T03:11:54.473+00:00	panel_check: bringing up nx on CS 13 ...
+2026-09-18T03:11:54.802+00:00	panel_check: nx painted, free heap 368720
+2026-09-18T03:11:55.305+00:00	panel_check: bringing up py on CS 4 ...
+2026-09-18T03:11:55.635+00:00	panel_check: py painted, free heap 368624
+2026-09-18T03:11:56.135+00:00	panel_check: bringing up ny on CS 5 ...
+2026-09-18T03:11:56.465+00:00	panel_check: ny painted, free heap 368528
+2026-09-18T03:11:56.966+00:00	panel_check: bringing up pz on CS 6 ...
+2026-09-18T03:11:57.296+00:00	panel_check: pz painted, free heap 368432
+2026-09-18T03:11:57.797+00:00	panel_check: all five brought up; now cycling colours forever
+2026-09-18T03:11:58.444+00:00	panel_check: cycle 0, boot diag-80d9a3ae, uptime_ms 12843, free heap 368432
+2026-09-18T03:11:58.445+00:00	as5600: read failed
+2026-09-18T03:11:58.449+00:00	[ 12849][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+2026-09-18T03:11:58.455+00:00	probe 100000 Hz: addr=2 regwrite=2 bytes=0 raw=0
+2026-09-18T03:11:58.463+00:00	probe  50000 Hz: addr=2 regwrite=2 bytes=2 raw=0
+2026-09-18T03:11:58.471+00:00	probe  25000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:11:58.480+00:00	probe  10000 Hz: addr=2 regwrite=0 bytes=2 raw=0
+2026-09-18T03:11:59.526+00:00	panel_check: cycle 1, boot diag-80d9a3ae, uptime_ms 13926, free heap 368432
+2026-09-18T03:11:59.527+00:00	as5600: read failed
+2026-09-18T03:12:00.573+00:00	panel_check: cycle 2, boot diag-80d9a3ae, uptime_ms 14973, free heap 368432
+2026-09-18T03:12:00.575+00:00	as5600: read failed
+2026-09-18T03:12:01.620+00:00	panel_check: cycle 3, boot diag-80d9a3ae, uptime_ms 16020, free heap 368432
+2026-09-18T03:12:01.622+00:00	as5600: read failed

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "sample_id": "sim-165441-6",
+  "target_id": "luna04_surface_fish_seam",
+  "depth_norm": 0.0898,
+  "asset_pack": "luna-04-ocean-atlas",
+  "crop": {
+    "u": -0.0215,
+    "v": 0.0879,
+    "w": 0.109375,
+    "h": 0.16796875
+  },
+  "received_at": "2026-09-10T16:54:44.845504+00:00",
+  "image_file": "sim-165441-6.png"
+}

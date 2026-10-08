@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "numericAssertions": 1725,
+  "normals": 6,
+  "pixels": 18,
+  "seams": 36,
+  "sameY": 6,
+  "aims": 22,
+  "sprites": 36,
+  "faceTraversal": [
+    "px",
+    "py",
+    "pz",
+    "px"
+  ]
+}

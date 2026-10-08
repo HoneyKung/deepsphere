@@ -1,0 +1,36 @@
+{
+  "raw_to_degrees": [
+    {"raw": 0, "degrees": 0.0},
+    {"raw": 1, "degrees": 0.087890625},
+    {"raw": 2048, "degrees": 180.0},
+    {"raw": 4095, "degrees": 359.912109375},
+    {"raw": 8191, "degrees": 359.912109375}
+  ],
+  "deadband": [
+    {"previous": 10.0, "current": 10.1, "deadband": 0.15, "expected": 10.0},
+    {"previous": 359.9, "current": 0.1, "deadband": 0.25, "expected": 359.9},
+    {"previous": 359.9, "current": 0.5, "deadband": 0.25, "expected": 0.5},
+    {"previous": 180.0, "current": 179.7, "deadband": 0.15, "expected": 179.7}
+  ],
+  "calibration": [
+    {"raw_min": 512, "raw_max": 3584, "direction": 1, "span_raw": 3072.0, "offset_raw": 0.0, "offset_deg": 0.0},
+    {"raw_min": 1024, "raw_max": 4095, "direction": 1, "span_raw": 3071.0, "offset_raw": 511.5, "offset_deg": 44.9560546875},
+    {"raw_min": 3584, "raw_max": 512, "direction": -1, "span_raw": 3072.0, "offset_raw": 0.0, "offset_deg": 0.0}
+  ],
+  "wrap_mapping": [
+    {"raw": 512, "offset_deg": 0.0, "expected": 45.0},
+    {"raw": 4095, "offset_deg": 44.9560546875, "expected": 314.9560546875},
+    {"raw": 0, "offset_deg": 44.9560546875, "expected": 315.0439453125}
+  ],
+  "zero": [
+    {"angle": 12.5, "zero": 12.5, "expected": 0.0},
+    {"angle": 2.0, "zero": 359.0, "expected": 3.0},
+    {"angle": 359.0, "zero": 1.0, "expected": -2.0},
+    {"angle": 180.0, "zero": 0.0, "expected": -180.0},
+    {"angle": -180.0, "zero": 0.0, "expected": -180.0}
+  ],
+  "calibration_sequences": [
+    {"samples": [3800, 3900, 4000, 4090, 50, 200, 500, 900, 1300, 1700, 2100, 2500, 2870], "raw_min": 3800, "raw_max": 2870, "direction": 1, "span_raw": 3166.0},
+    {"samples": [300, 200, 100, 0, 4000, 3500, 3100], "raw_min": 300, "raw_max": 3100, "direction": -1, "span_raw": 1296.0}
+  ]
+}

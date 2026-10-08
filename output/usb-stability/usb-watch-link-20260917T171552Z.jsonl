@@ -1,0 +1,26 @@
+{"at": "2026-09-17T17:15:52.438+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 12.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-17T17:15:52.439+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:15:52.440+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:15:53.442+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:15:53.443+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:15:54.448+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:15:54.450+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:15:55.454+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:15:55.466+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:15:56.479+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:15:56.482+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:15:57.486+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:15:57.490+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:15:58.493+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:15:58.499+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:15:59.502+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:15:59.503+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:16:00.506+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:16:00.509+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:16:01.510+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:16:01.512+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:16:02.515+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:16:02.516+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:16:03.518+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:16:03.520+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': PermissionError(13, 'Access is denied.', None, 5)"}
+{"at": "2026-09-17T17:16:04.522+00:00", "event": "watch_end", "port": "COM6", "boots_observed": 0, "damaged_lines": 0, "board_reported_truncations": 0, "last_session": "none", "watch_start": 1, "open_attempt": 12, "open_error": 12}

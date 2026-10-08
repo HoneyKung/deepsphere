@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "board": "waveshare-esp32-s3-zero",
+  "variant": "ESP32-S3FH4R2",
+  "flash_bytes": 4194304,
+  "psram_bytes": 2097152,
+  "usb": {
+    "native_cdc": true,
+    "monitor_baud": 115200,
+    "wait_for_host": false
+  },
+  "spi": {
+    "bus": "FSPI",
+    "sck_gpio": 12,
+    "mosi_gpio": 11,
+    "miso_gpio": null,
+    "clock_hz": 4000000,
+    "shared": [
+      "SCK",
+      "MOSI",
+      "DC",
+      "RST",
+      "3V3",
+      "GND"
+    ],
+    "hardware_confirmed": true,
+    "display_count": 6,
+    "clock_note": "Dropped to 4 MHz on 14 September 2026: five panels on long hand-soldered wires showed corrupted pixels at 10 MHz."
+  },
+  "pins": {
+    "dc_gpio": 9,
+    "rst_gpio": 10,
+    "display_cs": {
+      "px": 8,
+      "nx": 3,
+      "py": 4,
+      "ny": 5,
+      "pz": 6,
+      "nz": 7
+    },
+    "encoder_switch_gpio": null,
+    "encoder_a_gpio": null,
+    "encoder_b_gpio": null,
+    "button_scan_gpio": 1,
+    "button_collect_gpio": 2,
+      "button_analyze_gpio": null,
+    "button_analyze_gpio_recommended": null,
+    "encoder_switch_note": "The KY-040 is not wired. Every control is on the laptop keyboard, so GPIO4/5/6 carry display CS for py/ny/pz instead. Three free GPIOs must be found again before yaw.source can be set to encoder.",
+      "button_note": "Physical controls remain disabled and use the laptop numpad. Analyze has no GPIO assignment because GPIO3 is nx CS. GPIO1/2 are reserved for AS5600 SDA/SCL; GPIO7 is nz CS. No spare pin is assigned."
+  },
+  "power": {
+    "display_vcc_source": "ESP32_S3_ZERO_3V3",
+    "display_ground_source": "ESP32_S3_ZERO_GND_COMMON",
+    "logic_vcc_source": "ESP32_S3_ZERO_3V3",
+    "backlight": {
+      "net": "BL_or_BLK_per_module",
+      "controller_gpio": null,
+      "status": "left_unconnected_backlight_is_fed_from_vcc_on_the_module",
+      "evidence": "single-panel diagnostic rendered a readable image with BL floating on 10 September 2026"
+    },
+    "user_wiring_confirmed": true,
+    "display_supply_status": "unresolved",
+    "display_supply_note": "Six panels use ESP32-S3-Zero 3V3 only; MP1584 is not connected. Six-panel supply adequacy is unverified. Measure voltage at the furthest panel under load and total current on the mA range. The earlier 10 A-range reading is not evidence of adequacy. Never join supply outputs.",
+    "user_wiring_confirmed_note": "Six display panels are assigned to CS 8/3/4/5/6/7; the user reported all six available on 17 September 2026. Physical controls remain unwired and unconfirmed. Simultaneous six-panel operation has not yet been verified."
+  },
+  "pin_capability": {
+    "gpio6_input": {
+      "confirmed_by_vendor_pinout": true,
+      "user_wiring_confirmed": true,
+      "note": "GPIO6 no longer carries the KY-040 switch; it is the pz display CS line."
+    },
+    "gpio3_strapping_jtag_caution": true
+  },
+  "input_source": "keyboard_first",
+  "input_source_hardware_confirmed": false,
+  "reserved": {
+    "boot_gpio": 0,
+    "onboard_rgb_gpio": 21,
+    "psram_gpio_range": "33-37",
+    "uart0_tx_gpio": 43,
+    "uart0_rx_gpio": 44,
+    "usb_dm_gpio": 19,
+    "usb_dp_gpio": 20,
+    "usb_note": "The board runs native USB CDC, so GPIO19 and GPIO20 are the USB data pair and are not available for signals. Using either one breaks the serial link to the dashboard."
+  },
+  "yaw_source": "none",
+  "yaw_source_note": "No rotation sensor is fitted; the current default is a fixed heading with keyboard-first depth control. See config/controls.json and config/wiring-table.md."
+}

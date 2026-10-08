@@ -1,0 +1,6 @@
+2026-09-17T21:20:05.629+00:00	panel_check: cycle 3, boot diag-d17a4d22, uptime_ms 30903, free heap 368168
+2026-09-17T21:20:05.631+00:00	as5600: raw=3847 deg=338.1 magnet=ok agc=12 status=0x67
+2026-09-17T21:20:06.679+00:00	panel_check: cycle 0, boot diag-d17a4d22, uptime_ms 31952, free heap 368168
+2026-09-17T21:20:06.681+00:00	as5600: raw=81 deg=7.1 magnet=ok agc=8 status=0x67
+2026-09-17T21:20:07.728+00:00	panel_check: cycle 1, boot diag-d17a4d22, uptime_ms 33001, free heap 368168
+2026-09-17T21:20:07.730+00:00	as5600: raw=238 deg=20.9 magnet=ok agc=8 status=0x67

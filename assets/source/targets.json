@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "data_status": "illustrated_luna04_subject_metadata",
+  "targets": [
+    {
+      "target_id": "luna04_surface_fish_seam",
+      "u": 0.033203125,
+      "v": 0.171875,
+      "w": 0.109375,
+      "h": 0.16796875,
+      "label": "striped reef fish at horizontal seam",
+      "band": "surface",
+      "source_bounds_px": {
+        "left": -22.0,
+        "top": 45.0,
+        "right": 90.0,
+        "bottom": 131.0
+      },
+      "wraps_horizontal": true
+    },
+    {
+      "target_id": "luna04_orange_reef_fish",
+      "u": 0.732421875,
+      "v": 0.1796875,
+      "w": 0.099609375,
+      "h": 0.125,
+      "label": "orange reef fish",
+      "band": "surface",
+      "source_bounds_px": {
+        "left": 699.0,
+        "top": 60.0,
+        "right": 801.0,
+        "bottom": 124.0
+      },
+      "wraps_horizontal": false
+    },
+    {
+      "target_id": "luna04_manta_ray",
+      "u": 0.333984375,
+      "v": 0.39453125,
+      "w": 0.29296875,
+      "h": 0.30078125,
+      "label": "manta ray silhouette",
+      "band": "middle",
+      "source_bounds_px": {
+        "left": 192.0,
+        "top": 125.0,
+        "right": 492.0,
+        "bottom": 279.0
+      },
+      "wraps_horizontal": false
+    },
+    {
+      "target_id": "luna04_jellyfish",
+      "u": 0.5751953125,
+      "v": 0.4140625,
+      "w": 0.169921875,
+      "h": 0.30078125,
+      "label": "jellyfish",
+      "band": "middle",
+      "source_bounds_px": {
+        "left": 502.0,
+        "top": 135.0,
+        "right": 676.0,
+        "bottom": 289.0
+      },
+      "wraps_horizontal": false
+    },
+    {
+      "target_id": "luna04_lantern_fish",
+      "u": 0.18359375,
+      "v": 0.828125,
+      "w": 0.171875,
+      "h": 0.21875,
+      "label": "lantern fish",
+      "band": "deep",
+      "source_bounds_px": {
+        "left": 100.0,
+        "top": 368.0,
+        "right": 276.0,
+        "bottom": 480.0
+      },
+      "wraps_horizontal": false
+    },
+    {
+      "target_id": "luna04_seahorse_shape",
+      "u": 0.673828125,
+      "v": 0.8203125,
+      "w": 0.08984375,
+      "h": 0.2421875,
+      "label": "seahorse-like silhouette",
+      "band": "deep",
+      "source_bounds_px": {
+        "left": 644.0,
+        "top": 358.0,
+        "right": 736.0,
+        "bottom": 482.0
+      },
+      "wraps_horizontal": false
+    }
+  ]
+}

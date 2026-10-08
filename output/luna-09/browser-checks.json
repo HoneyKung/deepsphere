@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "results": [
+    {"name": "six real simulated panels use 50 mm faces and 30 mm openings", "status": "PASS"},
+    {"name": "Three.js mount keeps both diagonal vertices fixed", "status": "PASS"},
+    {"name": "six upper/lower strip seams coincide in millimetres", "status": "PASS"},
+    {"name": "every strip corner follows mounted world height in millimetres", "status": "PASS"},
+    {"name": "upper/upper and lower/lower pairs retain common image y", "status": "PASS"},
+    {"name": "every displayed fish pixel matches direct strip hit-test and RGB", "status": "PASS"},
+    {"name": "reticle is a linear y=+17.678 mm path over upper faces", "status": "PASS"},
+    {"name": "fish depth scroll is the same direct y translation as the background", "status": "PASS"},
+    {"name": "Digit and Numpad actions still scan and collect a millimetre fish", "status": "PASS"},
+    {"name": "arrow controls, zones, labels, grid, and unfold remain usable", "status": "PASS"}
+  ]
+}

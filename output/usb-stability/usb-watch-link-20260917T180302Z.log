@@ -1,0 +1,91 @@
+2026-09-17T18:03:06.707+00:00	panel_check: cycle 1, boot diag-ac1504a3, uptime_ms 197774, free heap 371324
+2026-09-17T18:03:08.853+00:00	panel_check: cycle 2, boot diag-ac1504a3, uptime_ms 199921, free heap 371324
+2026-09-17T18:03:10.999+00:00	panel_check: cycle 3, boot diag-ac1504a3, uptime_ms 202067, free heap 371324
+2026-09-17T18:03:13.146+00:00	panel_check: cycle 0, boot diag-ac1504a3, uptime_ms 204214, free heap 371324
+2026-09-17T18:03:13.148+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.151+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.153+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.155+00:00	selftest RST gpio10 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.156+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.157+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.160+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.162+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.163+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.165+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:13.167+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:15.294+00:00	panel_check: cycle 1, boot diag-ac1504a3, uptime_ms 206363, free heap 371324
+2026-09-17T18:03:17.441+00:00	panel_check: cycle 2, boot diag-ac1504a3, uptime_ms 208510, free heap 371324
+2026-09-17T18:03:19.589+00:00	panel_check: cycle 3, boot diag-ac1504a3, uptime_ms 210657, free heap 371324
+2026-09-17T18:03:21.736+00:00	panel_check: cycle 0, boot diag-ac1504a3, uptime_ms 212804, free heap 371324
+2026-09-17T18:03:21.738+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.742+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.745+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.747+00:00	selftest RST gpio10 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.749+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.751+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.752+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.754+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.757+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.760+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:21.765+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:23.885+00:00	panel_check: cycle 1, boot diag-ac1504a3, uptime_ms 214953, free heap 371324
+2026-09-17T18:03:26.032+00:00	panel_check: cycle 2, boot diag-ac1504a3, uptime_ms 217100, free heap 371324
+2026-09-17T18:03:28.179+00:00	panel_check: cycle 3, boot diag-ac1504a3, uptime_ms 219247, free heap 371324
+2026-09-17T18:03:30.326+00:00	panel_check: cycle 0, boot diag-ac1504a3, uptime_ms 221394, free heap 371324
+2026-09-17T18:03:30.329+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.332+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.334+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.336+00:00	selftest RST gpio10 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.339+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.341+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.345+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.347+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.349+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.352+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:30.357+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:32.475+00:00	panel_check: cycle 1, boot diag-ac1504a3, uptime_ms 223543, free heap 371324
+2026-09-17T18:03:34.622+00:00	panel_check: cycle 2, boot diag-ac1504a3, uptime_ms 225690, free heap 371324
+2026-09-17T18:03:36.768+00:00	panel_check: cycle 3, boot diag-ac1504a3, uptime_ms 227837, free heap 371324
+2026-09-17T18:03:38.916+00:00	panel_check: cycle 0, boot diag-ac1504a3, uptime_ms 229984, free heap 371324
+2026-09-17T18:03:38.919+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:38.927+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:38.936+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:38.940+00:00	selftest RST gpio10 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:38.946+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:38.949+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:38.952+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:38.957+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:38.960+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:38.961+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:41.063+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:41.064+00:00	panel_check: cycle 1, boot diag-ac1504a3, uptime_ms 232133, free heap 371324
+2026-09-17T18:03:43.211+00:00	panel_check: cycle 2, boot diag-ac1504a3, uptime_ms 234280, free heap 371324
+2026-09-17T18:03:45.357+00:00	panel_check: cycle 3, boot diag-ac1504a3, uptime_ms 236427, free heap 371324
+2026-09-17T18:03:47.506+00:00	panel_check: cycle 0, boot diag-ac1504a3, uptime_ms 238574, free heap 371324
+2026-09-17T18:03:47.514+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.520+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.529+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.534+00:00	selftest RST gpio10 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.538+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.540+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.547+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.550+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.553+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.560+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:47.562+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:49.655+00:00	panel_check: cycle 1, boot diag-ac1504a3, uptime_ms 240723, free heap 371324
+2026-09-17T18:03:51.800+00:00	panel_check: cycle 2, boot diag-ac1504a3, uptime_ms 242870, free heap 371324
+2026-09-17T18:03:53.946+00:00	panel_check: cycle 3, boot diag-ac1504a3, uptime_ms 245016, free heap 371324
+2026-09-17T18:03:56.095+00:00	panel_check: cycle 0, boot diag-ac1504a3, uptime_ms 247163, free heap 371324
+2026-09-17T18:03:56.100+00:00	selftest SCK gpio12 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.106+00:00	selftest MOSI gpio11 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.114+00:00	selftest DC gpio9 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.121+00:00	selftest RST gpio10 pulldown=1 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.130+00:00	selftest CS8 gpio8 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.135+00:00	selftest CS13 gpio13 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.138+00:00	selftest CS4 gpio4 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.145+00:00	selftest CS5 gpio5 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.150+00:00	selftest CS6 gpio6 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.155+00:00	selftest CS7 gpio7 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:56.164+00:00	selftest GPIO3 gpio3 pulldown=0 pullup=1 drive1->1 drive0->0 OK
+2026-09-17T18:03:58.244+00:00	panel_check: cycle 1, boot diag-ac1504a3, uptime_ms 249312, free heap 371324

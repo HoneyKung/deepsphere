@@ -1,0 +1,50 @@
+[
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\boards\\waveshare_esp32_s3_zero.json",
+    "Hash": "73FBC6FFCF3E0163A309736F37F1A640108C213AFB8502688241F6BFBDC3F672"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\data\\README.md",
+    "Hash": "979698327F395C1D4F613BF721A1618862A5F3822CDC5CCB6850625E76C08722"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\data\\sea_atlas_rgb565_be.bin",
+    "Hash": "28918FDCC785C3274D82FA14D45E2E09E28EB2D7D7BD42A4A55CF4756F4C4CEE"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\include\\deep_sphere_config.h",
+    "Hash": "0EF2740D4139655CFFB91866008BD15EDB6E9867670685A3AD650B7D92624CDE"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\include\\live_ocean_generated.h",
+    "Hash": "AB843237FD618FBC8B711E558B28FBE831ADFCFCDBDC21F35181DD2FD455791F"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\include\\live_ocean_motion.h",
+    "Hash": "9FC2F05964CAF9E4A36C2AEA0FB4E534043396A3896443EBEFE30D3976C2F74C"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\include\\live_ocean_render.h",
+    "Hash": "DDDEB2B14DC9EBDA533373CA5970B336A440EAC9C0CF6CC7F3E201305D86054F"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\include\\targets_generated.h",
+    "Hash": "B752A84B24239A759BF9676F773F34C7E5EFC2871935709261AEB8D3A370DB66"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\src\\main.cpp",
+    "Hash": "AAC4C63B520EF5299A89220C53FE07B955FFA60DDBE20B294EE927C431811984"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\src\\diag\\panel_check.cpp",
+    "Hash": "4E6E3DD60C28706FBCF31BF4B019570416512149DB4579E73966680AE57137B3"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\src\\math\\cube_math.cpp",
+    "Hash": "1D60E3F88430DE9CECC85A945B476CDA2F485E531021091640B1FBB20EC0F135"
+  },
+  {
+    "Path": "C:\\Users\\Acer\\Downloads\\oceanX\\prototype-v1\\firmware\\src\\math\\cube_math.h",
+    "Hash": "37035950BAA59237FB2B5D681C934178135D28351B8FD63111324E95FB8626CB"
+  }
+]

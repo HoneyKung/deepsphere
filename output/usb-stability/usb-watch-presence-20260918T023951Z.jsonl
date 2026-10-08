@@ -1,0 +1,36 @@
+{"at": "2026-09-18T02:39:51.525+00:00", "event": "watch_start", "port": "COM6", "mode": "presence-only", "seconds": 30.0, "note": "no program opens the port in this mode"}
+{"at": "2026-09-18T02:39:51.537+00:00", "event": "initial_state", "port": "COM6", "present": true}
+{"at": "2026-09-18T02:39:52.050+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:39:52.570+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:39:53.602+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:39:54.631+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:39:55.646+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:39:56.156+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:39:57.176+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:39:57.688+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:39:58.719+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:39:59.736+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:00.246+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:00.754+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:01.789+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:02.304+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:03.322+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:03.836+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:04.350+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:04.858+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:06.384+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:06.906+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:07.422+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:07.933+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:09.461+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:09.980+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:11.015+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:11.527+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:14.597+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:15.631+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:16.154+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:16.666+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:17.690+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:18.714+00:00", "event": "device_appeared", "port": "COM6"}
+{"at": "2026-09-18T02:40:21.300+00:00", "event": "device_vanished", "port": "COM6"}
+{"at": "2026-09-18T02:40:21.830+00:00", "event": "watch_end", "port": "COM6", "watch_start": 1, "initial_state": 1, "device_vanished": 17, "device_appeared": 16}

@@ -1,0 +1,15 @@
+{"at": "2026-09-17T17:36:22.864+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 3600.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-17T17:36:22.865+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:36:22.867+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-17T17:36:24.112+00:00", "event": "board_session_changed", "port": "COM6", "previous": null, "session": "s3-af6e27ac-337-8ccf2c43", "type": "log"}
+{"at": "2026-09-17T17:36:24.115+00:00", "event": "board_dropped_line_bytes", "port": "COM6", "total": 3, "note": "the board could not fit a whole line in the USB FIFO"}
+{"at": "2026-09-17T17:41:11.442+00:00", "event": "read_error", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-17T17:41:11.445+00:00", "event": "close", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-17T17:41:11.447+00:00", "event": "reopen_wait", "port": "COM6", "seconds": 1.0}
+{"at": "2026-09-17T17:41:12.450+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:41:12.453+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-17T17:41:13.455+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:41:13.458+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-17T17:41:14.459+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:41:14.462+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-17T17:41:14.756+00:00", "event": "board_session_changed", "port": "COM6", "previous": "s3-af6e27ac-337-8ccf2c43", "session": "s3-af6e27ac-337-c6873072", "type": "log"}

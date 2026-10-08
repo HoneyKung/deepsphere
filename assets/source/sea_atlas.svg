@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <defs>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b9edf2"/>
+      <stop offset="0.28" stop-color="#3e9aa9"/>
+      <stop offset="0.68" stop-color="#164e6a"/>
+      <stop offset="1" stop-color="#081c35"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="512" fill="url(#water)"/>
+  <path d="M0 90 C128 72 190 112 320 88 S544 72 680 94 S900 112 1024 84 L1024 150 C870 168 742 132 600 154 S300 165 0 145Z" fill="#e5fbf5" opacity=".35"/>
+  <path d="M0 312 C160 276 270 330 430 302 S740 278 1024 322 L1024 512 L0 512Z" fill="#06182e" opacity=".42"/>
+  <g stroke="#c7f2ee" stroke-width="1" opacity=".23" fill="none">
+    <path d="M0 128H1024M0 256H1024M0 384H1024"/>
+    <path d="M128 0V512M256 0V512M384 0V512M512 0V512M640 0V512M768 0V512M896 0V512"/>
+  </g>
+  <g fill="#d8fff4" stroke="#06324c" stroke-width="4">
+    <path d="M305 285 l38 -18 54 12 -40 18 32 15 -74 5 -28 -16z"/>
+    <path d="M830 108 l33 -15 43 14 -35 14 28 13 -60 5 -26 -14z"/>
+    <path d="M1004 214 l25 -13 34 12 -27 12 19 10 -48 4 -20 -12z"/>
+  </g>
+  <g fill="#ffdc7a" stroke="#432d55" stroke-width="3">
+    <circle cx="1015" cy="220" r="16"/>
+    <circle cx="38" cy="220" r="16"/>
+    <circle cx="322" cy="300" r="18"/>
+    <circle cx="858" cy="116" r="15"/>
+  </g>
+  <g fill="#f8ffff" font-family="monospace" font-size="18">
+    <text x="16" y="30">SEA ATLAS TEST ART</text>
+    <text x="444" y="492">V: deep</text>
+    <text x="16" y="492">U: 0.0</text>
+  </g>
+</svg>

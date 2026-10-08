@@ -1,0 +1,29 @@
+{"at": "2026-09-17T20:40:46.247+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 20.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-17T20:40:46.249+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:46.250+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-17T20:40:47.252+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:47.253+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-17T20:40:48.254+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:48.255+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-17T20:40:49.256+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:49.259+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-17T20:40:49.359+00:00", "event": "read_error", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-17T20:40:49.360+00:00", "event": "close", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-17T20:40:49.361+00:00", "event": "reopen_wait", "port": "COM6", "seconds": 1.0}
+{"at": "2026-09-17T20:40:50.362+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:50.364+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-17T20:40:51.368+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:51.370+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-17T20:40:51.465+00:00", "event": "read_error", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-17T20:40:51.465+00:00", "event": "close", "port": "COM6", "reason": "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))"}
+{"at": "2026-09-17T20:40:51.466+00:00", "event": "reopen_wait", "port": "COM6", "seconds": 1.0}
+{"at": "2026-09-17T20:40:52.467+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:52.468+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-17T20:40:53.470+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:53.471+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-17T20:40:54.473+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:54.475+00:00", "event": "open_error", "port": "COM6", "reason": "could not open port 'COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)"}
+{"at": "2026-09-17T20:40:55.476+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T20:40:55.481+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-17T20:41:36.263+00:00", "event": "close", "port": "COM6", "reason": "window elapsed"}
+{"at": "2026-09-17T20:41:36.266+00:00", "event": "watch_end", "port": "COM6", "boots_observed": 0, "damaged_lines": 0, "board_reported_truncations": 0, "last_session": "none", "watch_start": 1, "open_attempt": 10, "open_error": 7, "open_success": 3, "read_error": 2, "close": 3, "reopen_wait": 2}

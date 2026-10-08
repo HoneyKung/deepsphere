@@ -1,0 +1,13 @@
+{
+  "geometry_version": "LUNA-09-vertex-up",
+  "heading_range_deg": [0, 270],
+  "search": "visible reticle at depth 0.1, yaw integer degrees, time 0..120 seconds in 0.25 second steps",
+  "targets": [
+    {"id":"luna04_surface_fish_seam","h_mm":14.7,"speed_mm_s":2.4,"reachable":true,"fixture":{"yaw_deg":0,"time_s":0,"face":"px"}},
+    {"id":"luna04_orange_reef_fish","h_mm":15.2,"speed_mm_s":1.8,"reachable":true,"fixture":{"yaw_deg":134,"time_s":0,"face":"py"}},
+    {"id":"luna04_manta_ray","h_mm":15.7,"speed_mm_s":1.2,"reachable":true,"fixture":{"yaw_deg":243,"time_s":0,"face":"pz"}},
+    {"id":"luna04_jellyfish","h_mm":16.2,"speed_mm_s":-0.8,"reachable":true,"fixture":{"yaw_deg":270,"time_s":0,"face":"pz"}},
+    {"id":"luna04_lantern_fish","h_mm":16.7,"speed_mm_s":2.5,"reachable":true,"fixture":{"yaw_deg":33,"time_s":31.75,"face":"px"}},
+    {"id":"luna04_seahorse_shape","h_mm":17.2,"speed_mm_s":-1.0,"reachable":true,"fixture":{"yaw_deg":162,"time_s":3.5,"face":"py"}}
+  ]
+}

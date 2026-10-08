@@ -1,0 +1,4 @@
+{"at": "2026-09-17T17:12:55.789+00:00", "event": "watch_start", "port": "COM6", "mode": "link", "seconds": 1800.0, "dtr": true, "rts": false, "reconnect": true}
+{"at": "2026-09-17T17:12:55.790+00:00", "event": "open_attempt", "port": "COM6"}
+{"at": "2026-09-17T17:12:55.803+00:00", "event": "open_success", "port": "COM6"}
+{"at": "2026-09-17T17:12:55.916+00:00", "event": "board_session_changed", "port": "COM6", "previous": null, "session": "s3-af6e27ac-340-e77eef3d", "type": "log"}

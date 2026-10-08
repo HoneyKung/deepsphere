@@ -1,0 +1,84 @@
+2026-09-18T02:47:43.672+00:00	panel_check: cycle 3, boot diag-63b43ed4, uptime_ms 58070, free heap 368432
+2026-09-18T02:47:43.673+00:00	[ 58070][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:43.678+00:00	[ 58077][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:43.686+00:00	[ 58085][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:43.693+00:00	[ 58092][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:43.700+00:00	as5600: read failed
+2026-09-18T02:47:44.747+00:00	panel_check: cycle 0, boot diag-63b43ed4, uptime_ms 59145, free heap 368432
+2026-09-18T02:47:44.747+00:00	[ 59145][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:44.754+00:00	[ 59152][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:44.760+00:00	[ 59160][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:44.768+00:00	[ 59167][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:44.774+00:00	as5600: read failed
+2026-09-18T02:47:45.820+00:00	panel_check: cycle 1, boot diag-63b43ed4, uptime_ms 60220, free heap 368432
+2026-09-18T02:47:45.821+00:00	[ 60220][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:45.828+00:00	[ 60227][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:45.835+00:00	[ 60234][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:45.842+00:00	[ 60242][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:45.849+00:00	as5600: read failed
+2026-09-18T02:47:46.896+00:00	panel_check: cycle 2, boot diag-63b43ed4, uptime_ms 61295, free heap 368432
+2026-09-18T02:47:46.897+00:00	[ 61295][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:46.903+00:00	[ 61302][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:46.910+00:00	[ 61309][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:46.917+00:00	[ 61317][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:46.924+00:00	as5600: read failed
+2026-09-18T02:47:47.970+00:00	panel_check: cycle 3, boot diag-63b43ed4, uptime_ms 62370, free heap 368432
+2026-09-18T02:47:47.972+00:00	[ 62370][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:47.978+00:00	[ 62377][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:47.985+00:00	[ 62384][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:47.992+00:00	[ 62391][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:47.999+00:00	as5600: read failed
+2026-09-18T02:47:49.046+00:00	panel_check: cycle 0, boot diag-63b43ed4, uptime_ms 63445, free heap 368432
+2026-09-18T02:47:49.047+00:00	[ 63445][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:49.053+00:00	[ 63453][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:49.060+00:00	[ 63460][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:49.068+00:00	[ 63467][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:49.074+00:00	as5600: read failed
+2026-09-18T02:47:50.122+00:00	panel_check: cycle 1, boot diag-63b43ed4, uptime_ms 64521, free heap 368432
+2026-09-18T02:47:50.123+00:00	[ 64521][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:50.129+00:00	[ 64528][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:50.137+00:00	[ 64535][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:50.143+00:00	[ 64543][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:50.150+00:00	as5600: read failed
+2026-09-18T02:47:51.196+00:00	panel_check: cycle 2, boot diag-63b43ed4, uptime_ms 65596, free heap 368432
+2026-09-18T02:47:51.197+00:00	[ 65596][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:51.204+00:00	[ 65603][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:51.211+00:00	[ 65611][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:51.218+00:00	[ 65618][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:51.225+00:00	as5600: read failed
+2026-09-18T02:47:52.271+00:00	panel_check: cycle 3, boot diag-63b43ed4, uptime_ms 66671, free heap 368432
+2026-09-18T02:47:52.272+00:00	[ 66671][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:52.280+00:00	[ 66678][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:52.286+00:00	[ 66686][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:52.293+00:00	[ 66693][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:52.300+00:00	as5600: read failed
+2026-09-18T02:47:53.347+00:00	panel_check: cycle 0, boot diag-63b43ed4, uptime_ms 67746, free heap 368432
+2026-09-18T02:47:53.348+00:00	[ 67746][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:53.354+00:00	[ 67753][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:53.361+00:00	[ 67761][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:53.368+00:00	[ 67768][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:53.375+00:00	as5600: read failed
+2026-09-18T02:47:54.422+00:00	panel_check: cycle 1, boot diag-63b43ed4, uptime_ms 68821, free heap 368432
+2026-09-18T02:47:54.423+00:00	[ 68821][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:54.429+00:00	[ 68828][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:54.436+00:00	[ 68836][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:54.443+00:00	[ 68843][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:54.450+00:00	as5600: read failed
+2026-09-18T02:47:55.497+00:00	panel_check: cycle 2, boot diag-63b43ed4, uptime_ms 69896, free heap 368432
+2026-09-18T02:47:55.498+00:00	[ 69896][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:55.505+00:00	[ 69904][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:55.512+00:00	[ 69911][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:55.519+00:00	[ 69918][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:55.526+00:00	as5600: read failed
+2026-09-18T02:47:56.572+00:00	panel_check: cycle 3, boot diag-63b43ed4, uptime_ms 70972, free heap 368432
+2026-09-18T02:47:56.573+00:00	[ 70972][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:56.580+00:00	[ 70979][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:56.588+00:00	[ 70987][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:56.594+00:00	[ 70994][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:56.601+00:00	as5600: read failed
+2026-09-18T02:47:57.647+00:00	panel_check: cycle 0, boot diag-63b43ed4, uptime_ms 72047, free heap 368432
+2026-09-18T02:47:57.648+00:00	[ 72047][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:57.655+00:00	[ 72054][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:57.662+00:00	[ 72062][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:57.669+00:00	[ 72069][E][Wire.cpp:499] requestFrom(): i2cWriteReadNonStop returned Error -1
+2026-09-18T02:47:57.676+00:00	as5600: read failed
