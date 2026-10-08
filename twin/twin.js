@@ -65,7 +65,10 @@ const AUDIO_EVENT_LABELS = {
 };
 
 function showAudioEvent(cueId) {
-  const text = AUDIO_EVENT_LABELS[cueId];
+  if (AUDIO_EVENT_LABELS[cueId]) showPill(AUDIO_EVENT_LABELS[cueId], 2800);
+}
+
+function showPill(text, ms) {
   const pill = $('audio-event-pill');
   const label = $('audio-event-label');
   if (!text || !pill || !label) return;
@@ -78,7 +81,7 @@ function showAudioEvent(cueId) {
   audio.eventPillTimer = window.setTimeout(() => {
     pill.classList.remove('show');
     window.setTimeout(() => { pill.hidden = true; }, 220);
-  }, 2800);
+  }, ms || 2800);
 }
 
 function audioLog(cueId, source, detail) {
@@ -1270,7 +1273,7 @@ function updateHUD(hit) {
   $('depth-marker').style.top = (state.depth * 100) + '%';
 
   const el = $('depth-zone');
-  const zoneLabels = { surface: 'ตื้น · SURFACE', mid: 'กลาง · MID', deep: 'ลึก · DEEP' };
+  const zoneLabels = LEVEL_LABELS;
   el.dataset.zone = state.zone;
   el.textContent = zoneLabels[state.zone] || state.zone.toUpperCase();
 }
@@ -1358,6 +1361,186 @@ function showVoiceNarration(id, values) {
 
 // ---------------------------------------------------------------- actions
 
+// ---------------------------------------------------------------- species card and analysis list
+const LEVEL_LABELS = { surface: 'ชั้น 1 · แนวปะการัง', mid: 'ชั้น 2 · ซากเรือ', deep: 'ชั้น 3 · ภูเขาไฟใต้น้ำ' };
+const SPECIES = {
+  shoal: { about: 'ปลาตัวเล็กสีเงินอมทอง ว่ายเกาะกลุ่มกันใกล้ผิวน้ำที่แสงแดดส่องถึง',
+    fact: 'การว่ายเป็นฝูงทำให้ผู้ล่าเล็งทีละตัวได้ยาก ทั้งฝูงเลี้ยวพร้อมกันได้เพราะแต่ละตัวคอยดูเพื่อนที่อยู่ข้าง ๆ' },
+  reef: { about: 'ปลาสีส้มสดลายขาว อาศัยตามแนวปะการังน้ำตื้นและไม่ค่อยว่ายไปไกลจากบ้าน',
+    fact: 'ปลาการ์ตูนอยู่ร่วมกับดอกไม้ทะเลได้เพราะมีเมือกเคลือบตัว กันเข็มพิษของดอกไม้ทะเลไว้' },
+  seahorse: { about: 'ปลาที่ว่ายตัวตั้งตรง ใช้หางเกี่ยวสาหร่ายหรือกิ่งปะการังไว้ไม่ให้ถูกกระแสน้ำพัดไป',
+    fact: 'ม้าน้ำตัวผู้เป็นฝ่ายอุ้มท้อง ตัวเมียวางไข่ไว้ในถุงหน้าท้องของตัวผู้ แล้วตัวผู้เป็นคนคลอดลูก' },
+  manta: { about: 'ปลากระเบนขนาดใหญ่ที่ว่ายเหมือนบิน กรองกินแพลงก์ตอนจากน้ำที่ไหลผ่านปาก',
+    fact: 'กระเบนราหูยักษ์กางครีบได้กว้างราว 7 เมตร และมีสมองใหญ่ที่สุดในบรรดาปลา' },
+  lantern: { about: 'ปลาตัวเล็กแห่งเขตแสงสลัว มีอวัยวะเรืองแสงเรียงเป็นแถวตามลำตัว',
+    fact: 'ทุกคืนปลาตะเกียงว่ายขึ้นมาหากินใกล้ผิวน้ำ แล้วกลับลงที่ลึกก่อนเช้า เป็นส่วนหนึ่งของการอพยพประจำวันที่ใหญ่ที่สุดในโลก' },
+  jelly: { about: 'ลำตัวใสเป็นวุ้น ลอยไปตามกระแสน้ำและบีบร่มเพื่อดันตัวไปข้างหน้า',
+    fact: 'แมงกะพรุนเป็นน้ำราว 95% ไม่มีสมอง ไม่มีหัวใจ และอยู่ในทะเลมานานกว่าไดโนเสาร์' },
+  angler: { about: 'นักล่าแห่งความมืด ปากกว้างฟันแหลม มีก้านยื่นจากหัวปลายเรืองแสงไว้ล่อเหยื่อ',
+    fact: 'แสงที่ปลายก้านมาจากแบคทีเรียเรืองแสงที่อาศัยอยู่ข้างใน ปลาตกเบ็ดสร้างแสงเองไม่ได้' },
+  squid: { about: 'หมึกแห่งทะเลลึก ว่ายถอยหลังด้วยการพ่นน้ำ และเปลี่ยนสีผิวได้ในพริบตา',
+    fact: 'หมึกยักษ์มีดวงตาใหญ่ที่สุดในอาณาจักรสัตว์ กว้างราว 25 เซนติเมตร ไว้รับแสงริบหรี่ในที่ลึก' }
+};
+const card = { timer: 0, items: [] };
+
+function cardAnimate() {
+  clearInterval(card.timer);
+  let t = state.seconds;
+  const paint = () => {
+    if (!$('discovery-popup').classList.contains('show')) { clearInterval(card.timer); return; }
+    t += 0.08;
+    card.items.forEach((item, index) => paintCreature(item.canvas, item.subject, t + index * 1.3, item.depth));
+  };
+  paint();
+  card.timer = window.setInterval(paint, 80);
+}
+
+function showSpeciesCard(subject, sample) {
+  const key = subjectCueKey(subject), info = SPECIES[key] || {}, done = state.collected.length >= SUBJECTS.length;
+  $('discovery-title').textContent = done ? 'ครบทั้ง ' + SUBJECTS.length + ' ตัวอย่าง · MISSION COMPLETE'
+    : 'เก็บตัวอย่างแล้ว · ' + state.collected.length + ' / ' + SUBJECTS.length;
+  const art = $('discovery-art');
+  art.hidden = false;
+  $('discovery-emoji').textContent = '';
+  $('discovery-species').textContent = VOICE_SPECIES[key] || subject.name;
+  $('discovery-sub').textContent = subject.name + ' · ' + (LEVEL_LABELS[sample.zone] || '') + ' · ' + Math.round(sample.depth * MAX_METRES) + ' ม.';
+  const about = document.createElement('div'), fact = document.createElement('div'), tag = document.createElement('b');
+  about.textContent = info.about || '';
+  fact.className = 'fact'; tag.textContent = 'รู้ไหม? ';
+  fact.append(tag, document.createTextNode(info.fact || ''));
+  $('discovery-info').replaceChildren(about, fact);
+  card.items = [{ canvas: art, subject, depth: sample.depth }];
+  $('discovery-popup').classList.add('show');
+  cardAnimate();
+}
+
+function showAnalysis() {
+  $('discovery-title').textContent = 'ผลวิเคราะห์ · ANALYSIS';
+  $('discovery-art').hidden = true;
+  $('discovery-emoji').textContent = 'ANALYSIS';
+  $('discovery-species').textContent = state.collected.length + ' / ' + SUBJECTS.length + ' ตัวอย่าง';
+  $('discovery-sub').textContent = state.collected.length >= SUBJECTS.length ? 'เก็บครบทุกชนิดแล้ว' : 'ตัวที่ยังไม่พบบอกไว้ว่าอยู่ชั้นไหน';
+  const rows = [], items = [];
+  const order = SUBJECTS.map((_, index) => index).sort((x, y) => SUBJECTS[x].y_mm - SUBJECTS[y].y_mm);
+  for (const index of order) {
+    const subject = SUBJECTS[index], sample = state.collected.find((c) => c.id === subject.id), key = subjectCueKey(subject);
+    const row = document.createElement('div'), text = document.createElement('div'), name = document.createElement('div'), meta = document.createElement('div');
+    row.className = 'specimen-row' + (sample ? '' : ' missing');
+    name.className = 'name'; meta.className = 'meta';
+    if (sample) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 168; canvas.height = 100;
+      row.append(canvas);
+      items.push({ canvas, subject, depth: sample.depth });
+      name.textContent = VOICE_SPECIES[key] || subject.name;
+      meta.textContent = subject.name + ' · ' + Math.round(sample.depth * MAX_METRES) + ' ม.';
+    } else {
+      const unknown = document.createElement('div');
+      unknown.className = 'unknown'; unknown.textContent = '?';
+      row.append(unknown);
+      const home = 0.1 + (subject.y_mm - geometry.aimHeightMm) / geometry.depthTravelMm;
+      name.textContent = 'ยังไม่พบ';
+      meta.textContent = LEVEL_LABELS[home < ZONE_BOUNDS[0] ? 'surface' : home < ZONE_BOUNDS[1] ? 'mid' : 'deep'];
+    }
+    text.append(name, meta); row.append(text); rows.push(row);
+  }
+  $('discovery-info').replaceChildren(...rows);
+  card.items = items;
+  $('discovery-popup').classList.add('show');
+  cardAnimate();
+}
+
+// ---------------------------------------------------------------- levels: a floor with one way through
+// Each level ends in a floor (config.gates). The reticle is where the sub is, so a floor can only be passed, in
+// either direction, while the reticle is over the opening. renderer.js draws the floors; this is the rule.
+const GATES_ON = !/[?&](acceptance=1|gates=0)/.test(location.search);
+state.gatesOff = !GATES_ON;
+const GATE_AHEAD = {
+  reef: 'ข้างล่างคือพื้นทรายกับแนวปะการัง · หมุนกล่องหาช่องทางลง',
+  wreck: 'ข้างล่างมีซากเรือบนลานหิน · หารอยแยกที่มีแสงเพื่อลงต่อ'
+};
+
+function gateList() { return GATES_ON && config && config.gates || []; }
+// Millimetres along the strip from the reticle to the opening; positive means turn right.
+function gateOffset(gate) {
+  const L = geometry.stripLengthMm;
+  return geometry.wrapDistance(gate.u * L, ((state.yaw / 360 * L) % L + L) % L);
+}
+function gateOpen(gate) { return Math.abs(gateOffset(gate)) <= gate.half_mm * 0.8; }
+
+function syncLevel(depth) {
+  const list = gateList();
+  let level = 0;
+  list.forEach((gate, index) => {
+    if (depth > gate.depth + 1e-9 || Math.abs(depth - gate.depth) <= 1e-9 && state.level > index) level = index + 1;
+  });
+  state.level = level;
+}
+
+function gateBump(gate, dir) {
+  const now = performance.now();
+  if (now - (audio.bumpAt || 0) < 1500) return;
+  audio.bumpAt = now;
+  gate.bumps = (gate.bumps || 0) + 1;
+  cue('hull_creak', { minGap: 0 });
+  const way = dir > 0 ? 'ทางลง' : 'ทางขึ้น';
+  const side = gateOffset(gate) > 0 ? 'หมุนไปทางขวา ▶' : '◀ หมุนไปทางซ้าย';
+  const text = (dir > 0 ? 'พื้นกั้นอยู่' : 'เพดานหินกั้นอยู่') + ' · ' + (gate.bumps > 1 ? side + ' เพื่อหา' + way : 'หมุนกล่องหา' + way);
+  showPill(text, 3200);
+  say(text);
+}
+
+function gatePassed(gate, dir) {
+  gate.bumps = 0;
+  audio.gatePassAt = performance.now();
+  state.bubbleBurstAt = performance.now();
+  say((dir > 0 ? 'ลอดช่องลงสู่ ' : 'กลับขึ้นสู่ ') + LEVEL_LABELS[['surface', 'mid', 'deep'][Math.min(2, state.level)]]);
+}
+
+// Where the sub actually ends up when it tries to go from one depth to another.
+function passGates(previous, next) {
+  const list = gateList();
+  if (!list.length) return next;
+  syncLevel(previous);
+  for (;;) {
+    if (next > previous && state.level < list.length && next > list[state.level].depth) {
+      const gate = list[state.level];
+      if (!gateOpen(gate)) { gateBump(gate, 1); return gate.depth; }
+      state.level++; gatePassed(gate, 1);
+    } else if (next < previous && state.level > 0 && next < list[state.level - 1].depth) {
+      const gate = list[state.level - 1];
+      if (!gateOpen(gate)) { gateBump(gate, -1); return gate.depth; }
+      state.level--; gatePassed(gate, -1);
+    } else return next;
+  }
+}
+
+// Every frame: is the reticle over a way through that is within reach? (renderer.js turns the reticle gold.)
+function updateGates() {
+  const list = gateList();
+  let ready = 0;
+  if (list.length && state.started) {
+    const below = list[state.level], above = list[state.level - 1];
+    if (below && below.depth - state.depth < 0.06 && gateOpen(below)) ready = 1;
+    else if (above && state.depth - above.depth < 0.06 && gateOpen(above)) ready = -1;
+    if (below && !below.seen && below.depth - state.depth < 0.11) {
+      below.seen = true;
+      showPill(GATE_AHEAD[below.kind] || 'หมุนกล่องหาช่องทางลง', 4200);
+      say(GATE_AHEAD[below.kind] || 'หมุนกล่องหาช่องทางลง');
+    }
+    if (!below && !audio.seaBedSeen && state.depth > 0.9) {
+      audio.seaBedSeen = true;
+      say('ก้นทะเล · หินบะซอลต์ รอยแตกลาวา และปล่องน้ำร้อน');
+    }
+  }
+  if (ready && ready !== state.gateReady && performance.now() - (audio.gatePassAt || 0) > 2500) {
+    showPill(ready > 0 ? 'เจอช่องแล้ว · กดดำลง ▼' : 'เจอช่องแล้ว · กดขึ้น ▲', 2600);
+    handNote(74, 1);
+    window.setTimeout(() => handNote(81, 1), 170);
+  }
+  state.gateReady = ready;
+}
+
 function doScan() {
   renderPanels();
   const hit = reticleHit(state.yaw);
@@ -1413,7 +1596,7 @@ function doCollect() {
   activity('act'); sparkleFor(6);
   state.collectFace = hit.face;
   state.collectXY = [hit.pixel_uv[0] * 240, hit.pixel_uv[1] * 240];
-  state.collected.push({ id: SUBJECTS[s].id, depth: state.depth, face: FACES[hit.face].id });
+  state.collected.push({ id: SUBJECTS[s].id, depth: state.depth, zone: state.zone, face: FACES[hit.face].id });
   if (state.collected.length >= SUBJECTS.length) {
     prioritySound('mission_complete', 3);
     window.setTimeout(() => speakLine('vo_complete'), 550);
@@ -1421,10 +1604,10 @@ function doCollect() {
     prioritySound('collect_success', 1);
     window.setTimeout(() => speakLine('vo_collect'), 500);
   }
-  // Collect only takes the sample. Reading the samples back is what Analyze is for, so the
-  // panel stays closed here and the pilot keeps flying.
+  // A collected sample brings up its species card; Analyze lists the whole tray.
   say('Sample stored: ' + SUBJECTS[s].name + ' — ' + state.collected.length + ' of ' + SUBJECTS.length +
     ' in the tray. Press 3 to analyse.');
+  showSpeciesCard(SUBJECTS[s], state.collected[state.collected.length - 1]);
 }
 
 // Dive assist: keep every creature outlined until it is switched off again.
@@ -1441,15 +1624,7 @@ function doAnalyze() {
   cue('analyze_open');
   activity('act');
   const names = state.collected.map((c) => SUBJECTS.find((s) => s.id === c.id).name);
-  // Analyze is the one that opens the panel, and it reports every sample in the tray.
-  const lines = state.collected.map((c) => {
-    const subject = SUBJECTS.find((s) => s.id === c.id);
-    return subject.name + ' — face ' + c.face + ', ' + Math.round(c.depth * MAX_METRES) + ' m';
-  });
-  $('discovery-emoji').textContent = 'ANALYSIS';
-  $('discovery-species').textContent = state.collected.length + ' of ' + SUBJECTS.length + ' specimens';
-  $('discovery-info').innerHTML = lines.join('<br>');
-  $('discovery-popup').classList.add('show');
+  showAnalysis();
   const last = state.collected[state.collected.length - 1];
   const lastSubject = SUBJECTS.find((subject) => subject.id === last.id);
   const species = subjectCueKey(lastSubject);
@@ -1463,9 +1638,10 @@ function doAnalyze() {
 
 // ---------------------------------------------------------------- input
 
-function setDepth(next) {
+function setDepth(next, free) {
   const previous = state.depth;
-  state.depth = clamp01(next);
+  state.depth = free ? clamp01(next) : passGates(previous, clamp01(next));
+  if (free) syncLevel(state.depth);
   if (state.started && state.depth !== previous) updateDepthMotion(previous, state.depth);
   updateZone(state.depth);
   $('depth-input').value = state.depth;
@@ -1491,6 +1667,7 @@ function depthHoldStart(dir) {
 // Friends open the page with no hardware: the player view hides the engineering controls and adds on-screen
 // buttons. ?dev=1 (and the live-board and acceptance runs) keep the full twin.
 const DEV_MODE = /[?&](dev|live|acceptance)=1/.test(location.search);
+state.pretty = !/[?&](acceptance=1|sprites=blocks)/.test(location.search);
 if (!DEV_MODE) {
   document.body.classList.add('player', 'hide-labels');
   state.labels = false;
@@ -1562,7 +1739,8 @@ function initInput() {
       case 'Digit1': case 'Numpad1': e.preventDefault(); doScan(); break;
       case 'Digit2': case 'Numpad2': e.preventDefault(); doCollect(); break;
       case 'Digit3': case 'Numpad3': e.preventDefault(); doAnalyze(); break;
-      case 'KeyR': orbit = { theta: -1.3, phi: 1.32, dist: DEV_MODE ? 4.4 : 3.5 }; fitOrbit(); setYaw(0); setDepth(0); break;
+      case 'KeyR': orbit = { theta: -1.3, phi: 1.32, dist: DEV_MODE ? 4.4 : 3.5 }; fitOrbit(); setYaw(0); setDepth(0, true); break;
+      case 'Enter': case 'Escape': if ($('discovery-popup').classList.contains('show')) $('btn-discovery-close').click(); break;
       case 'KeyD': e.preventDefault(); setDebug(!audio.debug); break;
       case 'KeyN': audio.handNotes = !audio.handNotes; say(audio.handNotes ? 'Hand notes on.' : 'Hand notes off.'); break;
       case 'KeyM':
@@ -1580,7 +1758,7 @@ function initInput() {
   $('btn-analyze').addEventListener('click', doAnalyze);
   $('btn-mute').addEventListener('click', toggleMute);
   $('btn-discovery-close').addEventListener('click', () => {
-    $('discovery-popup').classList.remove('show'); cue('analyze_close');
+    $('discovery-popup').classList.remove('show'); card.items = []; cue('analyze_close');
   });
 }
 

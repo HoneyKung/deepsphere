@@ -6,7 +6,7 @@
 <title>Deep Sphere — ดำลงไปกับลูกบาศก์</title>
 <meta name="description" content="Browser digital twin of the six-panel Deep Sphere cube: the same face maths, the same live-ocean motion and the same audio cues the firmware uses.">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="deepcore.css?v=20261009a">
+<link rel="stylesheet" href="deepcore.css?v=20261009e">
 </head>
 <body>
 
@@ -16,7 +16,7 @@
     <div class="intro-title">DEEP SPHERE</div>
     <div class="intro-sub">SIX-PANEL CUBE — DIGITAL TWIN</div>
     <button class="intro-start" id="btn-start" disabled>LOADING PANELS</button>
-    <div class="intro-hint">ลากเพื่อหมุนกล่อง · กดค้าง ▼ เพื่อดำลง · สแกน → เก็บ → วิเคราะห์<br>ใส่หูฟังแล้วจะได้ยินครบ · เพลงจะมาเมื่อคุณขยับ และค่อย ๆ จางเมื่อคุณหยุด</div>
+    <div class="intro-hint">ลากเพื่อหมุนกล่อง · กดค้าง ▼ เพื่อดำลง · สแกน → เก็บ → วิเคราะห์<br>ทะเลมี 3 ชั้น แต่ละชั้นมีพื้นกั้น ต้องหมุนหาช่องทางลงเอง<br>ใส่หูฟังแล้วจะได้ยินครบ · เพลงจะมาเมื่อคุณขยับ และค่อย ๆ จางเมื่อคุณหยุด</div>
 </div>
 
 <div id="canvas-container"></div>
@@ -119,12 +119,14 @@
 </div>
 <button class="sound-btn" id="btn-sound" type="button" aria-label="เปิดหรือปิดเสียง" aria-pressed="true">เสียง: เปิด</button>
 
-<div class="discovery-popup" id="discovery-popup">
-    <div class="discovery-title">SPECIMEN COLLECTED </div>
-    <div id="discovery-emoji" style="font-size: 64px; margin: 12px 0;"></div>
+<div class="discovery-popup" id="discovery-popup" role="dialog" aria-live="polite">
+    <div class="discovery-title" id="discovery-title">SPECIMEN COLLECTED</div>
+    <canvas class="discovery-art" id="discovery-art" width="400" height="220"></canvas>
+    <div id="discovery-emoji" hidden></div>
     <div class="discovery-species" id="discovery-species"></div>
+    <div class="discovery-sub" id="discovery-sub"></div>
     <div class="discovery-info" id="discovery-info"></div>
-    <button class="discovery-close" id="btn-discovery-close">ACKNOWLEDGE</button>
+    <button class="discovery-close" id="btn-discovery-close">ไปต่อ · CONTINUE</button>
 </div>
 
 <aside class="audio-debug" id="audio-debug" aria-label="Audio diagnostics" hidden>
@@ -146,9 +148,9 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="geometry.js?v=20261009a"></script>
-<script src="ocean.js?v=20261009a"></script>
-<script src="renderer.js?v=20261009a"></script>
-<script src="twin.js?v=20261009a"></script>
+<script src="geometry.js?v=20261009e"></script>
+<script src="ocean.js?v=20261009e"></script>
+<script src="renderer.js?v=20261009e"></script>
+<script src="twin.js?v=20261009e"></script>
 </body>
 </html>

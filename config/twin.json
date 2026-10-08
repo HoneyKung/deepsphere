@@ -309,5 +309,23 @@
    ],
    "name": "Abyss Squid"
   }
- ]
+ ],
+ "gates": [
+  {
+   "id": "reef_floor",
+   "kind": "reef",
+   "depth": 0.25,
+   "u": 0.62,
+   "half_mm": 13
+  },
+  {
+   "id": "wreck_shelf",
+   "kind": "wreck",
+   "depth": 0.65,
+   "u": 0.2,
+   "half_mm": 13,
+   "wreck_u": 0.45
+  }
+ ],
+ "gates_note": "Floors between the three levels. depth = where the floor is (same scale as the zone bounds), u = where the way through is, as a fraction of the way round the cube (0..1), half_mm = half its width along the strip. The sub passes a floor only while the reticle is over the opening."
 }
