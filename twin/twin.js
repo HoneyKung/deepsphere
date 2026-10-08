@@ -54,14 +54,14 @@ const VOICE_SPECIES = {
 };
 
 const AUDIO_EVENT_LABELS = {
-  zone_enter_mid: 'เข้าสู่เขตทะเลกลาง',
-  zone_enter_deep: 'เข้าสู่เขตทะเลลึก',
-  zone_up: 'กำลังกลับสู่ผิวน้ำ',
-  scan_hit: 'ตรวจพบสิ่งมีชีวิต',
-  first_discovery: 'ค้นพบสิ่งมีชีวิตชนิดใหม่',
-  collect_success: 'เก็บตัวอย่างแล้ว',
-  mission_complete: 'ภารกิจสำเร็จ',
-  max_depth_warning: 'เตือน: ถึงความลึกสูงสุด'
+  zone_enter_mid: 'Level 2 · Shipwreck shelf',
+  zone_enter_deep: 'Level 3 · Volcanic vents',
+  zone_up: 'Heading back up',
+  scan_hit: 'Life detected',
+  first_discovery: 'New species found',
+  collect_success: 'Sample collected',
+  mission_complete: 'Mission complete',
+  max_depth_warning: 'Warning: maximum depth'
 };
 
 function showAudioEvent(cueId) {
@@ -883,7 +883,7 @@ function toggleMute() {
   setMasterGain();
   if (audio.muted && 'speechSynthesis' in window) speechSynthesis.cancel();
   const sound = $('btn-sound');
-  if (sound) { sound.setAttribute('aria-pressed', audio.muted ? 'false' : 'true'); sound.textContent = audio.muted ? 'เสียง: ปิด' : 'เสียง: เปิด'; }
+  if (sound) { sound.setAttribute('aria-pressed', audio.muted ? 'false' : 'true'); sound.textContent = audio.muted ? 'Sound: off' : 'Sound: on'; }
   say(audio.muted ? 'Audio muted.' : 'Audio on.');
   audioLog('master_mute', audio.muted ? 'silent' : 'file', audio.muted ? 'muted' : 'unmuted');
 }
@@ -1081,8 +1081,8 @@ function stopLifePhrases() {
 
 function updateAudioFocus(hit) {
   if (!state.started || !audio.manifest) return;
-  const targetIndex = hit && hit.onPanel ? subjectNear(hit.face, hit.u, hit.v, 11) : -1;
-  const rect = targetIndex >= 0 ? FACES[hit.face].rect : null;
+  const targetIndex = aimedSubject(hit);
+  const rect = targetIndex >= 0 && !state.sphere ? FACES[hit.face].rect : null;
   const center = rect ? (rect.left + rect.right) / 2 : 0;
   const pan = rect ? Math.max(-0.85, Math.min(0.85, (hit.u - center) / ((rect.right - rect.left) / 2))) : 0;
   if (targetIndex === audio.lifeTarget) {
@@ -1259,23 +1259,52 @@ function updateDepthMotion(previous, next) {
 
 const $ = (id) => document.getElementById(id);
 
+// Depth zones and read-outs for the Red Sea survey the original DeepCore screen was written around
+// (22.3°N 38.9°E). Pressure rises one atmosphere every ten metres; the deep Red Sea stays near 21 °C and is
+// saltier than the open ocean.
+const SEA_ZONES = [
+  { name: 'SURFACE', max: 30, visibility: 'EXCELLENT', told: true,
+    note: 'Surface zone, 0 to 30 metres. 28 °C and about 40 PSU: the Red Sea is one of the warmest and saltiest seas on Earth.' },
+  { name: 'SUNLIGHT ZONE', max: 88, visibility: 'GOOD',
+    note: 'Sunlight zone, 30 to 88 metres. Still bright enough for reef-building corals and the fish that live among them.' },
+  { name: 'MESOPHOTIC', max: 200, visibility: 'MODERATE',
+    note: 'Mesophotic zone, 88 to 200 metres. About one percent of the surface light is left; only low-light corals still photosynthesise.' },
+  { name: 'TWILIGHT ZONE', max: 494, visibility: 'LOW',
+    note: 'Twilight zone, 200 to 494 metres. Too dark for photosynthesis. From here down, most light is made by animals.' },
+  { name: 'BATHYAL ZONE', max: 1000, visibility: 'MINIMAL',
+    note: 'Bathyal zone, 494 to 1,000 metres. Pressure passes 50 atmospheres, yet the Red Sea stays near 21 °C, unusually warm for deep water.' },
+  { name: 'MIDNIGHT ZONE', max: 2000, visibility: 'NONE',
+    note: 'Midnight zone, 1,000 to 2,000 metres. No sunlight at all. Brine pools were found on the Red Sea floor at about 1,770 metres.' },
+  { name: 'ABYSSAL ZONE', max: 1e9, visibility: 'NONE',
+    note: 'Below 2,000 metres. The Red Sea is a young ocean, a rift still opening between Africa and Arabia, about 3,040 metres at its deepest.' }
+];
+function seaZone(metres) { return SEA_ZONES.find((zone) => metres < zone.max) || SEA_ZONES[SEA_ZONES.length - 1]; }
+
 function updateHUD(hit) {
   const m = Math.round(state.depth * MAX_METRES);
   $('val-heading').textContent = state.yaw.toFixed(1) + ' deg';
   if (document.activeElement !== $('heading-input')) $('heading-input').value = state.yaw.toFixed(1);
   $('depth-number').textContent = m;
   $('val-pressure').textContent = (1 + m / 10).toFixed(1) + ' ATM';
-  $('val-temp').textContent = (28 - 24 * clamp01(state.depth * 1.6)).toFixed(1) + '°C';
-  $('val-visibility').textContent = state.depth < 0.25 ? 'EXCELLENT' : state.depth < 0.65 ? 'LIMITED' : 'NONE';
+  const sea = seaZone(m);
+  $('val-pressure').classList.toggle('warning', m > 500);
+  $('val-temp').textContent = Math.max(21, 28 - m * 0.007).toFixed(1) + '°C';
+  $('val-visibility').textContent = sea.visibility;
+  $('val-salinity').textContent = (40 + 0.6 * clamp01(m / 300)).toFixed(1) + ' PSU';
   $('val-panels').textContent = FACES.filter((f) => f.on).length + ' / 6';
   $('val-reticle').textContent = hit ? FACES[hit.face].id + (hit.onPanel ? '' : ' (frame)') : '—';
   $('val-specimens').textContent = state.collected.length + ' / ' + SUBJECTS.length;
   $('depth-marker').style.top = (state.depth * 100) + '%';
 
   const el = $('depth-zone');
-  const zoneLabels = LEVEL_LABELS;
   el.dataset.zone = state.zone;
-  el.textContent = zoneLabels[state.zone] || state.zone.toUpperCase();
+  el.textContent = sea.name;
+  $('depth-level').textContent = LEVEL_LABELS[state.zone] || '';
+  // The first time each zone is reached, the narration box says what is known about it.
+  if (state.started && audio.seaZone !== sea) {
+    audio.seaZone = sea;
+    if (!sea.told) { sea.told = true; say(sea.note); }
+  }
 }
 
 function setLiveBanner(status, deg, reason) {
@@ -1341,45 +1370,49 @@ const say = (text) => {
 
 function showVoiceNarration(id, values) {
   const lines = VOICE_LINES[id];
-  const narration = $('narration');
-  if (!lines || !narration) return;
+  if (!lines || !$('narration')) return;
   const params = values || {};
-  const english = String(lines.en || '').replace('{names}', params.enNames || params.names || '');
-  const thai = String(lines.th || '').replace('{names}', params.thNames || params.names || '');
-  const enLine = document.createElement('span');
-  enLine.className = 'narration-en';
-  enLine.lang = 'en';
-  enLine.textContent = english;
-  const thLine = document.createElement('span');
-  thLine.className = 'narration-th';
-  thLine.lang = 'th';
-  thLine.textContent = thai;
-  const cursor = document.createElement('span');
-  cursor.className = 'cursor';
-  narration.replaceChildren(enLine, thLine, cursor);
+  say(String(lines.en || '').replace('{names}', params.enNames || params.names || ''));
 }
 
 // ---------------------------------------------------------------- actions
 
 // ---------------------------------------------------------------- species card and analysis list
-const LEVEL_LABELS = { surface: 'ชั้น 1 · แนวปะการัง', mid: 'ชั้น 2 · ซากเรือ', deep: 'ชั้น 3 · ภูเขาไฟใต้น้ำ' };
+const LEVEL_LABELS = { surface: 'LEVEL 1 · CORAL REEF', mid: 'LEVEL 2 · SHIPWRECK', deep: 'LEVEL 3 · VOLCANIC VENTS' };
+// What each creature on the cube stands for. sci = scientific name, range = where it really lives.
 const SPECIES = {
-  shoal: { about: 'ปลาตัวเล็กสีเงินอมทอง ว่ายเกาะกลุ่มกันใกล้ผิวน้ำที่แสงแดดส่องถึง',
-    fact: 'การว่ายเป็นฝูงทำให้ผู้ล่าเล็งทีละตัวได้ยาก ทั้งฝูงเลี้ยวพร้อมกันได้เพราะแต่ละตัวคอยดูเพื่อนที่อยู่ข้าง ๆ' },
-  reef: { about: 'ปลาสีส้มสดลายขาว อาศัยตามแนวปะการังน้ำตื้นและไม่ค่อยว่ายไปไกลจากบ้าน',
-    fact: 'ปลาการ์ตูนอยู่ร่วมกับดอกไม้ทะเลได้เพราะมีเมือกเคลือบตัว กันเข็มพิษของดอกไม้ทะเลไว้' },
-  seahorse: { about: 'ปลาที่ว่ายตัวตั้งตรง ใช้หางเกี่ยวสาหร่ายหรือกิ่งปะการังไว้ไม่ให้ถูกกระแสน้ำพัดไป',
-    fact: 'ม้าน้ำตัวผู้เป็นฝ่ายอุ้มท้อง ตัวเมียวางไข่ไว้ในถุงหน้าท้องของตัวผู้ แล้วตัวผู้เป็นคนคลอดลูก' },
-  manta: { about: 'ปลากระเบนขนาดใหญ่ที่ว่ายเหมือนบิน กรองกินแพลงก์ตอนจากน้ำที่ไหลผ่านปาก',
-    fact: 'กระเบนราหูยักษ์กางครีบได้กว้างราว 7 เมตร และมีสมองใหญ่ที่สุดในบรรดาปลา' },
-  lantern: { about: 'ปลาตัวเล็กแห่งเขตแสงสลัว มีอวัยวะเรืองแสงเรียงเป็นแถวตามลำตัว',
-    fact: 'ทุกคืนปลาตะเกียงว่ายขึ้นมาหากินใกล้ผิวน้ำ แล้วกลับลงที่ลึกก่อนเช้า เป็นส่วนหนึ่งของการอพยพประจำวันที่ใหญ่ที่สุดในโลก' },
-  jelly: { about: 'ลำตัวใสเป็นวุ้น ลอยไปตามกระแสน้ำและบีบร่มเพื่อดันตัวไปข้างหน้า',
-    fact: 'แมงกะพรุนเป็นน้ำราว 95% ไม่มีสมอง ไม่มีหัวใจ และอยู่ในทะเลมานานกว่าไดโนเสาร์' },
-  angler: { about: 'นักล่าแห่งความมืด ปากกว้างฟันแหลม มีก้านยื่นจากหัวปลายเรืองแสงไว้ล่อเหยื่อ',
-    fact: 'แสงที่ปลายก้านมาจากแบคทีเรียเรืองแสงที่อาศัยอยู่ข้างใน ปลาตกเบ็ดสร้างแสงเองไม่ได้' },
-  squid: { about: 'หมึกแห่งทะเลลึก ว่ายถอยหลังด้วยการพ่นน้ำ และเปลี่ยนสีผิวได้ในพริบตา',
-    fact: 'หมึกยักษ์มีดวงตาใหญ่ที่สุดในอาณาจักรสัตว์ กว้างราว 25 เซนติเมตร ไว้รับแสงริบหรี่ในที่ลึก' }
+  shoal: { sci: 'Pseudanthias squamipinnis', common: 'Sea Goldie (Lyretail Anthias)',
+    lines: ['Clouds of these orange-gold fish hover over Red Sea reefs, picking plankton out of the current.',
+      'Every one is born female; the largest in a group turns into a male.'],
+    range: 'Depth: 0–55 m / Coral reef', source: 'FishBase' },
+  reef: { sci: 'Amphiprion bicinctus', common: 'Red Sea Clownfish',
+    lines: ['The two-banded anemonefish, native to the Red Sea and the Gulf of Aden.',
+      'Lives among the stinging tentacles of sea anemones, protected by its own coat of mucus.'],
+    range: 'Depth: 1–30 m / Coral reef', source: 'FishBase' },
+  seahorse: { sci: 'Hippocampus fuscus', common: 'Sea Pony',
+    lines: ['A small seahorse of sheltered seagrass beds in the Red Sea and Indian Ocean; it anchors itself with its tail.',
+      'The male carries the eggs in a belly pouch and gives birth to the young.'],
+    range: 'Depth: shallow water, to about 10 m / Seagrass', source: 'FishBase' },
+  manta: { sci: 'Mobula alfredi', common: 'Reef Manta Ray',
+    lines: ['Filter-feeds on plankton, with a wingspan of up to about 5 metres.',
+      'Mantas have the largest brain of any fish. Tagged Red Sea mantas have dived deeper than 400 m.'],
+    range: 'Depth: mostly the top 30 m, dives past 400 m / Reefs and open water', source: 'FishBase; Braun et al. 2014, PLoS ONE' },
+  lantern: { sci: 'Benthosema pterotum', common: 'Skinnycheek Lanternfish',
+    lines: ['The most abundant fish of the Red Sea twilight zone: about 5 cm long, with rows of light organs along its belly.',
+      'Spends the day in the dark far below and swims up towards the surface every night to feed.'],
+    range: 'Depth: near the surface at night, about 300–800 m by day / Open water', source: 'FishBase' },
+  jelly: { sci: 'Atolla wyvillei', common: 'Atolla (Crown) Jellyfish',
+    lines: ['A deep-red jellyfish of the midnight zone, found in oceans around the world.',
+      'When attacked it sets off a spinning ring of blue flashes, a "burglar alarm" that draws in bigger predators.'],
+    range: 'Depth: about 1,000–4,000 m / Open water', source: 'SeaLifeBase' },
+  angler: { sci: 'Melanocetus johnsonii', common: 'Humpback Anglerfish',
+    lines: ['An ambush predator of the deep. The female dangles a glowing lure in front of a mouth full of long teeth.',
+      'The light is made by bacteria living in the lure. Females reach about 15 cm; males stay under 3 cm.'],
+    range: 'Depth: about 200–1,500 m / Open water', source: 'FishBase' },
+  squid: { sci: 'Vampyroteuthis infernalis', common: 'Vampire Squid',
+    lines: ['Neither a true squid nor an octopus: the only living member of its own order.',
+      'Lives where there is almost no oxygen, carries light organs on its arm tips, and squirts glowing mucus instead of ink.'],
+    range: 'Depth: about 600–1,200 m / Oxygen minimum zone', source: 'SeaLifeBase' }
 };
 const card = { timer: 0, items: [] };
 
@@ -1396,34 +1429,35 @@ function cardAnimate() {
 }
 
 function showSpeciesCard(subject, sample) {
-  const key = subjectCueKey(subject), info = SPECIES[key] || {}, done = state.collected.length >= SUBJECTS.length;
-  $('discovery-title').textContent = done ? 'ครบทั้ง ' + SUBJECTS.length + ' ตัวอย่าง · MISSION COMPLETE'
-    : 'เก็บตัวอย่างแล้ว · ' + state.collected.length + ' / ' + SUBJECTS.length;
+  const key = subjectCueKey(subject), info = SPECIES[key] || { lines: [] }, done = state.collected.length >= SUBJECTS.length;
+  $('discovery-title').textContent = (done ? '★ ALL SPECIMENS COLLECTED ★' : '★ NEW SPECIMEN COLLECTED ★') + '  ' + state.collected.length + ' / ' + SUBJECTS.length;
   const art = $('discovery-art');
   art.hidden = false;
   $('discovery-emoji').textContent = '';
-  $('discovery-species').textContent = VOICE_SPECIES[key] || subject.name;
-  $('discovery-sub').textContent = subject.name + ' · ' + (LEVEL_LABELS[sample.zone] || '') + ' · ' + Math.round(sample.depth * MAX_METRES) + ' ม.';
-  const about = document.createElement('div'), fact = document.createElement('div'), tag = document.createElement('b');
-  about.textContent = info.about || '';
-  fact.className = 'fact'; tag.textContent = 'รู้ไหม? ';
-  fact.append(tag, document.createTextNode(info.fact || ''));
-  $('discovery-info').replaceChildren(about, fact);
+  $('discovery-species').textContent = info.sci || subject.name;
+  $('discovery-sub').textContent = (info.common || subject.name) + ' · on the cube: ' + subject.name;
+  const rows = (info.lines || []).map((text) => { const row = document.createElement('div'); row.textContent = text; return row; });
+  const range = document.createElement('div'), log = document.createElement('div');
+  range.className = 'fact';
+  range.textContent = (info.range || '') + (info.source ? ' / Source: ' + info.source : '');
+  log.className = 'logged';
+  log.textContent = 'Sample logged at ' + Math.round(sample.depth * MAX_METRES) + ' m · ' + (LEVEL_LABELS[sample.zone] || '') + ' · 22.3°N 38.9°E';
+  $('discovery-info').replaceChildren(...rows, range, log);
   card.items = [{ canvas: art, subject, depth: sample.depth }];
   $('discovery-popup').classList.add('show');
   cardAnimate();
 }
 
 function showAnalysis() {
-  $('discovery-title').textContent = 'ผลวิเคราะห์ · ANALYSIS';
+  $('discovery-title').textContent = 'ANALYSIS';
   $('discovery-art').hidden = true;
   $('discovery-emoji').textContent = 'ANALYSIS';
-  $('discovery-species').textContent = state.collected.length + ' / ' + SUBJECTS.length + ' ตัวอย่าง';
-  $('discovery-sub').textContent = state.collected.length >= SUBJECTS.length ? 'เก็บครบทุกชนิดแล้ว' : 'ตัวที่ยังไม่พบบอกไว้ว่าอยู่ชั้นไหน';
+  $('discovery-species').textContent = state.collected.length + ' / ' + SUBJECTS.length + ' specimens';
+  $('discovery-sub').textContent = state.collected.length >= SUBJECTS.length ? 'Every species in this survey has been collected.' : 'Species not found yet are listed with the level they live on.';
   const rows = [], items = [];
   const order = SUBJECTS.map((_, index) => index).sort((x, y) => SUBJECTS[x].y_mm - SUBJECTS[y].y_mm);
   for (const index of order) {
-    const subject = SUBJECTS[index], sample = state.collected.find((c) => c.id === subject.id), key = subjectCueKey(subject);
+    const subject = SUBJECTS[index], sample = state.collected.find((c) => c.id === subject.id), info = SPECIES[subjectCueKey(subject)] || {};
     const row = document.createElement('div'), text = document.createElement('div'), name = document.createElement('div'), meta = document.createElement('div');
     row.className = 'specimen-row' + (sample ? '' : ' missing');
     name.className = 'name'; meta.className = 'meta';
@@ -1432,14 +1466,16 @@ function showAnalysis() {
       canvas.width = 168; canvas.height = 100;
       row.append(canvas);
       items.push({ canvas, subject, depth: sample.depth });
-      name.textContent = VOICE_SPECIES[key] || subject.name;
-      meta.textContent = subject.name + ' · ' + Math.round(sample.depth * MAX_METRES) + ' ม.';
+      const sci = document.createElement('i');
+      sci.textContent = info.sci || subject.name;
+      name.append(sci);
+      meta.textContent = (info.common || subject.name) + ' · logged at ' + Math.round(sample.depth * MAX_METRES) + ' m';
     } else {
       const unknown = document.createElement('div');
       unknown.className = 'unknown'; unknown.textContent = '?';
       row.append(unknown);
       const home = 0.1 + (subject.y_mm - geometry.aimHeightMm) / geometry.depthTravelMm;
-      name.textContent = 'ยังไม่พบ';
+      name.textContent = 'Not found yet';
       meta.textContent = LEVEL_LABELS[home < ZONE_BOUNDS[0] ? 'surface' : home < ZONE_BOUNDS[1] ? 'mid' : 'deep'];
     }
     text.append(name, meta); row.append(text); rows.push(row);
@@ -1456,8 +1492,8 @@ function showAnalysis() {
 const GATES_ON = !/[?&](acceptance=1|gates=0)/.test(location.search);
 state.gatesOff = !GATES_ON;
 const GATE_AHEAD = {
-  reef: 'ข้างล่างคือพื้นทรายกับแนวปะการัง · หมุนกล่องหาช่องทางลง',
-  wreck: 'ข้างล่างมีซากเรือบนลานหิน · หารอยแยกที่มีแสงเพื่อลงต่อ'
+  reef: 'Sand and a coral reef below · turn the box to find the way down',
+  wreck: 'A shipwreck on a rock shelf below · look for the glowing rift to go deeper'
 };
 
 function gateList() { return GATES_ON && config && config.gates || []; }
@@ -1483,9 +1519,9 @@ function gateBump(gate, dir) {
   audio.bumpAt = now;
   gate.bumps = (gate.bumps || 0) + 1;
   cue('hull_creak', { minGap: 0 });
-  const way = dir > 0 ? 'ทางลง' : 'ทางขึ้น';
-  const side = gateOffset(gate) > 0 ? 'หมุนไปทางขวา ▶' : '◀ หมุนไปทางซ้าย';
-  const text = (dir > 0 ? 'พื้นกั้นอยู่' : 'เพดานหินกั้นอยู่') + ' · ' + (gate.bumps > 1 ? side + ' เพื่อหา' + way : 'หมุนกล่องหา' + way);
+  const way = dir > 0 ? 'the way down' : 'the way up';
+  const side = gateOffset(gate) > 0 ? 'turn right ▶' : '◀ turn left';
+  const text = (dir > 0 ? 'The floor is in the way' : 'Rock overhead') + ' · ' + (gate.bumps > 1 ? side + ' to find ' + way : 'turn the box to find ' + way);
   showPill(text, 3200);
   say(text);
 }
@@ -1494,7 +1530,7 @@ function gatePassed(gate, dir) {
   gate.bumps = 0;
   audio.gatePassAt = performance.now();
   state.bubbleBurstAt = performance.now();
-  say((dir > 0 ? 'ลอดช่องลงสู่ ' : 'กลับขึ้นสู่ ') + LEVEL_LABELS[['surface', 'mid', 'deep'][Math.min(2, state.level)]]);
+  say((dir > 0 ? 'Through the gap, down to ' : 'Back up to ') + LEVEL_LABELS[['surface', 'mid', 'deep'][Math.min(2, state.level)]] + '.');
 }
 
 // Where the sub actually ends up when it tries to go from one depth to another.
@@ -1525,16 +1561,16 @@ function updateGates() {
     else if (above && state.depth - above.depth < 0.06 && gateOpen(above)) ready = -1;
     if (below && !below.seen && below.depth - state.depth < 0.11) {
       below.seen = true;
-      showPill(GATE_AHEAD[below.kind] || 'หมุนกล่องหาช่องทางลง', 4200);
-      say(GATE_AHEAD[below.kind] || 'หมุนกล่องหาช่องทางลง');
+      showPill(GATE_AHEAD[below.kind] || 'Turn the box to find the way down', 4200);
+      say(GATE_AHEAD[below.kind] || 'Turn the box to find the way down');
     }
     if (!below && !audio.seaBedSeen && state.depth > 0.9) {
       audio.seaBedSeen = true;
-      say('ก้นทะเล · หินบะซอลต์ รอยแตกลาวา และปล่องน้ำร้อน');
+      say('The sea bed: black basalt, glowing lava cracks and hydrothermal vents.');
     }
   }
   if (ready && ready !== state.gateReady && performance.now() - (audio.gatePassAt || 0) > 2500) {
-    showPill(ready > 0 ? 'เจอช่องแล้ว · กดดำลง ▼' : 'เจอช่องแล้ว · กดขึ้น ▲', 2600);
+    showPill(ready > 0 ? 'Found the gap · hold ▼ to dive' : 'Found the gap · hold ▲ to rise', 2600);
     handNote(74, 1);
     window.setTimeout(() => handNote(81, 1), 170);
   }
@@ -1548,7 +1584,7 @@ function doScan() {
     cue('action_error'); speakLine('vo_on_frame');
     say('The reticle is on the printed frame, not on a panel. Nothing to scan.'); return;
   }
-  const s = subjectNear(hit.face, hit.u, hit.v, 11);
+  const s = aimedSubject(hit);
   const fx = $('scan-effect');
   fx.classList.remove('active'); void fx.offsetWidth; fx.classList.add('active');
   state.sweepStart = performance.now();
@@ -1586,7 +1622,7 @@ function doScan() {
 function doCollect() {
   renderPanels();
   const hit = reticleHit(state.yaw);
-  const s = hit && hit.onPanel ? subjectNear(hit.face, hit.u, hit.v, 11) : -1;
+  const s = aimedSubject(hit);
   if (s < 0) { cue('action_error'); speakLine('vo_nothing'); say('Nothing under the reticle to collect.'); return; }
   if (state.collected.some((c) => c.id === SUBJECTS[s].id)) {
     cue('collect_duplicate'); speakLine('vo_duplicate');
@@ -1684,6 +1720,24 @@ function yawHoldStart(dir) {
   yawHold.timer = window.setInterval(() => setYaw(state.yaw + dir * 1.5), 30);
 }
 
+// Cube or sphere: the same sea on a different body. The choice is remembered on this device.
+const SHAPE_KEY = 'deepSphereShape';
+function setShape(sphere, remember) {
+  state.sphere = Boolean(sphere);
+  applyShape();
+  const button = $('btn-shape');
+  if (button) { button.textContent = state.sphere ? 'Shape: sphere' : 'Shape: cube'; button.setAttribute('aria-pressed', state.sphere ? 'true' : 'false'); }
+  if (remember !== false) { try { window.localStorage.setItem(SHAPE_KEY, state.sphere ? 'sphere' : 'cube'); } catch (_) {} }
+}
+function initShape() {
+  const asked = new URLSearchParams(location.search).get('shape');
+  let saved = '';
+  try { saved = window.localStorage.getItem(SHAPE_KEY) || ''; } catch (_) {}
+  if (!DEV_MODE && (asked || saved) === 'sphere' || asked === 'sphere') setShape(true, false);
+  const button = $('btn-shape');
+  if (button) button.addEventListener('click', () => setShape(!state.sphere));
+}
+
 function initPad() {
   const hold = (id, down, up) => {
     const el = $(id);
@@ -1742,6 +1796,7 @@ function initInput() {
       case 'KeyR': orbit = { theta: -1.3, phi: 1.32, dist: DEV_MODE ? 4.4 : 3.5 }; fitOrbit(); setYaw(0); setDepth(0, true); break;
       case 'Enter': case 'Escape': if ($('discovery-popup').classList.contains('show')) $('btn-discovery-close').click(); break;
       case 'KeyD': e.preventDefault(); setDebug(!audio.debug); break;
+      case 'KeyB': setShape(!state.sphere); break;
       case 'KeyN': audio.handNotes = !audio.handNotes; say(audio.handNotes ? 'Hand notes on.' : 'Hand notes off.'); break;
       case 'KeyM':
         toggleMute();
@@ -1752,6 +1807,7 @@ function initInput() {
   window.addEventListener('keyup', (e) => { if (e.code === 'ArrowUp' || e.code === 'ArrowDown') depthHoldStop(); });
   window.addEventListener('blur', () => { depthHoldStop(); yawHoldStop(); });
   initPad();
+  initShape();
 
   $('btn-scan').addEventListener('click', doScan);
   $('btn-collect').addEventListener('click', doCollect);
@@ -1795,7 +1851,7 @@ async function start() {
     // The opening: two phrases of the invitation, then the sea is left alone until the player moves.
     window.setTimeout(() => startPerformance('invite', { fromStart: true, phrases: 2, hold: BEAT.phrase }), 900);
     if (audio.boardConnected) cue('board_link_on');
-    say('Six panels on a vertex-up cube. The sea turns with the cube; the reticle stays in front of the base.');
+    say('Deep Sphere online. Red Sea survey, 22.3°N 38.9°E. Drag to turn the box, hold ▼ to dive, and find the way down through each level.');
   } catch (error) {
     console.error(error);
     button.textContent = 'AUDIO UNAVAILABLE — RETRY';

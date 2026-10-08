@@ -35,7 +35,7 @@ function updateZone(depth) {
 
 function reticleHit(yaw) {
   const p=geometry.aim(yaw,state.depth);
-  return {...p,u:p.local[0],v:p.local[1],onPanel:p.visible};
+  return {...p,u:p.local[0],v:p.local[1],onPanel:state.sphere?true:p.visible};
 }
 
 // Scan reads the same winning subject index that supplied the last displayed pixel.
@@ -93,13 +93,14 @@ function makeSeaPre(stripX,stripY,n) {
   }
   return {uPhase,vert,lon,mer};
 }
-function paintSea(out,stripX,stripY,pre,n,skip,w,stride) {
+function paintSea(out,stripX,stripY,pre,n,skip,w,stride,h) {
+  h=h||w;
   if(!SEA_LUT) buildSeaLut();
   const look=config.depth_darkening,d=clamp01(state.depth),gs=geometry.stripLengthMm/18;
   const amp=look.texture_amplitude_rgb,band=look.surface_band.rgb,lens=look.snell_window.rgb,gridGain=look.grid_gain;
   const texShift=d*SEA_TEX_DRIFT_MM,lensFade=clamp01(1-d/look.snell_window.depth_fade_norm),lensStrength=look.snell_window.strength;
   const bandFade=clamp01(1-d/look.surface_band.fade_depth_norm),grid=state.grid;
-  for(let yy=0;yy<w;yy+=stride) for(let xx=0;xx<w;xx+=stride) {
+  for(let yy=0;yy<h;yy+=stride) for(let xx=0;xx<w;xx+=stride) {
     const i=yy*w+xx;
     if(skip&&skip[i]) continue;
     const sy=stripY[i],raw=d+(SEA_TOP_MM-sy)*SEA_K,dp=raw<0?0:raw>1?1:raw,li=((dp*1023)|0)*3,yt=sy-texShift;
@@ -113,7 +114,7 @@ function paintSea(out,stripX,stripY,pre,n,skip,w,stride) {
     }
     const mm=pre.mer[i];
     if(mm>0) {r*=1-mm*0.2;g*=1+mm;b*=1+mm*0.4;}
-    for(let dy=0;dy<stride&&yy+dy<w;dy++) for(let dx=0;dx<stride&&xx+dx<w;dx++) {
+    for(let dy=0;dy<stride&&yy+dy<h;dy++) for(let dx=0;dx<stride&&xx+dx<w;dx++) {
       const o=((yy+dy)*w+xx+dx)*4;out[o]=r;out[o+1]=g;out[o+2]=b;out[o+3]=255;
     }
   }
@@ -201,7 +202,7 @@ const ART={
     ctx.beginPath();ctx.moveTo(n*0.05,-ht*0.4);ctx.quadraticCurveTo(-n*0.15,-ht*0.8,-n*0.4,-ht*0.32);ctx.closePath();ctx.fill();
     fishPath(ctx,len,ht,wag);ctx.fillStyle=vgrad(ctx,ht/2,-ht/2,shade(c,1.05),tint(c,0.25));ctx.fill();
     ctx.save();ctx.clip();
-    for(const bx of [n*0.42,-n*0.02,-n*0.5]) {ctx.fillStyle='#1c1410';ctx.fillRect(bx-len*0.075,-ht,len*0.15,ht*2);ctx.fillStyle='#fbfbf4';ctx.fillRect(bx-len*0.055,-ht,len*0.11,ht*2);}
+    for(const bx of [n*0.42,-n*0.1]) {ctx.fillStyle='#1c1410';ctx.fillRect(bx-len*0.075,-ht,len*0.15,ht*2);ctx.fillStyle='#fbfbf4';ctx.fillRect(bx-len*0.055,-ht,len*0.11,ht*2);}
     ctx.restore();
     fishPath(ctx,len,ht,wag);ctx.strokeStyle='rgba(40,18,10,0.75)';ctx.lineWidth=0.14;ctx.stroke();
     ctx.fillStyle=shade(c,0.75,0.9);ctx.beginPath();ctx.ellipse(n*0.12,-ht*0.08,len*0.09,ht*0.16,-0.5+Math.sin(t*5)*0.3,0,TAU);ctx.fill();
@@ -338,7 +339,7 @@ const ART={
   }
 };
 function drawCreatures(ctx,m,shown) {
-  const aimY=geometry.aimHeightMm,scroll=geometry.stripScrollMm(state.depth),t=state.seconds,reach=geometry.stripStepMm+26;
+  const aimY=geometry.aimHeightMm,scroll=geometry.stripScrollMm(state.depth),t=state.seconds,reach=m.reach?m.reach+8:geometry.stripStepMm+26;
   const mark=state.highlight||performance.now()<state.highlightUntil;
   for(let k=0;k<shown.length;k++) {
     const sub=config.subjects[k],dx=geometry.wrapDistance(shown[k][0],m.cx),y=2*aimY-shown[k][1]+scroll;
@@ -455,7 +456,7 @@ function drawFloor(ctx,m,gate,index) {
   const K=geometry.depthTravelMm,L=geometry.stripLengthMm,d=clamp01(state.depth),t=state.seconds,T=FLOOR.thick;
   const y0=geometry.aimHeightMm-FLOOR.clear+(d-gate.depth)*K+(gate.shift||0);
   if(y0<-74||y0-T>70) return;
-  const gx=gate.u*L,hw=gate.half_mm,reach=geometry.stripStepMm+18,wreck=gate.kind==='wreck';
+  const gx=gate.u*L,hw=gate.half_mm,reach=m.reach||geometry.stripStepMm+18,wreck=gate.kind==='wreck';
   const open=x=> {const f=clamp01((Math.abs(geometry.wrapDistance(x,gx))-hw)/(hw*0.6));return f*f*(3-2*f);};
   const prof=x=> {const u=x/L*TAU;return 1.6*Math.sin(u*4+index*2)+0.9*Math.sin(u*9+1.1+index)+0.5*Math.sin(u*21+0.3);};
   const top=x=>y0+prof(x)-(1-open(x))*T*0.5;
@@ -509,7 +510,7 @@ function drawFloor(ctx,m,gate,index) {
 function drawSeaBed(ctx,m) {
   const d=clamp01(state.depth),t=state.seconds,base=geometry.aimHeightMm-FLOOR.clear-4+(d-1)*geometry.depthTravelMm;
   if(base<-70) return;
-  const reach=geometry.stripStepMm+18,floor=x=>seaFloor(x,base);
+  const reach=m.reach||geometry.stripStepMm+18,floor=x=>seaFloor(x,base);
   ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);
   for(const col of FLOOR.columns) {
     const dx=geometry.wrapDistance(col.x,m.cx);
@@ -597,7 +598,7 @@ function seaFloor(x,base) {
 }
 function drawLife(ctx,m,shown) {
   if(!LIFE.built) buildLife();
-  const d=clamp01(state.depth),t=state.seconds,W=m.w,S=m.scale,step=geometry.stripStepMm,reach=step+18;
+  const d=clamp01(state.depth),t=state.seconds,W=m.w,S=m.scale,step=geometry.stripStepMm,reach=m.reach||step+18;
   const wrapY=v=>((v+60)%120+120)%120-60;
   const band=(a,b,c,e)=>d<=a||d>=e?0:d<b?(d-a)/(b-a):d<=c?1:(e-d)/(e-c);
   let PX=0,PY=0;
@@ -736,6 +737,84 @@ function stepLife(hit) {
   if(LIFE.bursts.length) LIFE.bursts=LIFE.bursts.filter(b=>t-b.born<b.life);
 }
 
+// ---------------------------------------------------------------- sphere view
+// The same sea wrapped round a ball instead of the six panels: one texture, strip x round the equator and strip
+// height from pole to pole (the strip is exactly half as tall as it is long, so the picture is undistorted at the
+// equator). Everything that draws the sea is shared with the cube; only the canvas it lands on is different.
+const BALL={W:960,H:480,ready:false};
+function makeBall() {
+  const W=BALL.W,H=BALL.H,L=geometry.stripLengthMm,span=geometry.stripStepMm*3,n=W*H,k=W/L;
+  const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+  BALL.ctx=canvas.getContext('2d');BALL.tex=new THREE.CanvasTexture(canvas);
+  BALL.tex.minFilter=THREE.LinearFilter;BALL.tex.generateMipmaps=false;BALL.tex.wrapS=THREE.RepeatWrapping;
+  BALL.stripX=new Float64Array(n);BALL.stripY=new Float64Array(n);
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++) {const i=y*W+x;BALL.stripX[i]=(x+0.5)/W*L;BALL.stripY[i]=span/2-(y+0.5)/H*span;}
+  BALL.pre=makeSeaPre(BALL.stripX,BALL.stripY,n);
+  BALL.image=new ImageData(W,H);BALL.k=k;
+  // Three maps: the middle one, and one a whole turn to each side so shapes that cross the seam are completed.
+  BALL.maps=[0,-W,W].map(shift=>({cx:L/2,w:W,reach:L/2+2,a:k,b:0,c:0,d:-k,e:W/2+shift,f:H/2,scale:k}));
+  // Line the texture up with the cube: strip x = 0 sits at the same azimuth on both.
+  const azimuth=yaw=> {const p=geometry.aim(yaw,0).point_mm;return Math.atan2(p[1],p[0]);};
+  let turn=azimuth(20)-azimuth(0);while(turn>Math.PI)turn-=TAU;while(turn<-Math.PI)turn+=TAU;
+  if(turn<0) BALL.tex.repeat.x=-1;
+  const mesh=new THREE.Mesh(new THREE.SphereGeometry(L/TAU/faceConfig.physical_face_dimensions_mm.face_edge,72,36),new THREE.MeshBasicMaterial({map:BALL.tex,toneMapped:false}));
+  mesh.rotation.x=Math.PI/2;
+  BALL.holder=new THREE.Group();BALL.holder.rotation.z=azimuth(0)-Math.PI;BALL.holder.add(mesh);cubeGroup.add(BALL.holder);
+  const radius=L/TAU/faceConfig.physical_face_dimensions_mm.face_edge,top=-radius+0.02,bottom=-Math.sqrt(3)/2;
+  BALL.stem=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,top-bottom,24),new THREE.MeshStandardMaterial({color:0x75959a}));
+  BALL.stem.rotation.x=Math.PI/2;BALL.stem.position.z=(top+bottom)/2;scene.add(BALL.stem);
+  BALL.ready=true;
+}
+function applyShape() {
+  if(state.sphere&&!BALL.ready) makeBall();
+  mountedGroup.visible=!state.sphere;
+  if(BALL.ready) {BALL.holder.visible=state.sphere;BALL.stem.visible=state.sphere;}
+  panels.forEach(p=>{p.cacheKey=null;p.ring.cacheKey=null;p.ring.lastAt=0;});BALL.cacheKey=null;lastRenderKey='';
+}
+function renderBall(hit,shown) {
+  const W=BALL.W,H=BALL.H,k=BALL.k,ctx=BALL.ctx,now=performance.now();
+  if(state.seaDepth!==state.depth) {state.seaDepth=state.depth;state.seaChangedAt=now;}
+  const moving=now-(state.seaChangedAt||0)<220,key=state.depth+'|'+state.grid+'|'+(moving?'c':'f');
+  if(BALL.cacheKey!==key) {paintSea(BALL.image.data,BALL.stripX,BALL.stripY,BALL.pre,W*H,null,W,moving?4:1,H);BALL.cacheKey=key;}
+  ctx.setTransform(1,0,0,1,0,0);ctx.putImageData(BALL.image,0,0);
+  for(const m of BALL.maps) drawLife(ctx,m,shown);
+  ctx.setTransform(1,0,0,1,0,0);
+  const sweep=(now-state.sweepStart)/SCAN_SWEEP_MS;
+  if(sweep>=0&&sweep<=1) {
+    const top=geometry.stripStepMm*1.5,y=H/2-(top-sweep*2*top)*k,g=ctx.createLinearGradient(0,y-3*k,0,y+3*k);
+    g.addColorStop(0,'rgba(40,255,150,0)');g.addColorStop(0.5,'rgba(40,255,150,0.85)');g.addColorStop(1,'rgba(40,255,150,0)');
+    ctx.fillStyle=g;ctx.fillRect(0,y-3*k,W,6*k);
+  }
+  const ry=H/2-geometry.aimHeightMm*k,flash=(now-state.collectFlash)/COLLECT_FLASH_MS;
+  for(const rx of [hit.strip_mm[0]*k,hit.strip_mm[0]*k-W,hit.strip_mm[0]*k+W]) {
+    if(rx<-80||rx>W+80) continue;
+    if(flash>=0&&flash<=1) {ctx.strokeStyle='rgba(0,255,150,'+(1-flash).toFixed(2)+')';ctx.lineWidth=3;ctx.beginPath();ctx.arc(rx,ry,8+flash*55,0,TAU);ctx.stroke();}
+    ctx.strokeStyle=state.gateReady?'#ffd36b':'#00ffcc';ctx.lineWidth=1.5;ctx.lineCap='butt';ctx.beginPath();
+    for(const sign of [-1,1]) {ctx.moveTo(rx+sign*3,ry);ctx.lineTo(rx+sign*10,ry);ctx.moveTo(rx,ry+sign*3);ctx.lineTo(rx,ry+sign*10);}
+    ctx.stroke();ctx.strokeRect(rx-7,ry-7,14,14);
+    if(state.gateReady) {
+      const step=Math.floor(now/170)%3,dir=state.gateReady;
+      ctx.lineWidth=2;ctx.lineCap='round';
+      for(let i=0;i<3;i++) {const cy=ry+dir*(14+i*7);ctx.globalAlpha=i===step?1:0.35;ctx.beginPath();ctx.moveTo(rx-5,cy-dir*4);ctx.lineTo(rx,cy);ctx.lineTo(rx+5,cy-dir*4);ctx.stroke();}
+      ctx.globalAlpha=1;
+    }
+  }
+  BALL.tex.needsUpdate=true;
+}
+// Which creature the reticle is on. The cube reads the pixel the panel shows; the sphere has no panels or
+// frames, so it tests the creature's box in the sea directly.
+function aimedSubject(hit) {
+  if(!hit) return -1;
+  if(!state.sphere) return hit.onPanel?subjectNear(hit.face,hit.u,hit.v,11):-1;
+  const shown=geometry.poses(state.seconds),aimY=geometry.aimHeightMm,scroll=geometry.stripScrollMm(state.depth);
+  let best=-1,near=1e9;
+  shown.forEach((pos,index)=> {
+    const sub=config.subjects[index],dx=Math.abs(geometry.wrapDistance(hit.strip_mm[0],pos[0])),dy=Math.abs(aimY-(2*aimY-pos[1]+scroll));
+    if(dx<=sub.w_mm/2+1.4&&dy<=sub.h_mm/2+1.4&&dx+dy<near) {near=dx+dy;best=index;}
+  });
+  return best;
+}
+
 function makePanel(f) {
   const canvas=document.createElement('canvas');canvas.width=PANEL;canvas.height=PANEL;
   const ctx=canvas.getContext('2d'), tex=new THREE.CanvasTexture(canvas);
@@ -864,7 +943,7 @@ function drawReticle(p,hit) {
 }
 
 function updateAimMarker(hit) {
-  aimMarker.visible=hit.onPanel;
+  aimMarker.visible=hit.onPanel&&!state.sphere;
   const bp=hit.point_mm.map(x=>x/faceConfig.physical_face_dimensions_mm.face_edge),a=(state.yaw+geometry.aimPhaseDeg)*Math.PI/180;
   aimMarker.position.set(bp[0]*Math.cos(a)+bp[1]*Math.sin(a),-bp[0]*Math.sin(a)+bp[1]*Math.cos(a),bp[2]);
 }
@@ -872,6 +951,7 @@ function updateAimMarker(hit) {
 function renderPanels() {
   const hit=reticleHit(state.yaw),shown=geometry.poses(state.seconds);
   stepLife(hit);
+  if(state.sphere) {renderBall(hit,shown);return hit;}
   panels.forEach((p,face)=> {
     if(state.seaDepth!==state.depth) {state.seaDepth=state.depth;state.seaChangedAt=performance.now();}
     const moving=performance.now()-(state.seaChangedAt||0)<220;

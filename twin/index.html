@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Deep Sphere — ดำลงไปกับลูกบาศก์</title>
+<title>Deep Sphere — dive with the cube</title>
 <meta name="description" content="Browser digital twin of the six-panel Deep Sphere cube: the same face maths, the same live-ocean motion and the same audio cues the firmware uses.">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="deepcore.css?v=20261009e">
+<link rel="stylesheet" href="deepcore.css?v=20261009f">
 </head>
 <body>
 
@@ -16,7 +16,7 @@
     <div class="intro-title">DEEP SPHERE</div>
     <div class="intro-sub">SIX-PANEL CUBE — DIGITAL TWIN</div>
     <button class="intro-start" id="btn-start" disabled>LOADING PANELS</button>
-    <div class="intro-hint">ลากเพื่อหมุนกล่อง · กดค้าง ▼ เพื่อดำลง · สแกน → เก็บ → วิเคราะห์<br>ทะเลมี 3 ชั้น แต่ละชั้นมีพื้นกั้น ต้องหมุนหาช่องทางลงเอง<br>ใส่หูฟังแล้วจะได้ยินครบ · เพลงจะมาเมื่อคุณขยับ และค่อย ๆ จางเมื่อคุณหยุด</div>
+    <div class="intro-hint">Drag to turn the box · hold ▼ to dive · Scan → Collect → Analyze<br>The sea has three levels. Each ends in a floor: turn the box to find the way down.<br>Headphones recommended · the music joins when you move and fades when you stop</div>
 </div>
 
 <div id="canvas-container"></div>
@@ -44,7 +44,7 @@
 <div class="scan-effect" id="scan-effect"></div>
 
 <div class="hud hud-status" id="hud-status">
-    <div class="status-title">Deep Sphere Navigation</div>
+    <div class="status-title">DeepCore Navigation</div>
     <div class="status-grid">
         <span class="status-label">Pressure</span>
         <span class="status-value" id="val-pressure">1.0 ATM</span>
@@ -52,21 +52,26 @@
         <span class="status-value" id="val-temp">28.0&deg;C</span>
         <span class="status-label">Visibility</span>
         <span class="status-value" id="val-visibility">EXCELLENT</span>
-        <span class="status-label">Panels lit</span>
-        <span class="status-value" id="val-panels">6 / 6</span>
-        <span class="status-label">Heading</span>
-        <span class="status-value" id="val-heading">0.0 deg</span>
-        <span class="status-label">Reticle</span>
-        <span class="status-value" id="val-reticle">ny</span>
-        <span class="status-label">Tray</span>
-        <span class="status-value" id="val-specimens">0 / 6</span>
+        <span class="status-label">Salinity</span>
+        <span class="status-value" id="val-salinity">40.0 PSU</span>
+        <span class="status-label">Coord</span>
+        <span class="status-value" id="val-coord">22.3&deg;N 38.9&deg;E</span>
+        <span class="status-label">Specimens</span>
+        <span class="status-value" id="val-specimens">0 / 8</span>
+        <span class="status-label dev-only">Panels lit</span>
+        <span class="status-value dev-only" id="val-panels">6 / 6</span>
+        <span class="status-label dev-only">Heading</span>
+        <span class="status-value dev-only" id="val-heading">0.0 deg</span>
+        <span class="status-label dev-only">Reticle</span>
+        <span class="status-value dev-only" id="val-reticle">ny</span>
     </div>
 </div>
 
 <div class="hud hud-depth" id="hud-depth">
     <div class="depth-number" id="depth-number">0</div>
     <div class="depth-unit">METERS</div>
-        <div class="depth-zone" id="depth-zone" data-zone="surface">ตื้น · SURFACE</div>
+        <div class="depth-zone" id="depth-zone" data-zone="surface">SURFACE</div>
+    <div class="depth-level" id="depth-level">LEVEL 1 · CORAL REEF</div>
 </div>
 
 <div class="hud hud-bar">
@@ -109,24 +114,27 @@
 
 <div class="panel-strip" id="panel-strip"></div>
 
-<div class="pad" id="pad" aria-label="ปุ่มควบคุม">
-  <button class="pad-btn" id="pad-left" type="button" aria-label="หมุนซ้าย">◀</button>
+<div class="pad" id="pad" aria-label="Controls">
+  <button class="pad-btn" id="pad-left" type="button" aria-label="Turn left">◀</button>
   <div class="pad-col">
-    <button class="pad-btn" id="pad-up" type="button" aria-label="ลอยขึ้น">▲<span>ขึ้น</span></button>
-    <button class="pad-btn" id="pad-down" type="button" aria-label="ดำลง">▼<span>ดำลง</span></button>
+    <button class="pad-btn" id="pad-up" type="button" aria-label="Rise">▲<span>UP</span></button>
+    <button class="pad-btn" id="pad-down" type="button" aria-label="Dive">▼<span>DIVE</span></button>
   </div>
-  <button class="pad-btn" id="pad-right" type="button" aria-label="หมุนขวา">▶</button>
+  <button class="pad-btn" id="pad-right" type="button" aria-label="Turn right">▶</button>
 </div>
-<button class="sound-btn" id="btn-sound" type="button" aria-label="เปิดหรือปิดเสียง" aria-pressed="true">เสียง: เปิด</button>
+<div class="top-bar">
+  <button class="sound-btn" id="btn-shape" type="button" aria-pressed="false" title="Switch between the cube and a sphere (B)">Shape: cube</button>
+  <button class="sound-btn" id="btn-sound" type="button" aria-label="Sound on or off" aria-pressed="true">Sound: on</button>
+</div>
 
 <div class="discovery-popup" id="discovery-popup" role="dialog" aria-live="polite">
-    <div class="discovery-title" id="discovery-title">SPECIMEN COLLECTED</div>
+    <div class="discovery-title" id="discovery-title">★ NEW SPECIMEN COLLECTED ★</div>
     <canvas class="discovery-art" id="discovery-art" width="400" height="220"></canvas>
     <div id="discovery-emoji" hidden></div>
     <div class="discovery-species" id="discovery-species"></div>
     <div class="discovery-sub" id="discovery-sub"></div>
     <div class="discovery-info" id="discovery-info"></div>
-    <button class="discovery-close" id="btn-discovery-close">ไปต่อ · CONTINUE</button>
+    <button class="discovery-close" id="btn-discovery-close">ACKNOWLEDGE</button>
 </div>
 
 <aside class="audio-debug" id="audio-debug" aria-label="Audio diagnostics" hidden>
@@ -148,9 +156,9 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="geometry.js?v=20261009e"></script>
-<script src="ocean.js?v=20261009e"></script>
-<script src="renderer.js?v=20261009e"></script>
-<script src="twin.js?v=20261009e"></script>
+<script src="geometry.js?v=20261009f"></script>
+<script src="ocean.js?v=20261009f"></script>
+<script src="renderer.js?v=20261009f"></script>
+<script src="twin.js?v=20261009f"></script>
 </body>
 </html>
