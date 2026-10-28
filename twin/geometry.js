@@ -5,6 +5,7 @@ const TwinGeometry={
   create(config,faceConfig,scene){
     const edge=faceConfig.physical_face_dimensions_mm.face_edge;
     const stripConfig=config.strip_map||{},step=stripConfig.face_step_mm||edge/Math.sqrt(2),stripLengthMm=stripConfig.length_mm||step*6,faces=faceConfig.faces;
+    const ringConfig=config.ring||{},ringPanels=Math.max(3,ringConfig.panels||6),ringOrder=ringConfig.azimuth_order||config.azimuth_order;
     const faceById=id=>faces.find(f=>f.id===id),faceIndex=id=>config.azimuth_order.indexOf(id);
     const rects=Object.fromEntries(faces.map(f=>[f.id,f.physical_face_uv]));
     const mount=config.mount_orientation.matrix, inverse=transpose(mount);
@@ -42,7 +43,49 @@ const TwinGeometry={
     const atlas=(id,u,v,depth)=>stripPoint(id,u,v);
     const atlasFace=(x,y,depth)=>{const hit=faceForStrip(x,y);return {face:hit.k,face_id:hit.id,local:hit.local,valid:hit.faceOutside<=1e-9};};
     const horizontalPerimeterMm=()=>stripLengthMm;
-    return {config,faces,faceConfig,scene,mount,inverse,edge,point,strip,pixel,atlas,atlasFace,aim,poses,subjectAt,stripPoint,stripLocal,stripLengthMm,stripStepMm:step,stripScrollMm,depthTravelMm,backgroundScrollMm,aimHeightMm:aimY,aimPhaseDeg:90,referencePerimeterMm:stripLengthMm,wrapDistance,faceForStrip,stripFrames:faceFrames};
+    const ringPanelWidth=ringConfig.panel_active_mm||23.4,ringBezel=ringConfig.bezel_mm??6,ringPitch=ringPanelWidth+ringBezel;
+    const ringRadius=ringPitch/(2*Math.tan(Math.PI/ringPanels)),ringLengthMm=2*Math.PI*ringRadius;
+    const ringOpeningAngle=2*Math.atan(ringPanelWidth/(2*ringRadius)),ringPanelArcMm=ringRadius*ringOpeningAngle,ringAimY=0;
+    const ringCenterAngle=index=>((index/ringPanels)+(ringConfig.reticle_azimuth_deg||0)/360)*Math.PI*2;
+    const ringPanel=(index,u,v)=>{
+      const id=ringOrder[index%ringOrder.length],angle=ringCenterAngle(index)+Math.atan((u-.5)*ringPanelWidth/ringRadius);
+      const x=((angle/(Math.PI*2))*ringLengthMm%ringLengthMm+ringLengthMm)%ringLengthMm,y=ringAimY+(0.5-v)*ringPanelWidth;
+      return {id,index,u,v,angle,strip_mm:[x,y],point_mm:[ringRadius*Math.cos(angle),ringRadius*Math.sin(angle),y-ringAimY],pixel_uv:[u,v]};
+    };
+    const ringAim=yaw=>{
+      const offset=ringConfig.reticle_azimuth_deg||0,a=(((yaw+offset)%360)+360)%360/360*2*Math.PI;
+      const stepAngle=2*Math.PI/ringPanels,localAngle=((a-offset*Math.PI/180+Math.PI*2)%(Math.PI*2)),index=Math.floor((localAngle+stepAngle/2)/stepAngle)%ringPanels;
+      const center=ringCenterAngle(index),delta=((a-center+Math.PI*3)%(Math.PI*2))-Math.PI;
+      const u=.5+Math.tan(delta)*ringRadius/ringPanelWidth,visible=u>=0&&u<=1;
+      const h=ringPanel(index,u,.5);
+      return {...h,strip_mm:[((a/(Math.PI*2))*ringLengthMm)%ringLengthMm,ringAimY],face:index,face_id:h.id,u,v:.5,local:[u,.5],pixel_uv:[Math.max(0,Math.min(1,u)),.5],surface_available:true,visible,onPanel:visible,point_mm:h.point_mm};
+    };
+    const ringPointAt=(index,x,y)=>{
+      let dx=x-ringCenterAngle(index)/(Math.PI*2)*ringLengthMm;while(dx>ringLengthMm/2)dx-=ringLengthMm;while(dx<-ringLengthMm/2)dx+=ringLengthMm;
+      const delta=dx*Math.PI*2/ringLengthMm;
+      const u=.5+Math.tan(delta)*ringRadius/ringPanelWidth;
+      return ringPanel(index,u,.5+(ringAimY-y)/ringPanelWidth);
+    };
+    const ringPoses=seconds=>config.subjects.map(s=>{const x=(s.x_mm/stripLengthMm*ringLengthMm)+(s.speed_mm_s/stripLengthMm*ringLengthMm)*seconds;return [((x%ringLengthMm)+ringLengthMm)%ringLengthMm,s.y_mm-aimY];});
+    const ringWrapDistance=(x,center)=>{let d=x-center;while(d>ringLengthMm/2)d-=ringLengthMm;while(d<-ringLengthMm/2)d+=ringLengthMm;return d;};
+    const ringCanvasX=(index,x,width)=>{
+      const center=ringCenterAngle(index)/(Math.PI*2)*ringLengthMm,delta=ringWrapDistance(x,center)/ringRadius;
+      return width*(.5+Math.tan(delta)*ringRadius/ringPanelWidth);
+    };
+    const gateOffset=(gate,yaw,lengthMm=stripLengthMm,yawOffsetDeg=0)=>{
+      let delta=gate.u*lengthMm-((yaw+yawOffsetDeg)/360*lengthMm);
+      while(delta>lengthMm/2)delta-=lengthMm;while(delta<-lengthMm/2)delta+=lengthMm;
+      return delta;
+    };
+    const gateOpen=(gate,yaw,lengthMm=stripLengthMm,yawOffsetDeg=0)=>Math.abs(gateOffset(gate,yaw,lengthMm,yawOffsetDeg))<=gate.half_mm*.8;
+    const gateOpeningAt=(gate,x,center,lengthMm=stripLengthMm,openingFactor=0.8)=>{
+      let delta=x-center;while(delta>lengthMm/2)delta-=lengthMm;while(delta<-lengthMm/2)delta+=lengthMm;
+      const half=gate.half_mm*openingFactor,f=clamp01((Math.abs(delta)-half)/(half*.6));return 1-f*f*(3-2*f);
+    };
+    const floorSolidAt=(gate,x,center,lengthMm=stripLengthMm,openingFactor=0.8)=>1-gateOpeningAt(gate,x,center,lengthMm,openingFactor);
+    const ringMarkerPoint=()=>{const a=(ringConfig.reticle_azimuth_deg||0)*Math.PI/180;return [ringRadius*Math.cos(a),ringRadius*Math.sin(a),ringAimY];};
+    const ringSubjectAt=(x,y,depth,shown)=>{const scroll=stripScrollMm(depth);for(let i=0;i<shown.length;i++){const s=config.subjects[i],dx=ringWrapDistance(x,shown[i][0]),dy=y-( -shown[i][1]+scroll),halfW=s.w_mm/2,halfH=s.h_mm/2;if(Math.abs(dx)>halfW||Math.abs(dy)>halfH)continue;const col=Math.floor((dx/halfW*.5+.5)*8),row=Math.floor((dy/halfH*.5+.5)*8);if(col>=0&&col<8&&row>=0&&row<8&&(config.sprite_masks[s.kind][row]&(1<<(7-col))))return i;}return -1;};
+    return {config,faces,faceConfig,scene,mount,inverse,edge,point,strip,pixel,atlas,atlasFace,aim,poses,subjectAt,stripPoint,stripLocal,stripLengthMm,stripStepMm:step,stripScrollMm,depthTravelMm,backgroundScrollMm,aimHeightMm:aimY,aimPhaseDeg:90,referencePerimeterMm:stripLengthMm,wrapDistance,faceForStrip,stripFrames:faceFrames,ringPanels,ringOrder,ringPanelWidth,ringBezel,ringPitch,ringRadius,ringLengthMm,ringOpeningAngle,ringPanelArcMm,ringAimY,ringPanel,ringAim,ringPointAt,ringPoses,ringSubjectAt,ringWrapDistance,ringCanvasX,ringMarkerPoint,gateOffset,gateOpen,gateOpeningAt,floorSolidAt};
   }
 };
 

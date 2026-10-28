@@ -10,8 +10,9 @@ import math
 from pathlib import Path
 import threading
 import time
+import uuid
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 try:
     import serial
@@ -30,6 +31,8 @@ LOG_PATH = ROOT / "output" / "twin-bridge.log"
 LOG_MAX_BYTES = 1_000_000
 ESP32S3_VID = 0x303A
 ESP32S3_PID = 0x1001
+CP210X_VID = 0x10C4
+CH340_VID = 0x1A86
 
 
 class BridgeEventLog:
@@ -66,7 +69,7 @@ class BridgeEventLog:
 
 
 def find_esp32s3_ports(port_list_module=None) -> list[str]:
-    """Return detected ESP32-S3 USB CDC ports in operating-system order."""
+    """Return known ESP32 serial ports, preferring USB-UART base-board adapters."""
     provider = serial_list_ports if port_list_module is None else port_list_module
     if provider is None:
         return []
@@ -74,8 +77,14 @@ def find_esp32s3_ports(port_list_module=None) -> list[str]:
         ports = provider.comports()
     except Exception:
         return []
-    return [item.device for item in ports
-            if getattr(item, "vid", None) == ESP32S3_VID and getattr(item, "pid", None) == ESP32S3_PID]
+    # The base board uses a USB-UART bridge; put those ports before the S3's native CDC.
+    # A base-io hello is still verified from the actual serial stream before being recorded.
+    usb_uart = [item.device for item in ports
+                if getattr(item, "vid", None) in {CP210X_VID, CH340_VID}]
+    s3_cdc = [item.device for item in ports
+              if getattr(item, "vid", None) == ESP32S3_VID and
+              getattr(item, "pid", None) == ESP32S3_PID]
+    return usb_uart + s3_cdc
 
 
 def format_serial_error(error: Exception, port: str) -> str:
@@ -103,9 +112,34 @@ class YawState:
         self.received_at = 0.0
         self.seen_message = False
         self.started_at = time.monotonic()
+        self.events: list[dict] = []
+        self.event_sequence = 0
+        self.event_session = uuid.uuid4().hex
+        self.base_board_port = ""
 
     def update(self, message: dict) -> None:
-        if message.get("type") != "yaw":
+        message_type = message.get("type")
+        if message_type in {"wheel", "button"}:
+            if message_type == "wheel":
+                delta = message.get("delta")
+                if not isinstance(delta, int) or isinstance(delta, bool) or delta == 0:
+                    return
+            elif (message.get("name") not in {"scan", "collect", "analyze", "wheel"} or
+                  message.get("state") not in {"down", "up"}):
+                return
+            with self.lock:
+                self.event_sequence += 1
+                self.events.append({**message, "id": self.event_sequence})
+                self.events = self.events[-256:]
+            return
+        if message_type == "hello":
+            if message.get("board") == "base-io":
+                with self.lock:
+                    self.event_sequence += 1
+                    self.events.append({**message, "id": self.event_sequence})
+                    self.events = self.events[-256:]
+            return
+        if message_type != "yaw":
             return
         ok = bool(message.get("ok"))
         magnet = str(message.get("magnet") or ("ok" if ok else "missing"))
@@ -139,18 +173,24 @@ class YawState:
             self.magnet = "missing"
             self.reason = reason or "port not found"
 
-    def snapshot(self) -> dict:
+    def snapshot(self, after_event_id: int = 0) -> dict:
         if self.simulated:
             elapsed = time.monotonic() - self.started_at
             return {"deg": (elapsed * 12.0) % 360.0, "ok": True, "magnet": "ok",
-                    "age_ms": 0, "simulated": True}
+                    "age_ms": 0, "simulated": True, "events": [],
+                    "event_session": self.event_session, "event_latest_id": self.event_sequence}
         with self.lock:
+            events = [event for event in self.events if event["id"] > after_event_id]
+            event_latest_id = self.event_sequence
+            event_session = self.event_session
             if not self.ok:
                 return {"ok": False, "reason": self.reason or "no data (wrong firmware?)",
-                        "magnet": self.magnet, "port": self.port}
+                        "magnet": self.magnet, "port": self.port, "events": events,
+                        "event_session": event_session, "event_latest_id": event_latest_id}
             return {"deg": round(self.deg, 2), "ok": True, "magnet": self.magnet,
                     "age_ms": max(0, round((time.monotonic() - self.received_at) * 1000)),
-                    "simulated": False, "port": self.port}
+                    "simulated": False, "port": self.port, "events": events,
+                    "event_session": event_session, "event_latest_id": event_latest_id}
 
 
 class TwinSerialWorker(threading.Thread):
@@ -158,6 +198,7 @@ class TwinSerialWorker(threading.Thread):
 
     def __init__(self, state: YawState, port_override: str | None = None,
                  serial_backend=None, port_provider=None, event_log: BridgeEventLog | None = None,
+                 port_metadata_provider=None,
                  reconnect_delay: float = RECONNECT_DELAY_S,
                  no_data_timeout: float = NO_DATA_TIMEOUT_S):
         super().__init__(daemon=True, name="TwinSerialWorker")
@@ -165,6 +206,7 @@ class TwinSerialWorker(threading.Thread):
         self.port_override = port_override
         self.serial_backend = serial if serial_backend is None else serial_backend
         self.port_provider = port_provider or find_esp32s3_ports
+        self.port_metadata_provider = serial_list_ports if port_metadata_provider is None else port_metadata_provider
         self.event_log = event_log or BridgeEventLog()
         self.reconnect_delay = reconnect_delay
         self.no_data_timeout = no_data_timeout
@@ -201,8 +243,10 @@ class TwinSerialWorker(threading.Thread):
         signature = tuple(ports)
         if len(ports) > 1 and signature != self._last_multiple_signature:
             self._last_multiple_signature = signature
-            print(f"Multiple ESP32-S3 ports found ({', '.join(ports)}); using {ports[0]}.", flush=True)
+            print(f"Multiple ESP32 ports found ({', '.join(ports)}); using {ports[0]}.", flush=True)
             self.event_log.record("multiple_ports", ports[0], candidates=ports, selected=ports[0])
+        if self.state.base_board_port in ports:
+            return self.state.base_board_port
         return ports[0]
 
     def _log_parse_error(self, port: str, sample: str) -> None:
@@ -229,7 +273,16 @@ class TwinSerialWorker(threading.Thread):
         except json.JSONDecodeError:
             self._log_parse_error(port, line)
             return False, False
-        if not isinstance(message, dict) or message.get("type") != "yaw":
+        if not isinstance(message, dict):
+            return False, False
+        message_type = message.get("type")
+        if message_type in {"wheel", "button", "hello"}:
+            self.state.update(message)
+            if message_type == "hello" and message.get("board") == "base-io":
+                self.state.base_board_port = port
+                self.event_log.record("base_board_hello", port, board="base-io")
+            return True, False
+        if message_type != "yaw":
             return False, False
         self.state.update(message)
         snapshot = self.state.snapshot()
@@ -246,7 +299,15 @@ class TwinSerialWorker(threading.Thread):
         connection.baudrate = SERIAL_BAUD
         connection.timeout = 0.1
         connection.write_timeout = 1.0
-        connection.dtr = True
+        vid = None
+        try:
+            for item in self.port_metadata_provider.comports():
+                if getattr(item, "device", None) == port:
+                    vid = getattr(item, "vid", None)
+                    break
+        except Exception:
+            vid = None
+        connection.dtr = vid not in {CP210X_VID, CH340_VID}
         connection.rts = False
         connection.open()
         return connection
@@ -314,7 +375,8 @@ class TwinSerialWorker(threading.Thread):
                 continue
 
             self._last_reported_reason = None
-            self.event_log.record("open_success", port, dtr=True, rts=False)
+            self.event_log.record("open_success", port,
+                                  dtr=bool(getattr(self.connection, "dtr", True)), rts=False)
             reason = "stopped by request"
             try:
                 reason = self._pump(self.connection, port)
@@ -355,7 +417,11 @@ class TwinRequestHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):  # noqa: N802 - required by BaseHTTPRequestHandler
         if urlsplit(self.path).path == "/yaw":
-            payload = json.dumps(self.state.snapshot(), separators=(",", ":")).encode("utf-8")
+            try:
+                after_event_id = max(0, int(parse_qs(urlsplit(self.path).query).get("after", ["0"])[0]))
+            except (TypeError, ValueError):
+                after_event_id = 0
+            payload = json.dumps(self.state.snapshot(after_event_id), separators=(",", ":")).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")

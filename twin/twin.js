@@ -26,6 +26,7 @@ const audio = {
   previousLifeCue: '', lastLifeAt: 0, lifeTrack: null, scanTimer: 0, sonarUntil: 0, debug: false,
   debugInterval: 0, yawProgress: 0, lastClickAt: 0, lastScanResult: 0,
   voiceLanguage: 'en', voiceAvailable: { th: false, en: false }, voiceVolume: savedVoiceVolume(), speakToken: 0,
+  voiceCurrentId: '', voicePendingId: '',
   eventTimer: null, eventPillTimer: 0, priorityEvent: '', priorityRank: 0, lastPriorityAt: 0,
   depthMotionTimer: 0, lastAscendAt: 0, boardConnected: false
 };
@@ -33,7 +34,8 @@ const audio = {
 const VOICE_LINES = {
   vo_welcome: { th: 'ปิดฝาเรียบร้อย ทุกระบบพร้อม เริ่มดำลงได้', en: 'Hatch sealed. All systems ready. Beginning our descent.' },
   vo_zone_mid: { th: 'ผ่าน 760 เมตรแล้ว แสงจากผิวน้ำลงมาไม่ถึงตรงนี้', en: 'Passing 760 metres. Sunlight does not reach this far.' },
-  vo_zone_deep: { th: 'ต่ำกว่า 1,976 เมตร แสงเดียวที่เหลือคือแสงจากสิ่งมีชีวิต เปิดไฟส่อง', en: 'Below 1,976 metres. The only light down here is made by living things. Floodlights on.' },
+  vo_zone_deep: { th: 'ต่ำกว่า 1,976 เมตรแล้ว เปิดไฟส่อง', en: 'Below 1,976 metres. Floodlights on.' },
+  vo_zone_deep_v2: { th: 'ต่ำกว่า 1,976 เมตรแล้ว เปิดไฟส่อง', en: 'Below 1,976 metres. Floodlights on.' },
   vo_scan_hit: { th: 'มีสัญญาณสิ่งมีชีวิตในเป้าเล็ง', en: 'Life signal in the reticle.' },
   vo_scan_miss: { th: 'ไม่มีสัญญาณ ตรงนี้มีแต่น้ำ', en: 'No signal. Open water.' },
   vo_on_frame: { th: 'เป้าเล็งอยู่บนขอบจอ หมุนต่ออีกนิด', en: 'The reticle is on the frame. Turn a little further.' },
@@ -42,7 +44,11 @@ const VOICE_LINES = {
   vo_nothing: { th: 'ไม่มีอะไรในเป้าให้เก็บ', en: 'Nothing in the reticle to collect.' },
   vo_tray_empty: { th: 'ถาดยังว่าง ลองเก็บตัวอย่างก่อน', en: 'The tray is empty. Collect a sample first.' },
   vo_analyze: { th: 'วิเคราะห์เสร็จ พบ {names}', en: 'Analysis complete: {names}.' },
-  vo_max_depth: { th: 'ถึงความลึกสูงสุด 3,040 เมตร แรงดันมากกว่าที่ผิวน้ำกว่า 300 เท่า', en: 'Maximum depth, 3,040 metres. Over 300 times the pressure at the surface.' },
+  vo_max_depth: { th: 'ถึงความลึกสูงสุด 3,040 เมตร การดำลงสิ้นสุดที่นี่', en: 'Maximum depth: 3,040 metres. The descent ends here.' },
+  vo_max_depth_v2: { th: 'ถึงความลึกสูงสุด 3,040 เมตร การดำลงสิ้นสุดที่นี่', en: 'Maximum depth: 3,040 metres. The descent ends here.' },
+  vo_gate_hint: { th: 'พื้นอยู่ใกล้แล้ว หมุนทรงกลมเพื่อหาช่อง', en: 'The floor is close. Turn the sphere to find the opening.' },
+  vo_gate_found: { th: 'พบช่องแล้ว กดดำลงเพื่อผ่าน', en: 'Opening found. Hold dive to pass through.' },
+  vo_gate_pass: { th: 'ผ่านช่องแล้ว ยินดีต้อนรับสู่ชั้นถัดไป', en: 'Through the opening. Welcome to the next level.' },
   vo_surface: { th: 'ขึ้นถึงผิวน้ำแล้ว', en: 'We have reached the surface.' },
   vo_complete: { th: 'เก็บครบทั้งแปดตัวอย่าง ภารกิจสำเร็จ', en: 'All eight samples collected. Mission complete.' }
 };
@@ -73,7 +79,7 @@ function showPill(text, ms) {
   const label = $('audio-event-label');
   if (!text || !pill || !label) return;
   clearTimeout(audio.eventPillTimer);
-  label.textContent = text;
+  label.textContent = String(text).replace(/\bthe box\b/gi, 'the sphere').replace(/\bthe cube\b/gi, 'the sphere');
   pill.hidden = false;
   pill.classList.remove('show');
   void pill.offsetWidth;
@@ -803,9 +809,10 @@ function atmosphereOk(requireRest) {
 const VOICE_POLICY = {
   vo_on_frame: { never: true }, vo_scan_hit: { first: 3, every: 2 }, vo_scan_miss: { first: 1, every: 4 },
   vo_collect: { first: 2, then: 'never' }, vo_duplicate: { cool: 20 }, vo_nothing: { cool: 20 }, vo_tray_empty: { cool: 20 },
-  vo_zone_mid: { cool: 60 }, vo_zone_deep: { cool: 60 }
+  vo_zone_mid: { cool: 60 }, vo_zone_deep: { cool: 60 }, vo_zone_deep_v2: { cool: 60 },
+  vo_gate_hint: { cool: 25 }, vo_gate_found: { cool: 20 }, vo_gate_pass: { cool: 0 }
 };
-const VOICE_ALWAYS = ['vo_welcome', 'vo_analyze', 'vo_complete', 'vo_max_depth', 'vo_surface'];
+const VOICE_ALWAYS = ['vo_welcome', 'vo_analyze', 'vo_complete', 'vo_max_depth', 'vo_max_depth_v2', 'vo_surface', 'vo_gate_pass'];
 function voiceAllowed(id) {
   const policy = VOICE_POLICY[id];
   const now = performance.now();
@@ -843,6 +850,8 @@ function handleZoneChange(previous, next) {
   const bridge = down ? (next === 'mid' ? 'down_mid' : 'down_deep') :
     up ? (next === 'mid' ? 'up_mid' : 'up_shallow') : '';
   const zoneKey = (down ? 'd_' : 'u_') + next;
+  const gatePassCovered = audio.gatePassVoiceZone === next;
+  if (gatePassCovered) audio.gatePassVoiceZone = '';
   audio.zoneCueAt = audio.zoneCueAt || {};
   const zoneRepeat = performance.now() - (audio.zoneCueAt[zoneKey] || -1e9) < 20000;
   if (!zoneRepeat) audio.zoneCueAt[zoneKey] = performance.now();
@@ -850,10 +859,10 @@ function handleZoneChange(previous, next) {
     audioLog('zone_' + zoneKey, 'silent', 'zone cue cooldown');
   } else if (next === 'mid' && down) {
     cue('zone_enter_mid', { duck: true });
-    speakLine('vo_zone_mid');
+    if (!gatePassCovered) speakLine('vo_zone_mid');
   } else if (next === 'deep' && down) {
     cue('zone_enter_deep', { duck: true });
-    speakLine('vo_zone_deep');
+    if (!gatePassCovered) speakLine('vo_zone_deep_v2');
   } else if (up) {
     cue('zone_up', { duck: true });
   }
@@ -888,17 +897,102 @@ function toggleMute() {
   audioLog('master_mute', audio.muted ? 'silent' : 'file', audio.muted ? 'muted' : 'unmuted');
 }
 
-async function speakLine(id, values) {
-  const lines = VOICE_LINES[id];
-  if (!lines) return;
-  if (!voiceAllowed(id)) { audioLog(id, 'silent', 'voice rule: skipped'); return; }
-  if (audio.muted || !state.started) {
-    audioLog(id, 'silent', audio.muted ? 'muted' : 'dive not started');
+function pumpVoiceQueue() {
+  if (audio.voiceCurrentRequest || !audio.voiceQueue || !audio.voiceQueue.length) return;
+  const item = audio.voiceQueue.shift();
+  const now = performance.now();
+  if (!VOICE_ALWAYS.includes(item.id) && now - item.queuedAt > 6000) {
+    pumpVoiceQueue();
     return;
   }
+  if (item.id === 'vo_gate_pass' &&
+      (now > item.expiresAt || state.level !== item.expectedLevel)) {
+    audio.gatePassVoiceZone = '';
+    const currentZoneVoice = state.level >= 2 ? 'vo_zone_deep_v2' : state.level === 1 ? 'vo_zone_mid' : '';
+    if (currentZoneVoice) speakLine(currentZoneVoice);
+    pumpVoiceQueue();
+    return;
+  }
+  audio.voiceCurrentRequest = item;
+  audio.voiceCurrentId = item.id;
+  audio.voicePendingId = audio.voiceQueue.length ? audio.voiceQueue[0].id : '';
+  let finished = false;
+  let watchdogVersion = 0;
+  const armWatchdog = (milliseconds) => {
+    const version = ++watchdogVersion;
+    window.setTimeout(() => {
+      if (finished || version !== watchdogVersion) return;
+      audio.speakToken++;
+      (item.voiceTrackIds || []).forEach((id) => {
+        const source = audio.activeCues && audio.activeCues.get(id);
+        if (source) { try { source.stop(); } catch (_) {} }
+      });
+      if (audio.voiceDuckId) {
+        audio.ducks.delete(audio.voiceDuckId);
+        audio.voiceDuckId = 0;
+      }
+      audio.mus.voiceHold = false;
+      audio.voiceCurrentId = '';
+      onComplete(false);
+    }, milliseconds);
+  };
+  armWatchdog(12000);
+  const onComplete = () => {
+    if (finished) return;
+    finished = true;
+    if (audio.voiceCurrentRequest === item) {
+      audio.voiceCurrentRequest = null;
+      audio.voiceCurrentId = '';
+      audio.voicePendingId = audio.voiceQueue.length ? audio.voiceQueue[0].id : '';
+    }
+    pumpVoiceQueue();
+  };
+  playVoiceLineNow(item.id, item.values, onComplete, (seconds) => armWatchdog(Math.max(1000, seconds * 1000 + 2000)), item).catch((error) => {
+    audioLog(item.id, 'silent', error.message);
+    onComplete(false);
+  });
+}
+
+function speakLine(id, values) {
+  if (!VOICE_LINES[id]) return false;
+  if (!voiceAllowed(id)) { audioLog(id, 'silent', 'voice rule: skipped'); return false; }
+  if (audio.muted || !state.started) {
+    audioLog(id, 'silent', audio.muted ? 'muted' : 'dive not started');
+    return false;
+  }
+  const select = $('audio-language');
+  if ((select ? select.value : audio.voiceLanguage) === 'off') {
+    audioLog(id, 'silent', 'voice disabled');
+    return false;
+  }
+  audio.voiceQueue = audio.voiceQueue || [];
+  const item = { id, values: values || {}, queuedAt: performance.now() };
+  if (id === 'vo_gate_pass') {
+    item.expectedLevel = state.level;
+    item.expiresAt = performance.now() + 10000;
+  }
+  const maxQueue = 4;
+  if (audio.voiceQueue.length >= maxQueue) {
+    const replaceIndex = VOICE_ALWAYS.includes(id) ? audio.voiceQueue.findIndex((queued) => !VOICE_ALWAYS.includes(queued.id)) : -1;
+    if (replaceIndex < 0) {
+      audioLog(id, 'silent', 'voice queue full');
+      return false;
+    }
+    audio.voiceQueue.splice(replaceIndex, 1);
+  }
+  audio.voiceQueue.push(item);
+  audio.voicePendingId = audio.voiceQueue[0].id;
+  pumpVoiceQueue();
+  return true;
+}
+
+async function playVoiceLineNow(id, values, onComplete, onDuration, request) {
+  const lines = VOICE_LINES[id];
+  if (!lines) return;
+  if (audio.muted || !state.started) { onComplete(false); return; }
   const select = $('audio-language');
   const requested = select ? select.value : audio.voiceLanguage;
-  if (requested === 'off') { audioLog(id, 'silent', 'voice disabled'); return; }
+  if (requested === 'off') { onComplete(false); return; }
   updateVoiceAvailability();
   let language = requested || 'en';
   if (language === 'th' && !audio.voiceAvailable.th && audio.voiceAvailable.en) language = 'en';
@@ -918,8 +1012,10 @@ async function speakLine(id, values) {
     try {
       const entries = [{ cueId: id, path: voicePath }, ...nameEntries];
       const buffers = await Promise.all(entries.map((entry) => loadBuffer(entry.path)));
-      if (token !== audio.speakToken || audio.muted) return;
+      if (token !== audio.speakToken || audio.muted) { onComplete(false); return false; }
+      onDuration(buffers.reduce((sum, buffer) => sum + (Number(buffer.duration) || 0), Math.max(0, entries.length - 1) * 0.15));
       const voiceDuck = duck({ bed: 0.45, life: 0.6, hull: 0.7, music: 0.58, hand: 0.5 }, 0, id);
+      audio.voiceDuckId = voiceDuck;
       audio.mus.voiceHold = true; applyThemeLevels(0.25);
       let index = 0;
       let finished = false;
@@ -927,26 +1023,35 @@ async function speakLine(id, values) {
         if (finished) return;
         finished = true;
         audio.ducks.delete(voiceDuck);
+        if (audio.voiceDuckId === voiceDuck) audio.voiceDuckId = 0;
         BUS_NAMES.forEach((name) => applyBusGain(name, 1.2));
         audio.mus.voiceHold = false; applyThemeLevels(1.2);
+        onComplete(true);
       };
       const playNext = () => {
         if (token !== audio.speakToken || audio.muted) { finish(); return; }
         const entry = entries[index];
+        request.voiceTrackIds = request.voiceTrackIds || [];
+        request.voiceTrackIds.push(entry.cueId);
+        audio.voiceCurrentId = entry.cueId;
         const track = playBuffer(entry.cueId, buffers[index], { bus: 'voice', onended: () => {
+          if (audio.voiceCurrentId === entry.cueId) audio.voiceCurrentId = '';
           index++;
           if (index < entries.length) window.setTimeout(playNext, 150);
           else finish();
         } });
         if (track) audioLog(entry.cueId, 'file', entry.path);
-        else finish();
+        else { if (audio.voiceCurrentId === entry.cueId) audio.voiceCurrentId = ''; finish(); }
       };
       playNext();
-      return;
-    } catch (error) { audioLog(id, 'draft', error.message); }
+      return true;
+    } catch (error) {
+      audioLog(id, 'draft', error.message);
+      if (token !== audio.speakToken || audio.muted) { onComplete(false); return false; }
+    }
   }
-  if (!('speechSynthesis' in window)) { audioLog(id, 'silent', 'speechSynthesis unavailable'); return; }
-  if (!audio.voiceAvailable[language]) { audioLog(id, 'silent', 'no ' + language + ' speech voice'); return; }
+  if (!('speechSynthesis' in window)) { audioLog(id, 'silent', 'speechSynthesis unavailable'); onComplete(false); return false; }
+  if (!audio.voiceAvailable[language]) { audioLog(id, 'silent', 'no ' + language + ' speech voice'); onComplete(false); return false; }
   const line = String(lines[language] || lines.en).replace('{names}', params[language + 'Names'] || params.names || '');
   let voiceDuck = 0;
   speechSynthesis.cancel();
@@ -963,17 +1068,22 @@ async function speakLine(id, values) {
     clearTimeout(endTimer);
     if (voiceDuck) {
       audio.ducks.delete(voiceDuck);
+      if (audio.voiceDuckId === voiceDuck) audio.voiceDuckId = 0;
       BUS_NAMES.forEach((name) => applyBusGain(name, 1.2));
     }
     audio.mus.voiceHold = false; applyThemeLevels(1.2);
+    if (audio.voiceCurrentId === id) audio.voiceCurrentId = '';
     if (token !== audio.speakToken) return;
     audioLog(id, 'draft', 'speechSynthesis ' + language);
+    onComplete(true);
   };
-  utterance.onstart = () => { voiceDuck = duck({ bed: 0.45, life: 0.6, hull: 0.7, music: 0.58 }, 0, id); };
+  utterance.onstart = () => { audio.voiceCurrentId = id; voiceDuck = duck({ bed: 0.45, life: 0.6, hull: 0.7, music: 0.58 }, 0, id); audio.voiceDuckId = voiceDuck; };
   utterance.onend = finish;
   utterance.onerror = finish;
   endTimer = window.setTimeout(finish, 12000);
+  audio.voiceCurrentId = id;
   speechSynthesis.speak(utterance);
+  return true;
 }
 
 // ---------------------------------------------------------------- the player's hands as an instrument
@@ -1082,9 +1192,10 @@ function stopLifePhrases() {
 function updateAudioFocus(hit) {
   if (!state.started || !audio.manifest) return;
   const targetIndex = aimedSubject(hit);
-  const rect = targetIndex >= 0 && !state.sphere ? FACES[hit.face].rect : null;
+  const rect = targetIndex >= 0 && !state.sphere && !state.ring ? FACES[hit.face].rect : null;
   const center = rect ? (rect.left + rect.right) / 2 : 0;
-  const pan = rect ? Math.max(-0.85, Math.min(0.85, (hit.u - center) / ((rect.right - rect.left) / 2))) : 0;
+  const pan = state.ring && targetIndex >= 0 ? Math.max(-0.85, Math.min(0.85, (hit.u - 0.5) * 1.7)) :
+    (rect ? Math.max(-0.85, Math.min(0.85, (hit.u - center) / ((rect.right - rect.left) / 2))) : 0);
   if (targetIndex === audio.lifeTarget) {
     if (audio.lifeTrack && audio.lifeTrack.pan) setParam(audio.lifeTrack.pan.pan, pan, 0.08);
     return;
@@ -1335,13 +1446,40 @@ function initLiveYaw() {
   state.liveTargetYaw = state.yaw;
   setLiveBanner('disconnected');
   let inFlight = false;
+  let lastBridgeEventId = 0;
+  let bridgeEventSession = null;
+  let hasBridgeCursor = false;
+  fetch('/config/controls.json', { cache: 'no-cache' }).then((response) => response.json()).then((controls) => {
+    const baseBoard = controls.base_board || {};
+    const configuredStep = Number(baseBoard.wheel_depth_per_click);
+    if (Number.isFinite(configuredStep) && configuredStep > 0 && configuredStep <= 1) wheelDepthPerClick = configuredStep;
+    if (typeof baseBoard.wheel_depth_reverse === 'boolean') wheelDepthReverse = baseBoard.wheel_depth_reverse;
+  }).catch(() => {});
   const poll = async () => {
     if (inFlight) return;
     inFlight = true;
     try {
-      const response = await fetch('/yaw?ts=' + Date.now(), { cache: 'no-store' });
+      const response = await fetch('/yaw?after=' + lastBridgeEventId + '&ts=' + Date.now(), { cache: 'no-store' });
       if (!response.ok) throw new Error('HTTP ' + response.status);
       const data = await response.json();
+      const latestId = Number.isInteger(data.event_latest_id) ? data.event_latest_id : null;
+      const sessionChanged = bridgeEventSession !== null && data.event_session && data.event_session !== bridgeEventSession;
+      const sequenceReset = latestId !== null && latestId < lastBridgeEventId;
+      if (!hasBridgeCursor || sessionChanged || sequenceReset) {
+        bridgeEventSession = data.event_session || null;
+        lastBridgeEventId = latestId === null ? Math.max(0, ...((data.events || []).map((event) => Number.isInteger(event.id) ? event.id : 0))) : latestId;
+        hasBridgeCursor = true;
+      } else {
+        bridgeEventSession = data.event_session || bridgeEventSession;
+        if (Array.isArray(data.events)) {
+          for (const event of data.events) {
+            if (!Number.isInteger(event.id) || event.id <= lastBridgeEventId) continue;
+            handleBridgeEvent(event);
+            lastBridgeEventId = event.id;
+          }
+        }
+        if (latestId !== null) lastBridgeEventId = Math.max(lastBridgeEventId, latestId);
+      }
       if (data.ok === true && Number.isFinite(Number(data.deg))) {
         state.liveConnected = true;
         state.liveTargetYaw = ((Number(data.deg) % 360) + 360) % 360;
@@ -1435,7 +1573,7 @@ function showSpeciesCard(subject, sample) {
   art.hidden = false;
   $('discovery-emoji').textContent = '';
   $('discovery-species').textContent = info.sci || subject.name;
-  $('discovery-sub').textContent = (info.common || subject.name) + ' · on the cube: ' + subject.name;
+  $('discovery-sub').textContent = (info.common || subject.name) + ' · in view: ' + subject.name;
   const rows = (info.lines || []).map((text) => { const row = document.createElement('div'); row.textContent = text; return row; });
   const range = document.createElement('div'), log = document.createElement('div');
   range.className = 'fact';
@@ -1492,17 +1630,24 @@ function showAnalysis() {
 const GATES_ON = !/[?&](acceptance=1|gates=0)/.test(location.search);
 state.gatesOff = !GATES_ON;
 const GATE_AHEAD = {
-  reef: 'Sand and a coral reef below · turn the box to find the way down',
+  reef: 'Sand and a coral reef below · turn the sphere to find the way down',
   wreck: 'A shipwreck on a rock shelf below · look for the glowing rift to go deeper'
 };
 
 function gateList() { return GATES_ON && config && config.gates || []; }
 // Millimetres along the strip from the reticle to the opening; positive means turn right.
 function gateOffset(gate) {
-  const L = geometry.stripLengthMm;
-  return geometry.wrapDistance(gate.u * L, ((state.yaw / 360 * L) % L + L) % L);
+  const ringMode = state.ring || state.sphere;
+  const length = ringMode ? geometry.ringLengthMm : geometry.stripLengthMm;
+  const offset = ringMode ? (config.ring.reticle_azimuth_deg || 0) : 0;
+  return geometry.gateOffset(gate, state.yaw, length, offset);
 }
-function gateOpen(gate) { return Math.abs(gateOffset(gate)) <= gate.half_mm * 0.8; }
+function gateOpen(gate) {
+  const ringMode = state.ring || state.sphere;
+  const length = ringMode ? geometry.ringLengthMm : geometry.stripLengthMm;
+  const offset = ringMode ? (config.ring.reticle_azimuth_deg || 0) : 0;
+  return geometry.gateOpen(gate, state.yaw, length, offset);
+}
 
 function syncLevel(depth) {
   const list = gateList();
@@ -1518,10 +1663,14 @@ function gateBump(gate, dir) {
   if (now - (audio.bumpAt || 0) < 1500) return;
   audio.bumpAt = now;
   gate.bumps = (gate.bumps || 0) + 1;
+  if (dir > 0 && now - (gate.voiceHintAt || -1e9) >= 25000) {
+    gate.voiceHintAt = now;
+    speakLine('vo_gate_hint');
+  }
   cue('hull_creak', { minGap: 0 });
   const way = dir > 0 ? 'the way down' : 'the way up';
   const side = gateOffset(gate) > 0 ? 'turn right ▶' : '◀ turn left';
-  const text = (dir > 0 ? 'The floor is in the way' : 'Rock overhead') + ' · ' + (gate.bumps > 1 ? side + ' to find ' + way : 'turn the box to find ' + way);
+  const text = (dir > 0 ? 'The floor is in the way' : 'Rock overhead') + ' · ' + (gate.bumps > 1 ? side + ' to find ' + way : 'turn the sphere to find ' + way);
   showPill(text, 3200);
   say(text);
 }
@@ -1530,6 +1679,17 @@ function gatePassed(gate, dir) {
   gate.bumps = 0;
   audio.gatePassAt = performance.now();
   state.bubbleBurstAt = performance.now();
+  if (dir > 0) {
+    const nextZone = ['surface', 'mid', 'deep'][Math.min(2, state.level)];
+    const foundAlreadySpeaking = audio.voiceCurrentId === 'vo_gate_found';
+    const queuedFound = (audio.voiceQueue || []).findIndex((item) => item.id === 'vo_gate_found');
+    if (foundAlreadySpeaking) audio.gatePassVoiceZone = nextZone;
+    else {
+      if (queuedFound >= 0) audio.voiceQueue.splice(queuedFound, 1);
+      speakLine('vo_gate_pass');
+      if (audio.voiceCurrentId === 'vo_gate_pass' || audio.voicePendingId === 'vo_gate_pass') audio.gatePassVoiceZone = nextZone;
+    }
+  }
   say((dir > 0 ? 'Through the gap, down to ' : 'Back up to ') + LEVEL_LABELS[['surface', 'mid', 'deep'][Math.min(2, state.level)]] + '.');
 }
 
@@ -1561,8 +1721,8 @@ function updateGates() {
     else if (above && state.depth - above.depth < 0.06 && gateOpen(above)) ready = -1;
     if (below && !below.seen && below.depth - state.depth < 0.11) {
       below.seen = true;
-      showPill(GATE_AHEAD[below.kind] || 'Turn the box to find the way down', 4200);
-      say(GATE_AHEAD[below.kind] || 'Turn the box to find the way down');
+      showPill(GATE_AHEAD[below.kind] || 'Turn the sphere to find the way down', 4200);
+      say(GATE_AHEAD[below.kind] || 'Turn the sphere to find the way down');
     }
     if (!below && !audio.seaBedSeen && state.depth > 0.9) {
       audio.seaBedSeen = true;
@@ -1570,6 +1730,11 @@ function updateGates() {
     }
   }
   if (ready && ready !== state.gateReady && performance.now() - (audio.gatePassAt || 0) > 2500) {
+    const readyGate = ready > 0 ? list[state.level] : list[state.level - 1];
+    if (state.gateReady === 0 && ready === 1 && readyGate && performance.now() - (readyGate.voiceFoundAt || -1e9) >= 20000) {
+      readyGate.voiceFoundAt = performance.now();
+      speakLine('vo_gate_found');
+    }
     showPill(ready > 0 ? 'Found the gap · hold ▼ to dive' : 'Found the gap · hold ▲ to rise', 2600);
     handNote(74, 1);
     window.setTimeout(() => handNote(81, 1), 170);
@@ -1694,7 +1859,7 @@ function setDepth(next, free) {
 // drag is direct while the finger is down and coasts on from the speed it was released at.
 const MOTION = { depthSpeed: 0.055, depthRise: 0.55, depthFall: 0.6, yawSpeed: 48, yawRise: 0.35, yawFall: 0.4, fling: 200 };
 const motion = { key: { up: false, down: false, left: false, right: false }, pad: { depth: 0, yaw: 0 },
-  depthVel: 0, yawVel: 0, dragVel: 0, dragAt: 0, last: 0 };
+  depthVel: 0, wheelDepthVel: 0, wheelDepthPending: 0, yawVel: 0, dragVel: 0, dragAt: 0, last: 0 };
 
 function easeSpeed(value, target, dt, rise, fall) {
   const gathering = target !== 0 && (value === 0 || Math.sign(target) === Math.sign(value)) && Math.abs(target) >= Math.abs(value);
@@ -1706,14 +1871,34 @@ function motionStep(now) {
   const dt = Math.min(0.2, Math.max(0, (now - (motion.last || now)) / 1000));   // stays true to the clock on a slow device
   motion.last = now;
   if (!state.started) return;
+  const depthStart = state.depth;
   const depthInput = Math.max(-1, Math.min(1, (motion.key.down ? 1 : 0) - (motion.key.up ? 1 : 0) + motion.pad.depth));
   motion.depthVel = easeSpeed(motion.depthVel, depthInput * MOTION.depthSpeed, dt, MOTION.depthRise, MOTION.depthFall);
-  if (Math.abs(motion.depthVel) > 0.0003) {
-    const want = clamp01(state.depth + motion.depthVel * dt);
-    setDepth(want);
-    // Stopped dead by a floor, the surface or the sea bed.
-    if (Math.abs(state.depth - want) > 1e-9 || want <= 0 && motion.depthVel < 0 || want >= 1 && motion.depthVel > 0) motion.depthVel = 0;
-  } else if (!depthInput) motion.depthVel = 0;
+  if (Math.abs(motion.depthVel) <= 0.0003 && !depthInput) motion.depthVel = 0;
+  const wheelDirection = Math.sign(motion.wheelDepthPending);
+  const wheelAcceleration = MOTION.depthSpeed / MOTION.depthRise;
+  const wheelStopSpeed = Math.sqrt(2 * wheelAcceleration * Math.abs(motion.wheelDepthPending));
+  const wheelTarget = wheelDirection * Math.min(MOTION.depthSpeed, wheelStopSpeed);
+  motion.wheelDepthVel = easeSpeed(motion.wheelDepthVel, wheelTarget, dt, MOTION.depthRise, MOTION.depthFall);
+  let wheelDelta = motion.wheelDepthVel * dt;
+  if (wheelDirection && wheelDelta * wheelDirection < 0) wheelDelta = 0;
+  if (wheelDirection && Math.abs(wheelDelta) >= Math.abs(motion.wheelDepthPending)) wheelDelta = motion.wheelDepthPending;
+  const depthWant = clamp01(depthStart + motion.depthVel * dt + wheelDelta);
+  if (Math.abs(motion.depthVel) > 0.0003 || Math.abs(wheelDelta) > 0) setDepth(depthWant);
+  // Stop a control that is pushing against a gate, the surface or the sea bed.
+  const depthBlocked = Math.abs(state.depth - depthWant) > 1e-9;
+  if (depthBlocked) {
+    motion.depthVel = 0;
+    motion.wheelDepthPending = 0;
+    motion.wheelDepthVel = 0;
+  } else if (state.depth <= 0 && motion.depthVel < 0 || state.depth >= 1 && motion.depthVel > 0) {
+    motion.depthVel = 0;
+  }
+  if (wheelDirection && !depthBlocked) {
+    motion.wheelDepthPending -= wheelDelta;
+    if (Math.abs(motion.wheelDepthPending) < 1e-7) motion.wheelDepthPending = 0;
+    if (state.depth <= 0 && wheelDirection < 0 || state.depth >= 1 && wheelDirection > 0) { motion.wheelDepthPending = 0; motion.wheelDepthVel = 0; }
+  } else if (Math.abs(motion.wheelDepthVel) < 0.0003) motion.wheelDepthVel = 0;
   const live = state.liveMode && state.liveConnected;
   if (dragging || live) { motion.yawVel = 0; return; }
   const yawInput = Math.max(-1, Math.min(1, (motion.key.right ? 1 : 0) - (motion.key.left ? 1 : 0) + motion.pad.yaw));
@@ -1738,6 +1923,22 @@ function motionRelease() { motion.key.up = motion.key.down = motion.key.left = m
 function depthHoldStop() { motion.pad.depth = 0; }
 function depthHoldStart(dir) { motion.pad.depth = dir; }
 
+let wheelDepthPerClick = 1 / 60;
+let wheelDepthReverse = true;
+function handleBridgeEvent(event) {
+  if (!event || typeof event !== 'object') return;
+  if (event.type === 'wheel' && Number.isFinite(event.delta)) {
+    motion.wheelDepthPending += event.delta * wheelDepthPerClick * (wheelDepthReverse ? -1 : 1);
+    activity('move');
+    return;
+  }
+  if (event.type !== 'button' || event.state !== 'down') return;
+  if (event.name === 'scan') doScan();
+  else if (event.name === 'collect') doCollect();
+  else if (event.name === 'analyze') doAnalyze();
+  else if (event.name === 'wheel') console.info('Wheel push switch pressed');
+}
+
 // Friends open the page with no hardware: the player view hides the engineering controls and adds on-screen
 // buttons. ?dev=1 (and the live-board and acceptance runs) keep the full twin.
 const DEV_MODE = /[?&](dev|live|acceptance)=1/.test(location.search);
@@ -1752,22 +1953,25 @@ if (!DEV_MODE) {
 function yawHoldStop() { motion.pad.yaw = 0; }
 function yawHoldStart(dir) { motion.pad.yaw = dir; }
 
-// Cube or sphere: the same sea on a different body. The choice is remembered on this device.
+// The player toggles between the sphere and the six-screen ring. The cube remains as a dev fixture.
 const SHAPE_KEY = 'deepSphereShape';
-function setShape(sphere, remember) {
-  state.sphere = Boolean(sphere);
-  applyShape();
+function setShape(shape, remember) {
+  if (typeof shape === 'boolean') shape = shape ? 'sphere' : 'cube';
+  if (!['sphere', 'ring', 'cube'].includes(shape)) shape = 'sphere';
+  state.shape = shape;
+  state.sphere = shape === 'sphere';
+  state.ring = shape === 'ring';
+  if (cubeGroup) applyShape();
   const button = $('btn-shape');
-  if (button) { button.textContent = state.sphere ? 'Shape: sphere' : 'Shape: cube'; button.setAttribute('aria-pressed', state.sphere ? 'true' : 'false'); }
-  if (remember !== false) { try { window.localStorage.setItem(SHAPE_KEY, state.sphere ? 'sphere' : 'cube'); } catch (_) {} }
+  if (button) { button.textContent = 'Shape: ' + shape; button.setAttribute('aria-pressed', state.sphere ? 'true' : 'false'); }
 }
 function initShape() {
   const asked = new URLSearchParams(location.search).get('shape');
-  let saved = '';
-  try { saved = window.localStorage.getItem(SHAPE_KEY) || ''; } catch (_) {}
-  if (!DEV_MODE && (asked || saved) === 'sphere' || asked === 'sphere') setShape(true, false);
+  const initial = ['sphere', 'ring', 'cube'].includes(asked) ? asked :
+    (!DEV_MODE ? 'sphere' : 'ring');
+  setShape(initial, false);
   const button = $('btn-shape');
-  if (button) button.addEventListener('click', () => setShape(!state.sphere));
+  if (button) button.addEventListener('click', () => setShape(state.shape === 'sphere' ? 'ring' : 'sphere'));
 }
 
 function initPad() {
@@ -1826,10 +2030,10 @@ function initInput() {
       case 'Digit1': case 'Numpad1': e.preventDefault(); doScan(); break;
       case 'Digit2': case 'Numpad2': e.preventDefault(); doCollect(); break;
       case 'Digit3': case 'Numpad3': e.preventDefault(); doAnalyze(); break;
-      case 'KeyR': orbit = { theta: -1.3, phi: 1.32, dist: DEV_MODE ? 4.4 : 3.5 }; fitOrbit(); motion.depthVel = 0; motion.yawVel = 0; setYaw(0); setDepth(0, true); break;
+      case 'KeyR': orbit = { theta: -1.3, phi: 1.32, dist: DEV_MODE ? 4.4 : 3.5 }; fitOrbit(); motion.depthVel = 0; motion.wheelDepthPending = 0; motion.wheelDepthVel = 0; motion.yawVel = 0; setYaw(0); setDepth(0, true); break;
       case 'Enter': case 'Escape': if ($('discovery-popup').classList.contains('show')) $('btn-discovery-close').click(); break;
       case 'KeyD': e.preventDefault(); setDebug(!audio.debug); break;
-      case 'KeyB': setShape(!state.sphere); break;
+      case 'KeyB': setShape(state.shape === 'sphere' ? 'ring' : 'sphere'); break;
       case 'KeyN': audio.handNotes = !audio.handNotes; say(audio.handNotes ? 'Hand notes on.' : 'Hand notes off.'); break;
       case 'KeyM':
         toggleMute();
@@ -1888,7 +2092,7 @@ async function start() {
     // The opening: two phrases of the invitation, then the sea is left alone until the player moves.
     window.setTimeout(() => startPerformance('invite', { fromStart: true, phrases: 2, hold: BEAT.phrase }), 900);
     if (audio.boardConnected) cue('board_link_on');
-    say('Deep Sphere online. Red Sea survey, 22.3°N 38.9°E. Drag to turn the box, hold ▼ to dive, and find the way down through each level.');
+    say('Deep Sphere online. Red Sea survey, 22.3°N 38.9°E. Drag to turn the sphere, hold ▼ to dive, and find the way down through each level.');
   } catch (error) {
     console.error(error);
     button.textContent = 'AUDIO UNAVAILABLE — RETRY';

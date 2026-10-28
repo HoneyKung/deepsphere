@@ -1,0 +1,18 @@
+Connecting to COM6 at 115200 baud (DTR=1, RTS=0)...
+Sending: {"type":"command","request_id":"cmd-822138","action":"hold_pin","pin":3} (Holding GPIO3 HIGH (all other signal pins LOW))
+[LOG] sweep painted px,nx,py,ny,pz,nz
+[ACK] status: accepted
+[LOG] holding GPIO3 high, every other signal low
+Closed port.
+Connecting to COM6 at 115200 baud (DTR=1, RTS=0)...
+Sending: {"type":"command","request_id":"cmd-823128","action":"resume_sweep"} (Resuming display sweep)
+[ACK] status: accepted
+[LOG] display CS lines prepared inactive before shared reset
+[LOG] shared display reset pulsed once
+[LOG] sweep initialized face px on CS8
+[LOG] sweep initialized face nx on CS3
+[LOG] sweep initialized face py on CS4
+[LOG] sweep initialized face ny on CS5
+[LOG] sweep initialized face pz on CS6
+[LOG] sweep initialized face nz on CS7
+Closed port.

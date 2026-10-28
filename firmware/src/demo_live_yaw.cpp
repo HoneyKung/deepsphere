@@ -1,3 +1,4 @@
+#include "reset_probe.h"
 #include <Arduino.h>
 #include <Wire.h>
 
@@ -39,6 +40,10 @@ void sendAck(bool ok) {
 
 void handleCommand(const String& line) {
   const String trimmed = line;
+  if (trimmed == "r") {
+    resetProbeRequest();
+    return;
+  }
   if (trimmed == "as5600_zero" || trimmed.indexOf("\"action\":\"as5600_zero\"") >= 0) {
     sendAck(gSensor.zero());
   }
@@ -64,6 +69,7 @@ void readCommands() {
 
 void setup() {
   Serial.begin(115200);
+  resetProbeBoot();
   gSensor.begin(Wire, kSdaPin, kSclPin);
   const uint32_t now = millis();
   gLastReadMs = now - kReadIntervalMs;
@@ -73,6 +79,7 @@ void setup() {
 void loop() {
   const uint32_t now = millis();
   readCommands();
+  resetProbeTick();
   if (static_cast<int32_t>(now - gLastReadMs) >= static_cast<int32_t>(kReadIntervalMs)) {
     gLastReadMs = now;
     gSensor.update();

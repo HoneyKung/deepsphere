@@ -1,0 +1,316 @@
+Processing live-yaw (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/waveshare_esp32_s3_zero.html
+PLATFORM: Espressif 32 (6.7.0) > Waveshare ESP32-S3-Zero 4MB Flash 2MB PSRAM
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (esp-builtin) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20016.0 (2.0.16) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 33 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Wire @ 2.0.0
+|-- Preferences @ 2.0.0
+Building in release mode
+Compiling .pio\build\live-yaw\src\demo_live_yaw.cpp.o
+Compiling .pio\build\live-yaw\src\sensors\as5600.cpp.o
+Building .pio\build\live-yaw\bootloader.bin
+Generating partitions .pio\build\live-yaw\partitions.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 1 ELF section
+Successfully created esp32s3 image.
+Compiling .pio\build\live-yaw\lib73f\Wire\Wire.cpp.o
+Compiling .pio\build\live-yaw\lib321\Preferences\Preferences.cpp.o
+Archiving .pio\build\live-yaw\lib73f\libWire.a
+Compiling .pio\build\live-yaw\FrameworkArduino\Esp.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\FirmwareMSC.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\HardwareSerial.cpp.o
+Archiving .pio\build\live-yaw\lib321\libPreferences.a
+Compiling .pio\build\live-yaw\FrameworkArduino\IPAddress.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\IPv6Address.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\MD5Builder.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\Print.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\Stream.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\StreamString.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\Tone.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\USB.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\USBCDC.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\USBMSC.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\WMath.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\WString.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\base64.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\cbuf.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-adc.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-bt.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-cpu.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-dac.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-gpio.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-i2c-slave.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-i2c.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-ledc.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-matrix.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-misc.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-psram.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-rgb-led.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-rmt.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-sigmadelta.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-spi.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-time.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-timer.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-tinyusb.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-touch.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\esp32-hal-uart.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\firmware_msc_fat.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\libb64\cdecode.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\libb64\cencode.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\main.cpp.o
+Compiling .pio\build\live-yaw\FrameworkArduino\stdlib_noniso.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\wiring_pulse.c.o
+Compiling .pio\build\live-yaw\FrameworkArduino\wiring_shift.c.o
+Archiving .pio\build\live-yaw\libFrameworkArduino.a
+Linking .pio\build\live-yaw\firmware.elf
+Retrieving maximum program size .pio\build\live-yaw\firmware.elf
+Checking size .pio\build\live-yaw\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   5.8% (used 19116 bytes from 327680 bytes)
+Flash: [==        ]  22.2% (used 290517 bytes from 1310720 bytes)
+Building .pio\build\live-yaw\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_image(__env__)} --flash_size 4MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\live-yaw\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-builtin, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM6
+Uploading .pio\build\live-yaw\firmware.bin
+esptool.py v4.5.1
+Serial port COM6
+Connecting...
+Chip is ESP32-S3 (revision v0.2)
+Features: WiFi, BLE
+Crystal is 40MHz
+MAC: ac:27:6e:af:90:ac
+Enabling default SPI flash mode...
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00003fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000e000 to 0x0000ffff...
+Flash will be erased from 0x00010000 to 0x00057fff...
+Erasing flash...
+Compressed 15104 bytes to 10429...
+Took 0.09s to erase flash block
+Writing at 0x00000000... (9 %)
+Writing at 0x0000064c... (18 %)
+Writing at 0x00000c4b... (27 %)
+Writing at 0x000011e5... (36 %)
+Writing at 0x000017a2... (45 %)
+Writing at 0x00001d2d... (54 %)
+Writing at 0x00002327... (63 %)
+Writing at 0x00002865... (72 %)
+Writing at 0x00002cf0... (81 %)
+Writing at 0x000033fc... (90 %)
+Writing at 0x000039c5... (100 %)
+Wrote 15104 bytes (10429 compressed) at 0x00000000 in 0.1 seconds (effective 890.7 kbit/s)...
+Hash of data verified.
+Erasing flash...
+Compressed 3072 bytes to 146...
+Took 0.02s to erase flash block
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (146 compressed) at 0x00008000 in 0.0 seconds (effective 1909.5 kbit/s)...
+Hash of data verified.
+Erasing flash...
+Compressed 8192 bytes to 49...
+Took 0.05s to erase flash block
+Writing at 0x0000e000... (100 %)
+Wrote 8192 bytes (49 compressed) at 0x0000e000 in 0.0 seconds (effective 2856.2 kbit/s)...
+Hash of data verified.
+Erasing flash...
+Compressed 290880 bytes to 163197...
+Took 0.76s to erase flash block
+Writing at 0x00010000... (0 %)
+Writing at 0x00010863... (1 %)
+Writing at 0x00011667... (1 %)
+Writing at 0x000124f6... (2 %)
+Writing at 0x0001300e... (3 %)
+Writing at 0x00013a5c... (3 %)
+Writing at 0x0001445c... (4 %)
+Writing at 0x00014e20... (5 %)
+Writing at 0x000159fc... (5 %)
+Writing at 0x0001671a... (6 %)
+Writing at 0x00017571... (6 %)
+Writing at 0x000180fd... (7 %)
+Writing at 0x00018b5c... (8 %)
+Writing at 0x0001969d... (8 %)
+Writing at 0x0001a447... (9 %)
+Writing at 0x0001b04a... (10 %)
+Writing at 0x0001bc07... (10 %)
+Writing at 0x0001d371... (11 %)
+Writing at 0x0001e3d8... (11 %)
+Writing at 0x000201a2... (12 %)
+Writing at 0x000207a6... (13 %)
+Writing at 0x00020da4... (13 %)
+Writing at 0x00021381... (14 %)
+Writing at 0x0002198a... (15 %)
+Writing at 0x00021df9... (15 %)
+Writing at 0x0002230d... (16 %)
+Writing at 0x000228da... (16 %)
+Writing at 0x00022e10... (17 %)
+Writing at 0x00023373... (18 %)
+Writing at 0x00023925... (18 %)
+Writing at 0x00023ecb... (19 %)
+Writing at 0x00024481... (20 %)
+Writing at 0x00024a13... (20 %)
+Writing at 0x00024f2b... (21 %)
+Writing at 0x0002562d... (21 %)
+Writing at 0x00025ba4... (22 %)
+Writing at 0x0002616d... (23 %)
+Writing at 0x0002670c... (23 %)
+Writing at 0x00026c2b... (24 %)
+Writing at 0x0002720c... (25 %)
+Writing at 0x00027894... (25 %)
+Writing at 0x00027ea8... (26 %)
+Writing at 0x000284b9... (26 %)
+Writing at 0x000289f3... (27 %)
+Writing at 0x00028f05... (28 %)
+Writing at 0x000293ff... (28 %)
+Writing at 0x00029984... (29 %)
+Writing at 0x00029f48... (30 %)
+Writing at 0x0002a41c... (30 %)
+Writing at 0x0002a966... (31 %)
+Writing at 0x0002aec9... (31 %)
+Writing at 0x0002b43e... (32 %)
+Writing at 0x0002b935... (33 %)
+Writing at 0x0002be22... (33 %)
+Writing at 0x0002c2f5... (34 %)
+Writing at 0x0002c81f... (35 %)
+Writing at 0x0002cd9d... (35 %)
+Writing at 0x0002d36e... (36 %)
+Writing at 0x0002d931... (36 %)
+Writing at 0x0002de7c... (37 %)
+Writing at 0x0002e4d0... (38 %)
+Writing at 0x0002ea48... (38 %)
+Writing at 0x0002f0c4... (39 %)
+Writing at 0x0002f594... (40 %)
+Writing at 0x0002faab... (40 %)
+Writing at 0x0002fff9... (41 %)
+Writing at 0x000304fb... (41 %)
+Writing at 0x0003099a... (42 %)
+Writing at 0x00030e60... (43 %)
+Writing at 0x00031396... (43 %)
+Writing at 0x00031873... (44 %)
+Writing at 0x00031f2e... (45 %)
+Writing at 0x00032456... (45 %)
+Writing at 0x0003297e... (46 %)
+Writing at 0x00032f25... (46 %)
+Writing at 0x0003347c... (47 %)
+Writing at 0x000339c9... (48 %)
+Writing at 0x00033f26... (48 %)
+Writing at 0x0003443c... (49 %)
+Writing at 0x00034997... (50 %)
+Writing at 0x00034f0c... (50 %)
+Writing at 0x00035485... (51 %)
+Writing at 0x000359b7... (51 %)
+Writing at 0x00035f2c... (52 %)
+Writing at 0x00036478... (53 %)
+Writing at 0x00036afd... (53 %)
+Writing at 0x00036ff7... (54 %)
+Writing at 0x000374de... (55 %)
+Writing at 0x00037a60... (55 %)
+Writing at 0x00037fa7... (56 %)
+Writing at 0x0003850d... (56 %)
+Writing at 0x00038b25... (57 %)
+Writing at 0x00038fe5... (58 %)
+Writing at 0x000396d6... (58 %)
+Writing at 0x00039ba0... (59 %)
+Writing at 0x0003ac20... (60 %)
+Writing at 0x0003b1c3... (60 %)
+Writing at 0x0003b7a5... (61 %)
+Writing at 0x0003c477... (61 %)
+Writing at 0x0003d83c... (62 %)
+Writing at 0x0003ebd2... (63 %)
+Writing at 0x0003f25e... (63 %)
+Writing at 0x0003f70c... (64 %)
+Writing at 0x0003fba2... (65 %)
+Writing at 0x00040079... (65 %)
+Writing at 0x00040522... (66 %)
+Writing at 0x00040e3b... (66 %)
+Writing at 0x0004138a... (67 %)
+Writing at 0x00042025... (68 %)
+Writing at 0x00042a65... (68 %)
+Writing at 0x0004342e... (69 %)
+Writing at 0x00044d7e... (70 %)
+Writing at 0x000456e6... (70 %)
+Writing at 0x00045e25... (71 %)
+Writing at 0x00046382... (71 %)
+Writing at 0x000469a4... (72 %)
+Writing at 0x00046e83... (73 %)
+Writing at 0x000473a7... (73 %)
+Writing at 0x000482a4... (74 %)
+Writing at 0x00048c85... (75 %)
+Writing at 0x00049459... (75 %)
+Writing at 0x00049a5c... (76 %)
+Writing at 0x00049fc8... (76 %)
+Writing at 0x0004a475... (77 %)
+Writing at 0x0004a981... (78 %)
+Writing at 0x0004ae47... (78 %)
+Writing at 0x0004b309... (79 %)
+Writing at 0x0004b7c1... (80 %)
+Writing at 0x0004bd25... (80 %)
+Writing at 0x0004c30d... (81 %)
+Writing at 0x0004c88d... (81 %)
+Writing at 0x0004cdea... (82 %)
+Writing at 0x0004d356... (83 %)
+Writing at 0x0004d8ee... (83 %)
+Writing at 0x0004df14... (84 %)
+Writing at 0x0004e4dc... (85 %)
+Writing at 0x0004ea8a... (85 %)
+Writing at 0x0004ef7b... (86 %)
+Writing at 0x0004f44b... (86 %)
+Writing at 0x0004f98f... (87 %)
+Writing at 0x0004ff10... (88 %)
+Writing at 0x00050423... (88 %)
+Writing at 0x000509a9... (89 %)
+Writing at 0x00050e91... (90 %)
+Writing at 0x000513ee... (90 %)
+Writing at 0x000519cb... (91 %)
+Writing at 0x00051fa7... (91 %)
+Writing at 0x0005256b... (92 %)
+Writing at 0x00052ab2... (93 %)
+Writing at 0x000530e9... (93 %)
+Writing at 0x00053700... (94 %)
+Writing at 0x00053e29... (95 %)
+Writing at 0x00054584... (95 %)
+Writing at 0x00054af6... (96 %)
+Writing at 0x00054faf... (96 %)
+Writing at 0x00055506... (97 %)
+Writing at 0x00055a7d... (98 %)
+Writing at 0x00055f9e... (98 %)
+Writing at 0x000567ac... (99 %)
+Writing at 0x00056e6c... (100 %)
+Wrote 290880 bytes (163197 compressed) at 0x00010000 in 2.4 seconds (effective 959.6 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+========================= [SUCCESS] Took 45.41 seconds =========================
+
+Environment    Status    Duration
+-------------  --------  ------------
+live-yaw       SUCCESS   00:00:45.409
+========================= 1 succeeded in 00:00:45.409 =========================

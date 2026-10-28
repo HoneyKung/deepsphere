@@ -1,0 +1,46 @@
+......................................audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmpx36gmop3\\catalog.json'
+..audio file missing for cue scan_hit: C:\Users\Acer\AppData\Local\Temp\tmp931dhsut\audio\nope.wav
+...audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmpic7wix3n\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmppfq7_3pi\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmpbeqgvy9e\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmp8wp7vvdg\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmp7azz8mc4\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmprh0kto40\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmp5sbavkof\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmpyht6k7dl\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmp8ofyknz2\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmpsgbbth47\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmp3001wweu\\catalog.json'
+audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmp3001wweu\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmpjqjox07h\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmph6g6umzn\\catalog.json'
+.audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmpp_82ghpd\\catalog.json'
+.............audio catalog unavailable: [Errno 2] No such file or directory: 'C:\\Users\\Acer\\AppData\\Local\\Temp\\tmpw6svo3b6\\catalog.json'
+............C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\test_luna04_assets.py:40: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  for pixel in image.getdata():
+..F.F.........................
+======================================================================
+FAIL: test_current_map_and_supply_status_are_explicit (test_luna06_display_reset.Luna06DisplayResetTests.test_current_map_and_supply_status_are_explicit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\test_luna06_display_reset.py", line 18, in test_current_map_and_supply_status_are_explicit
+    self.assertEqual(board["pins"]["display_cs"],
+AssertionError: {'px': 8, 'nx': 13, 'py': 4, 'ny': 5, 'pz': 6, 'nz': 7} != {'px': 8, 'nx': 13, 'py': 4, 'ny': 5, 'pz': 6, 'nz': 17}
+- {'nx': 13, 'ny': 5, 'nz': 7, 'px': 8, 'py': 4, 'pz': 6}
++ {'nx': 13, 'ny': 5, 'nz': 17, 'px': 8, 'py': 4, 'pz': 6}
+?                           +
+
+
+======================================================================
+FAIL: test_only_enabled_faces_are_initialized (test_luna06_display_reset.Luna06DisplayResetTests.test_only_enabled_faces_are_initialized)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Acer\Downloads\oceanX\prototype-v1\tests\test_luna06_display_reset.py", line 50, in test_only_enabled_faces_are_initialized
+    self.assertEqual(len(re.findall(r"new Adafruit_ST7789", setup_body)), 1)
+AssertionError: 2 != 1
+
+----------------------------------------------------------------------
+Ran 111 tests in 31.030s
+
+FAILED (failures=2)
+pygame-ce 2.5.8 (SDL 2.32.10, Python 3.12.14)

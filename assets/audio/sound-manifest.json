@@ -698,7 +698,7 @@
    "en": "voice/vo_zone_mid_en.wav"
   },
   "vo_zone_deep": {
-   "en": "voice/vo_zone_deep_en.wav"
+   "en": "voice/vo_zone_deep_v2_en.wav"
   },
   "vo_scan_hit": {
    "en": "voice/vo_scan_hit_en.wav"
@@ -725,13 +725,28 @@
    "en": "voice/vo_analyze_en.wav"
   },
   "vo_max_depth": {
-   "en": "voice/vo_max_depth_en.wav"
+   "en": "voice/vo_max_depth_v2_en.wav"
   },
   "vo_surface": {
    "en": "voice/vo_surface_en.wav"
   },
   "vo_complete": {
    "en": "voice/vo_complete_en.wav"
+  },
+  "vo_zone_deep_v2": {
+   "en": "voice/vo_zone_deep_v2_en.wav"
+  },
+  "vo_max_depth_v2": {
+   "en": "voice/vo_max_depth_v2_en.wav"
+  },
+  "vo_gate_hint": {
+   "en": "voice/vo_gate_hint_en.wav"
+  },
+  "vo_gate_found": {
+   "en": "voice/vo_gate_found_en.wav"
+  },
+  "vo_gate_pass": {
+   "en": "voice/vo_gate_pass_en.wav"
   }
  },
  "bridges": {
@@ -743,7 +758,7 @@
   "discovery_out": "music/bridge_discovery_out.wav",
   "to_invite": "music/bridge_to_invite.wav"
  },
- "voice_note": "เสียงพากย์: ผู้หญิงอังกฤษหวาน เบาลม (en-US-MichelleNeural ผ่าน edge-tts, ผู้ใช้เลือกรอบ 4) ปรับ pitch/ความช้า/ลมหายใจ ไม่มีไฟล์ไทย (เว็บสลับเป็นอังกฤษเอง) vo_analyze ไม่พูดชื่อสัตว์",
+ "voice_note": "เสียงภาษาอังกฤษ en-US-MichelleNeural ผ่าน edge-tts; เปลี่ยนบทโซนลึกและความลึกสูงสุดเป็นไฟล์ v2 โดยเก็บไฟล์เดิมไว้ใน voice_previous และเพิ่มบทช่องทางลง",
  "voice_names": {
   "shoal": "voice/vo_name_shoal_en.wav",
   "reef": "voice/vo_name_reef_en.wav",
@@ -881,8 +896,21 @@
    "voice/vo_name_lantern_en.wav": "voice/vo_name_lantern_en.mp3",
    "voice/vo_name_jelly_en.wav": "voice/vo_name_jelly_en.mp3",
    "voice/vo_name_angler_en.wav": "voice/vo_name_angler_en.mp3",
-   "voice/vo_name_squid_en.wav": "voice/vo_name_squid_en.mp3"
+   "voice/vo_name_squid_en.wav": "voice/vo_name_squid_en.mp3",
+   "voice/vo_zone_deep_v2_en.wav": "voice/vo_zone_deep_v2_en.mp3",
+   "voice/vo_max_depth_v2_en.wav": "voice/vo_max_depth_v2_en.mp3",
+   "voice/vo_gate_hint_en.wav": "voice/vo_gate_hint_en.mp3",
+   "voice/vo_gate_found_en.wav": "voice/vo_gate_found_en.mp3",
+   "voice/vo_gate_pass_en.wav": "voice/vo_gate_pass_en.mp3"
   },
   "note": "Compressed copies of the same recordings for the hosted page; made by tools/make_web_audio.py"
+ },
+ "voice_previous": {
+  "vo_zone_deep": {
+   "en": "voice/vo_zone_deep_en.wav"
+  },
+  "vo_max_depth": {
+   "en": "voice/vo_max_depth_en.wav"
+  }
  }
 }

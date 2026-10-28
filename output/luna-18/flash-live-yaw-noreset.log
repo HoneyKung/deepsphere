@@ -1,0 +1,525 @@
+﻿--- try 1
+Processing live-yaw-noreset (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+python.exe : *** [nobuild] Source `.pio\build\live-yaw-noreset\firmware.bin' not found, needed by target `nobuild'.
+At line:1 char:744
++ ...  utf8 $log; & .\.venv-validation\Scripts\python.exe -m platformio run ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (*** [nobuild] S...rget `nobuild'.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+========================== [FAILED] Took 2.41 seconds ==========================
+
+Environment       Status    Duration
+----------------  --------  ------------
+live-yaw-noreset  FAILED    00:00:02.406
+==================== 1 failed, 0 succeeded in 00:00:02.406 ====================
+--- try 2
+Processing live-yaw-noreset (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+python.exe : *** [nobuild] Source `.pio\build\live-yaw-noreset\firmware.bin' not found, needed by target `nobuild'.
+At line:1 char:744
++ ...  utf8 $log; & .\.venv-validation\Scripts\python.exe -m platformio run ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (*** [nobuild] S...rget `nobuild'.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+========================== [FAILED] Took 2.56 seconds ==========================
+
+Environment       Status    Duration
+----------------  --------  ------------
+live-yaw-noreset  FAILED    00:00:02.558
+==================== 1 failed, 0 succeeded in 00:00:02.558 ====================
+--- try 3
+Processing live-yaw-noreset (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+python.exe : *** [nobuild] Source `.pio\build\live-yaw-noreset\firmware.bin' not found, needed by target `nobuild'.
+At line:1 char:744
++ ...  utf8 $log; & .\.venv-validation\Scripts\python.exe -m platformio run ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (*** [nobuild] S...rget `nobuild'.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+========================== [FAILED] Took 2.51 seconds ==========================
+
+Environment       Status    Duration
+----------------  --------  ------------
+live-yaw-noreset  FAILED    00:00:02.513
+==================== 1 failed, 0 succeeded in 00:00:02.513 ====================
+--- try 4
+Processing live-yaw-noreset (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+python.exe : *** [nobuild] Source `.pio\build\live-yaw-noreset\firmware.bin' not found, needed by target `nobuild'.
+At line:1 char:744
++ ...  utf8 $log; & .\.venv-validation\Scripts\python.exe -m platformio run ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (*** [nobuild] S...rget `nobuild'.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+========================== [FAILED] Took 2.47 seconds ==========================
+
+Environment       Status    Duration
+----------------  --------  ------------
+live-yaw-noreset  FAILED    00:00:02.466
+==================== 1 failed, 0 succeeded in 00:00:02.466 ====================
+--- try2 1
+Processing live-yaw-noreset (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/waveshare_esp32_s3_zero.html
+PLATFORM: Espressif 32 (6.7.0) > Waveshare ESP32-S3-Zero 4MB Flash 2MB PSRAM
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (esp-builtin) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20016.0 (2.0.16) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 33 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Wire @ 2.0.0
+|-- Preferences @ 2.0.0
+Building in release mode
+Compiling .pio\build\live-yaw-noreset\src\demo_live_yaw.cpp.o
+Compiling .pio\build\live-yaw-noreset\src\sensors\as5600.cpp.o
+Building .pio\build\live-yaw-noreset\bootloader.bin
+Generating partitions .pio\build\live-yaw-noreset\partitions.bin
+Compiling .pio\build\live-yaw-noreset\libec1\Wire\Wire.cpp.o
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 1 ELF section
+Successfully created esp32s3 image.
+Compiling .pio\build\live-yaw-noreset\lib391\Preferences\Preferences.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\Esp.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\FirmwareMSC.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\HardwareSerial.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\IPAddress.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\IPv6Address.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\MD5Builder.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\Print.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\Stream.cpp.o
+Archiving .pio\build\live-yaw-noreset\lib391\libPreferences.a
+Archiving .pio\build\live-yaw-noreset\libec1\libWire.a
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\StreamString.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\Tone.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\USB.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\USBCDC.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\USBMSC.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\WMath.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\WString.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\base64.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\cbuf.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-adc.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-bt.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-cpu.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-dac.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-gpio.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-i2c-slave.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-i2c.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-ledc.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-matrix.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-misc.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-psram.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-rgb-led.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-rmt.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-sigmadelta.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-spi.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-time.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-timer.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-tinyusb.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-touch.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\esp32-hal-uart.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\firmware_msc_fat.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\libb64\cdecode.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\libb64\cencode.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\main.cpp.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\stdlib_noniso.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\wiring_pulse.c.o
+Compiling .pio\build\live-yaw-noreset\FrameworkArduino\wiring_shift.c.o
+Archiving .pio\build\live-yaw-noreset\libFrameworkArduino.a
+Linking .pio\build\live-yaw-noreset\firmware.elf
+Retrieving maximum program size .pio\build\live-yaw-noreset\firmware.elf
+Checking size .pio\build\live-yaw-noreset\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   5.8% (used 19132 bytes from 327680 bytes)
+Flash: [==        ]  22.3% (used 292145 bytes from 1310720 bytes)
+Building .pio\build\live-yaw-noreset\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_image(__env__)} --flash_size 4MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\live-yaw-noreset\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-builtin, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM6
+Uploading .pio\build\live-yaw-noreset\firmware.bin
+esptool.py v4.5.1
+Serial port COM6
+
+A fatal error occurred: Could not open COM6, the port doesn't exist
+*** [upload] Error 2
+========================= [FAILED] Took 46.91 seconds =========================
+
+Environment       Status    Duration
+----------------  --------  ------------
+live-yaw-noreset  FAILED    00:00:46.909
+==================== 1 failed, 0 succeeded in 00:00:46.909 ====================
+--- try2 2
+Processing live-yaw-noreset (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/waveshare_esp32_s3_zero.html
+PLATFORM: Espressif 32 (6.7.0) > Waveshare ESP32-S3-Zero 4MB Flash 2MB PSRAM
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (esp-builtin) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20016.0 (2.0.16) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 33 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Wire @ 2.0.0
+|-- Preferences @ 2.0.0
+Building in release mode
+Retrieving maximum program size .pio\build\live-yaw-noreset\firmware.elf
+Checking size .pio\build\live-yaw-noreset\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   5.8% (used 19132 bytes from 327680 bytes)
+Flash: [==        ]  22.3% (used 292145 bytes from 1310720 bytes)
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-builtin, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM6
+Uploading .pio\build\live-yaw-noreset\firmware.bin
+esptool.py v4.5.1
+Serial port COM6
+
+A fatal error occurred: Could not open COM6, the port doesn't exist
+*** [upload] Error 2
+========================== [FAILED] Took 6.77 seconds ==========================
+
+Environment       Status    Duration
+----------------  --------  ------------
+live-yaw-noreset  FAILED    00:00:06.769
+==================== 1 failed, 0 succeeded in 00:00:06.769 ====================
+--- try2 3
+Processing live-yaw-noreset (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/waveshare_esp32_s3_zero.html
+PLATFORM: Espressif 32 (6.7.0) > Waveshare ESP32-S3-Zero 4MB Flash 2MB PSRAM
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (esp-builtin) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20016.0 (2.0.16) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 33 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Wire @ 2.0.0
+|-- Preferences @ 2.0.0
+Building in release mode
+Retrieving maximum program size .pio\build\live-yaw-noreset\firmware.elf
+Checking size .pio\build\live-yaw-noreset\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   5.8% (used 19132 bytes from 327680 bytes)
+Flash: [==        ]  22.3% (used 292145 bytes from 1310720 bytes)
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-builtin, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM6
+Uploading .pio\build\live-yaw-noreset\firmware.bin
+esptool.py v4.5.1
+Serial port COM6
+
+A fatal error occurred: Could not open COM6, the port doesn't exist
+*** [upload] Error 2
+========================== [FAILED] Took 6.11 seconds ==========================
+
+Environment       Status    Duration
+----------------  --------  ------------
+live-yaw-noreset  FAILED    00:00:06.115
+==================== 1 failed, 0 succeeded in 00:00:06.115 ====================
+--- try2 4
+Processing live-yaw-noreset (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/waveshare_esp32_s3_zero.html
+PLATFORM: Espressif 32 (6.7.0) > Waveshare ESP32-S3-Zero 4MB Flash 2MB PSRAM
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (esp-builtin) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20016.0 (2.0.16) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 33 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Wire @ 2.0.0
+|-- Preferences @ 2.0.0
+Building in release mode
+Retrieving maximum program size .pio\build\live-yaw-noreset\firmware.elf
+Checking size .pio\build\live-yaw-noreset\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   5.8% (used 19132 bytes from 327680 bytes)
+Flash: [==        ]  22.3% (used 292145 bytes from 1310720 bytes)
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-builtin, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM6
+Uploading .pio\build\live-yaw-noreset\firmware.bin
+esptool.py v4.5.1
+Serial port COM6
+Connecting...
+Chip is ESP32-S3 (revision v0.2)
+Features: WiFi, BLE
+Crystal is 40MHz
+MAC: ac:27:6e:af:90:ac
+Enabling default SPI flash mode...
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00003fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000e000 to 0x0000ffff...
+Flash will be erased from 0x00010000 to 0x00057fff...
+Erasing flash...
+Compressed 15104 bytes to 10430...
+Took 0.08s to erase flash block
+Writing at 0x00000000... (9 %)
+Writing at 0x00000648... (18 %)
+Writing at 0x00000c46... (27 %)
+Writing at 0x000011e5... (36 %)
+Writing at 0x000017af... (45 %)
+Writing at 0x00001d37... (54 %)
+Writing at 0x0000232c... (63 %)
+Writing at 0x00002869... (72 %)
+Writing at 0x00002cf1... (81 %)
+Writing at 0x000033f9... (90 %)
+Writing at 0x000039c5... (100 %)
+Wrote 15104 bytes (10430 compressed) at 0x00000000 in 0.1 seconds (effective 842.1 kbit/s)...
+Hash of data verified.
+Erasing flash...
+Compressed 3072 bytes to 146...
+Took 0.03s to erase flash block
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (146 compressed) at 0x00008000 in 0.0 seconds (effective 2046.5 kbit/s)...
+Hash of data verified.
+Erasing flash...
+Compressed 8192 bytes to 47...
+Took 0.05s to erase flash block
+Writing at 0x0000e000... (100 %)
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.0 seconds (effective 2926.0 kbit/s)...
+Hash of data verified.
+Erasing flash...
+Compressed 292512 bytes to 164922...
+Took 0.75s to erase flash block
+Writing at 0x00010000... (0 %)
+Writing at 0x00010732... (1 %)
+Writing at 0x00011509... (1 %)
+Writing at 0x0001241d... (2 %)
+Writing at 0x00012f6a... (3 %)
+Writing at 0x00013a11... (3 %)
+Writing at 0x00014351... (4 %)
+Writing at 0x00014d56... (4 %)
+Writing at 0x000158f1... (5 %)
+Writing at 0x00016681... (6 %)
+Writing at 0x00017409... (6 %)
+Writing at 0x000180b0... (7 %)
+Writing at 0x00018a2b... (8 %)
+Writing at 0x00019629... (8 %)
+Writing at 0x0001a37d... (9 %)
+Writing at 0x0001b030... (9 %)
+Writing at 0x0001baa0... (10 %)
+Writing at 0x0001d0a0... (11 %)
+Writing at 0x0001e332... (11 %)
+Writing at 0x00020141... (12 %)
+Writing at 0x0002070f... (12 %)
+Writing at 0x00020d11... (13 %)
+Writing at 0x000212f1... (14 %)
+Writing at 0x00021833... (14 %)
+Writing at 0x00021d37... (15 %)
+Writing at 0x00022261... (16 %)
+Writing at 0x00022789... (16 %)
+Writing at 0x00022d4e... (17 %)
+Writing at 0x00023296... (17 %)
+Writing at 0x000237fe... (18 %)
+Writing at 0x00023dc1... (19 %)
+Writing at 0x00024362... (19 %)
+Writing at 0x00024919... (20 %)
+Writing at 0x00024e94... (20 %)
+Writing at 0x000253a0... (21 %)
+Writing at 0x00025a9a... (22 %)
+Writing at 0x00026027... (22 %)
+Writing at 0x000265d9... (23 %)
+Writing at 0x00026b60... (24 %)
+Writing at 0x000270a9... (24 %)
+Writing at 0x0002764e... (25 %)
+Writing at 0x00027ce9... (25 %)
+Writing at 0x00028284... (26 %)
+Writing at 0x000287de... (27 %)
+Writing at 0x00028e46... (27 %)
+Writing at 0x0002935b... (28 %)
+Writing at 0x00029861... (29 %)
+Writing at 0x00029da0... (29 %)
+Writing at 0x0002a35c... (30 %)
+Writing at 0x0002a868... (30 %)
+Writing at 0x0002ad9f... (31 %)
+Writing at 0x0002b2d5... (32 %)
+Writing at 0x0002b871... (32 %)
+Writing at 0x0002bd61... (33 %)
+Writing at 0x0002c253... (33 %)
+Writing at 0x0002c729... (34 %)
+Writing at 0x0002cc1f... (35 %)
+Writing at 0x0002d1b5... (35 %)
+Writing at 0x0002d77c... (36 %)
+Writing at 0x0002dd2d... (37 %)
+Writing at 0x0002e1ef... (37 %)
+Writing at 0x0002e752... (38 %)
+Writing at 0x0002edaa... (38 %)
+Writing at 0x0002f3cc... (39 %)
+Writing at 0x0002f986... (40 %)
+Writing at 0x0002fe99... (40 %)
+Writing at 0x000303f1... (41 %)
+Writing at 0x000308fb... (41 %)
+Writing at 0x00030da8... (42 %)
+Writing at 0x00031250... (43 %)
+Writing at 0x00031766... (43 %)
+Writing at 0x00031c71... (44 %)
+Writing at 0x000322f3... (45 %)
+Writing at 0x000327f6... (45 %)
+Writing at 0x00032d54... (46 %)
+Writing at 0x000332c2... (46 %)
+Writing at 0x00033834... (47 %)
+Writing at 0x00033d6a... (48 %)
+Writing at 0x000342bf... (48 %)
+Writing at 0x0003472e... (49 %)
+Writing at 0x00034c92... (50 %)
+Writing at 0x000351c2... (50 %)
+Writing at 0x0003577a... (51 %)
+Writing at 0x00035c90... (51 %)
+Writing at 0x000362cb... (52 %)
+Writing at 0x000367cc... (53 %)
+Writing at 0x00036e46... (53 %)
+Writing at 0x00037353... (54 %)
+Writing at 0x00037872... (54 %)
+Writing at 0x00037dd9... (55 %)
+Writing at 0x00038365... (56 %)
+Writing at 0x000388b5... (56 %)
+Writing at 0x00038e91... (57 %)
+Writing at 0x0003939f... (58 %)
+Writing at 0x00039a83... (58 %)
+Writing at 0x00039f4b... (59 %)
+Writing at 0x0003ab93... (59 %)
+Writing at 0x0003b406... (60 %)
+Writing at 0x0003ba4c... (61 %)
+Writing at 0x0003c454... (61 %)
+Writing at 0x0003d304... (62 %)
+Writing at 0x0003eb37... (62 %)
+Writing at 0x0003f589... (63 %)
+Writing at 0x0003fa2b... (64 %)
+Writing at 0x0003ff5c... (64 %)
+Writing at 0x000403ff... (65 %)
+Writing at 0x000408de... (66 %)
+Writing at 0x00040d7f... (66 %)
+Writing at 0x000416be... (67 %)
+Writing at 0x00041f32... (67 %)
+Writing at 0x00042e31... (68 %)
+Writing at 0x0004334a... (69 %)
+Writing at 0x00044aaf... (69 %)
+Writing at 0x00045a6f... (70 %)
+Writing at 0x000460f2... (70 %)
+Writing at 0x00046748... (71 %)
+Writing at 0x00046c7c... (72 %)
+Writing at 0x000471eb... (72 %)
+Writing at 0x000476ab... (73 %)
+Writing at 0x000481a6... (74 %)
+Writing at 0x00048c43... (74 %)
+Writing at 0x000497a1... (75 %)
+Writing at 0x00049d5d... (75 %)
+Writing at 0x0004a36e... (76 %)
+Writing at 0x0004a82c... (77 %)
+Writing at 0x0004ad38... (77 %)
+Writing at 0x0004b2a9... (78 %)
+Writing at 0x0004b735... (79 %)
+Writing at 0x0004bbe5... (79 %)
+Writing at 0x0004c10d... (80 %)
+Writing at 0x0004c682... (80 %)
+Writing at 0x0004cc12... (81 %)
+Writing at 0x0004d1f1... (82 %)
+Writing at 0x0004d700... (82 %)
+Writing at 0x0004dc5c... (83 %)
+Writing at 0x0004e24d... (83 %)
+Writing at 0x0004e7be... (84 %)
+Writing at 0x0004ed4e... (85 %)
+Writing at 0x0004f2f5... (85 %)
+Writing at 0x0004f79e... (86 %)
+Writing at 0x0004fc75... (87 %)
+Writing at 0x000501e4... (87 %)
+Writing at 0x0005071b... (88 %)
+Writing at 0x00050c57... (88 %)
+Writing at 0x00051240... (89 %)
+Writing at 0x0005175c... (90 %)
+Writing at 0x00051d10... (90 %)
+Writing at 0x000522c6... (91 %)
+Writing at 0x000528c6... (91 %)
+Writing at 0x00052e1c... (92 %)
+Writing at 0x0005334f... (93 %)
+Writing at 0x00053a21... (93 %)
+Writing at 0x0005406a... (94 %)
+Writing at 0x00054712... (95 %)
+Writing at 0x00054e89... (95 %)
+Writing at 0x000552a2... (96 %)
+Writing at 0x0005579c... (96 %)
+Writing at 0x00055cc3... (97 %)
+Writing at 0x00056259... (98 %)
+Writing at 0x00056845... (98 %)
+Writing at 0x00057012... (99 %)
+Writing at 0x0005765d... (100 %)
+Wrote 292512 bytes (164922 compressed) at 0x00010000 in 2.5 seconds (effective 953.4 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Staying in bootloader.
+========================= [SUCCESS] Took 11.51 seconds =========================
+
+Environment       Status    Duration
+----------------  --------  ------------
+live-yaw-noreset  SUCCESS   00:00:11.507
+========================= 1 succeeded in 00:00:11.507 =========================

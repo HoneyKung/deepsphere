@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Deep Sphere — dive with the cube</title>
-<meta name="description" content="Browser digital twin of the six-panel Deep Sphere cube: the same face maths, the same live-ocean motion and the same audio cues the firmware uses.">
+<title>Deep Sphere — dive the ocean</title>
+<meta name="description" content="Explore the Deep Sphere digital twin, follow marine life, and dive through the layers of the ocean.">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="deepcore.css?v=20261009i">
 </head>
@@ -14,9 +14,9 @@
 
 <div class="intro" id="intro">
     <div class="intro-title">DEEP SPHERE</div>
-    <div class="intro-sub">SIX-PANEL CUBE — DIGITAL TWIN</div>
+    <div class="intro-sub">DEEP SPHERE — DIGITAL TWIN</div>
     <button class="intro-start" id="btn-start" disabled>LOADING PANELS</button>
-    <div class="intro-hint">Drag to turn the box · hold ▼ to dive · Scan → Collect → Analyze<br>The sub has weight: it gathers way slowly and glides to a stop.<br>The sea has three levels. Each ends in a floor: turn the box to find the way down.<br>Headphones recommended · the music joins when you move and fades when you stop</div>
+    <div class="intro-hint">Drag to turn the sphere · hold ▼ to dive · Scan → Collect → Analyze<br>The sub has weight: it gathers way slowly and glides to a stop.<br>The sea has three levels. Each ends in a floor: turn the sphere to find the way down.<br>Headphones recommended · the music joins when you move and fades when you stop</div>
 </div>
 
 <div id="canvas-container"></div>
@@ -105,7 +105,7 @@
 
 <div class="hud-keys">
     <span class="keycap">&#8593;</span><span class="keycap">&#8595;</span> depth<br>
-    <span class="keycap">&#8592;</span><span class="keycap">&#8594;</span> turn the box<br>
+    <span class="keycap">&#8592;</span><span class="keycap">&#8594;</span> turn the sphere<br>
     <span class="keycap">1</span> scan <span class="keycap">2</span> collect<br>
     <span class="keycap">3</span> analyze<br>
     <span class="keycap">R</span> reset <button class="keycap mute-key" id="btn-mute" type="button" aria-label="Mute audio">M</button> mute
@@ -123,7 +123,7 @@
   <button class="pad-btn" id="pad-right" type="button" aria-label="Turn right">▶</button>
 </div>
 <div class="top-bar">
-  <button class="sound-btn" id="btn-shape" type="button" aria-pressed="false" title="Switch between the cube and a sphere (B)">Shape: cube</button>
+  <button class="sound-btn" id="btn-shape" type="button" aria-pressed="false" title="Switch between the sphere and six-screen ring (B)">Shape: sphere</button>
   <button class="sound-btn" id="btn-sound" type="button" aria-label="Sound on or off" aria-pressed="true">Sound: on</button>
 </div>
 
@@ -156,9 +156,9 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="geometry.js?v=20261009i"></script>
+<script src="geometry.js?v=20261028c"></script>
 <script src="ocean.js?v=20261009i"></script>
-<script src="renderer.js?v=20261009i"></script>
-<script src="twin.js?v=20261009i"></script>
+<script src="renderer.js?v=20261028c"></script>
+<script src="twin.js?v=20261028c"></script>
 </body>
 </html>

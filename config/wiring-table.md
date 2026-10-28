@@ -78,3 +78,40 @@ the board's USB cable to a wall charger and record visual results without serial
 Pass requires six panels lit together, correct colors, and five minutes of changing
 patterns without a dark panel, corruption or reboot. A serial init log alone does
 not establish that any physical panel lit.
+
+## บอร์ดฐาน — ESP32-WROOM / DevKit (`esp32dev`)
+
+ใช้บอร์ด ESP32 รุ่นปกติแยกจากบอร์ดหมุน ต่อ USB ผ่านชิป USB-UART ของบอร์ด
+ปุ่มและ KY-040 ต่อสัญญาณลง GND และใช้ `INPUT_PULLUP`; UART2 เป็นสายระดับ 3.3 V
+และต้องต่อ GND ร่วมกัน ขาที่เลือกไม่ชน strapping GPIO0/2/5/12/15, flash GPIO6–11,
+ขา input-only GPIO34–39 หรือ UART0 GPIO1/3 ขา GPIO13/26/27 เป็น ADC2 แต่ใช้งานเป็น
+digital input เท่านั้น และ firmware นี้ไม่เปิด Wi-Fi
+
+| อุปกรณ์ | ขา KY-040 หรือปุ่ม | GPIO | หมายเหตุ |
+|---|---|---:|---|
+| KY-040 | CLK | 32 | input pull-up; quadrature |
+| KY-040 | DT | 33 | input pull-up; นับครบ 4 transitions ต่อ detent |
+| KY-040 | SW | 25 | ต่อ GND เมื่อกด; debounce 35 ms; ส่ง event `button/wheel` |
+| ปุ่ม Scan | signal | 26 | อีกขาต่อ GND; active-low, debounce 35 ms |
+| ปุ่ม Collect | signal | 27 | อีกขาต่อ GND; active-low, debounce 35 ms |
+| ปุ่ม Analyze | signal | 13 | อีกขาต่อ GND; active-low, debounce 35 ms |
+| UART2 ไปบอร์ดหมุน | RX | 16 | รับบรรทัด JSON แล้ว forward ไป USB โดยคงข้อความเดิม |
+| UART2 ไปบอร์ดหมุน | TX | 17 | ส่ง event จากปุ่ม/ล้อไปบอร์ดหมุน |
+| USB-UART บน DevKit | USB Serial | UART0 | `Serial`, 115200 baud; GPIO1/3 สงวนไว้ให้ชิป USB-UART |
+
+### ผังสลิปริง 12 เส้น
+
+| เส้น | บอร์ดฐาน | บอร์ดหมุน | ใช้สำหรับ |
+|---:|---|---|---|
+| 1 | 5V | 5V | จ่ายไฟ |
+| 2 | 5V | 5V | จ่ายไฟ |
+| 3 | 5V | 5V | จ่ายไฟ |
+| 4 | GND | GND | กราวด์ร่วม |
+| 5 | GND | GND | กราวด์ร่วม |
+| 6 | GND | GND | กราวด์ร่วม |
+| 7 | GPIO17 / UART2 TX | UART RX | event จากฐานไปบอร์ดหมุน |
+| 8 | GPIO16 / UART2 RX | UART TX | yaw จากบอร์ดหมุนไปฐาน |
+| 9 | สำรอง | สำรอง | ไม่ต่อ |
+| 10 | สำรอง | สำรอง | ไม่ต่อ |
+| 11 | สำรอง | สำรอง | ไม่ต่อ |
+| 12 | สำรอง | สำรอง | ไม่ต่อ |

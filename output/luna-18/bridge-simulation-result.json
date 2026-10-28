@@ -1,0 +1,14 @@
+{
+  "boot_result": [
+    false,
+    false
+  ],
+  "parse_errors_after_boot": 0,
+  "stdout_after_boot": "",
+  "yaw_result_after_boot": [
+    true,
+    false
+  ],
+  "yaw_state_updated": true,
+  "bridge_events": []
+}

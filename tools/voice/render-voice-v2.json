@@ -1,0 +1,28 @@
+{
+ "voice": "en-US-MichelleNeural",
+ "rate": "-17%",
+ "pitch": "+20Hz",
+ "post": "lowpass 1st-order 11k, stereo room RT1.3 wet0.38, speech RMS -21.6 dBFS, peak<=-7.9",
+ "lines": {
+  "vo_zone_deep_v2": {
+   "text": "Below 1,976 metres. Floodlights on.",
+   "sec": 7.06
+  },
+  "vo_max_depth_v2": {
+   "text": "Maximum depth: 3,040 metres. The descent ends here.",
+   "sec": 7.28
+  },
+  "vo_gate_hint": {
+   "text": "The floor is close. Turn the sphere to find the opening.",
+   "sec": 5.96
+  },
+  "vo_gate_found": {
+   "text": "Opening found. Hold dive to pass through.",
+   "sec": 5.33
+  },
+  "vo_gate_pass": {
+   "text": "Through the opening. Welcome to the next level.",
+   "sec": 5.1
+  }
+ }
+}

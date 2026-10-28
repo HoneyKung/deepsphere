@@ -14,7 +14,8 @@ const state={depth:0,pretty:true,level:0,gateReady:0,frame:false,yaw:0,zone:'sur
 const SCAN_SWEEP_MS=1400, HIGHLIGHT_MS=10000, COLLECT_FLASH_MS=700;
 const panels=[], labels=[];
 let edgePairs=[];
-let scene,camera,renderer,cubeGroup,mountedGroup,aimMarker;
+let scene,camera,renderer,cubeGroup,mountedGroup,ringGroup,aimMarker,mountBase;
+const ringScreens=[];
 let dragging=false,lastX=0,lastY=0;
 let orbit={theta:-1.3,phi:1.32,dist:4.4};
 let previousTime=0,lastFrame=0,lastRenderKey='';
@@ -34,6 +35,8 @@ function updateZone(depth) {
 }
 
 function reticleHit(yaw) {
+  if(state.ring) return geometry.ringAim(yaw);
+  if(state.sphere) return {...geometry.ringAim(yaw),visible:true,onPanel:true};
   const p=geometry.aim(yaw,state.depth);
   return {...p,u:p.local[0],v:p.local[1],onPanel:state.sphere?true:p.visible};
 }
@@ -89,8 +92,8 @@ function buildSeaLut() {
   const look=config.depth_darkening;SEA_LUT=new Float32Array(1024*3);
   for(let i=0;i<1024;i++) {const c=TwinOcean.colorAtDepth(i/1023,look);SEA_LUT[i*3]=c[0];SEA_LUT[i*3+1]=c[1];SEA_LUT[i*3+2]=c[2];}
 }
-function makeSeaPre(stripX,stripY,n) {
-  const L=geometry.stripLengthMm,gs=L/18,look=config.depth_darkening;
+function makeSeaPre(stripX,stripY,n,lengthMm=geometry.stripLengthMm) {
+  const L=lengthMm,gs=L/18,look=config.depth_darkening;
   const uPhase=new Float32Array(n),vert=new Float32Array(n),lon=new Float32Array(n),mer=new Float32Array(n);
   for(let i=0;i<n;i++) {
     const u=((stripX[i]/L)%1+1)%1,gx=Math.abs(stripX[i]/gs-Math.round(stripX[i]/gs));
@@ -100,14 +103,14 @@ function makeSeaPre(stripX,stripY,n) {
   }
   return {uPhase,vert,lon,mer};
 }
-function paintSea(out,stripX,stripY,pre,n,skip,w,stride,h) {
+function paintSea(out,stripX,stripY,pre,n,skip,w,stride,h,lengthMm=geometry.stripLengthMm) {
   h=h||w;
   if(!SEA_LUT) buildSeaLut();
-  const look=config.depth_darkening,d=clamp01(state.depth),gs=geometry.stripLengthMm/18;
+  const look=config.depth_darkening,d=clamp01(state.depth),gs=lengthMm/18;
   const amp=look.texture_amplitude_rgb,band=look.surface_band.rgb,lens=look.snell_window.rgb,gridGain=look.grid_gain;
   const texShift=d*SEA_TEX_DRIFT_MM,lensFade=clamp01(1-d/look.snell_window.depth_fade_norm),lensStrength=look.snell_window.strength;
   const bandFade=clamp01(1-d/look.surface_band.fade_depth_norm),grid=state.grid;
-  const seaK=1/geometry.depthTravelMm,seaRef=geometry.aimHeightMm-FLOOR.clear-FLOOR.thick/2+seaShift();
+  const seaK=1/geometry.depthTravelMm,aimY=state.ring||state.sphere?geometry.ringAimY:geometry.aimHeightMm,seaRef=aimY-FLOOR.clear-FLOOR.thick/2+seaShift();
   for(let yy=0;yy<h;yy+=stride) for(let xx=0;xx<w;xx+=stride) {
     const i=yy*w+xx;
     if(skip&&skip[i]) continue;
@@ -130,8 +133,9 @@ function paintSea(out,stripX,stripY,pre,n,skip,w,stride,h) {
 
 // Which creature (if any) owns each pixel. Same maths as geometry.subjectAt, but one tight loop with the
 // per-creature numbers worked out once per frame (the old per-pixel function calls were the main cost).
-function seaBounds(stripX,stripY,n,skip) {
-  const L=geometry.stripLengthMm,ref=stripX[skip?skip.indexOf(0):0];
+function wrapAt(x,center,lengthMm) {let d=x-center;while(d>lengthMm/2)d-=lengthMm;while(d<-lengthMm/2)d+=lengthMm;return d;}
+function seaBounds(stripX,stripY,n,skip,lengthMm=geometry.stripLengthMm) {
+  const L=lengthMm,ref=stripX[skip?skip.indexOf(0):0];
   let a=1e9,b=-1e9,y0=1e9,y1=-1e9;
   for(let i=0;i<n;i++) {
     if(skip&&skip[i]) continue;
@@ -140,8 +144,8 @@ function seaBounds(stripX,stripY,n,skip) {
   }
   return {xc:ref+(a+b)/2,hx:(b-a)/2,y0,y1};
 }
-function fillSubjects(stripX,stripY,n,skip,shown,out,bounds) {
-  const L=geometry.stripLengthMm,aimY=geometry.aimHeightMm,scroll=geometry.stripScrollMm(state.depth),m=shown.length;
+function fillSubjects(stripX,stripY,n,skip,shown,out,bounds,lengthMm=geometry.stripLengthMm,aimY=geometry.aimHeightMm) {
+  const L=lengthMm,scroll=geometry.stripScrollMm(state.depth),m=shown.length;
   const sx=new Float64Array(m),sy=new Float64Array(m),hw=new Float64Array(m),hh=new Float64Array(m),masks=[];
   for(let k=0;k<m;k++) {
     const sub=config.subjects[k];sx[k]=shown[k][0];sy[k]=2*aimY-shown[k][1]+scroll;hw[k]=sub.w_mm/2;hh[k]=sub.h_mm/2;masks.push(config.sprite_masks[sub.kind]);
@@ -149,7 +153,7 @@ function fillSubjects(stripX,stripY,n,skip,shown,out,bounds) {
   // Only creatures whose box touches this panel are worth testing against its pixels.
   const active=[];
   for(let k=0;k<m;k++) {
-    let dxs=sx[k]-bounds.xc;dxs-=L*Math.round(dxs/L);
+    let dxs=wrapAt(sx[k],bounds.xc,L);
     if(Math.abs(dxs)>bounds.hx+hw[k]||sy[k]+hh[k]<bounds.y0||sy[k]-hh[k]>bounds.y1) continue;
     active.push(k);
   }
@@ -159,7 +163,7 @@ function fillSubjects(stripX,stripY,n,skip,shown,out,bounds) {
     const x=stripX[i],y=stripY[i];let found=-1;
     for(let a=0;a<active.length;a++) {
       const k=active[a];
-      let dx=x-sx[k];dx-=L*Math.round(dx/L);
+      const dx=wrapAt(x,sx[k],L);
       if(dx>hw[k]||dx<-hw[k]) continue;
       const dy=y-sy[k];
       if(dy>hh[k]||dy<-hh[k]) continue;
@@ -347,13 +351,17 @@ const ART={
   }
 };
 function drawCreatures(ctx,m,shown) {
-  const aimY=geometry.aimHeightMm,scroll=geometry.stripScrollMm(state.depth),t=state.seconds,reach=m.reach?m.reach+8:geometry.stripStepMm+26;
+  const aimY=m.aimY??geometry.aimHeightMm,wrap=m.wrapDistance||geometry.wrapDistance,scroll=geometry.stripScrollMm(state.depth),t=state.seconds,reach=m.reach?m.reach+8:geometry.stripStepMm+26;
   const mark=state.highlight||performance.now()<state.highlightUntil;
   for(let k=0;k<shown.length;k++) {
-    const sub=config.subjects[k],dx=geometry.wrapDistance(shown[k][0],m.cx),y=2*aimY-shown[k][1]+scroll;
+    const sub=config.subjects[k],dx=wrap(shown[k][0],m.cx),y=2*aimY-shown[k][1]+scroll;
     if(Math.abs(dx)>reach||y<-82||y>82) continue;
     const key=sub.art||(sub.art=artKey(sub)),view=ART_VIEW[key];
-    ctx.save();ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);ctx.translate(dx,y);
+    ctx.save();
+    if(m.projectX) {
+      const px=m.projectX(shown[k][0]),py=m.d*y+m.f,sx=m.scaleAtX(shown[k][0]);
+      ctx.setTransform(sx,0,0,m.d,px,py);
+    } else {ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);ctx.translate(dx,y);}
     if(mark) {
       // Dive assist: green corner brackets around every creature in view.
       const hw=view[0]/2+0.8,hh=view[1]/2+0.8,cy=view[3],a=1.8;
@@ -464,17 +472,19 @@ function drawWreck(ctx,t) {
   ctx.fillStyle='#4a3a2c';for(const p of [[-31,0.9],[-33.5,0.7]]) {ctx.beginPath();ctx.ellipse(p[0],p[1],1.1,1.4,0.3,0,TAU);ctx.fill();}
 }
 function drawFloor(ctx,m,gate,index) {
-  const K=geometry.depthTravelMm,L=geometry.stripLengthMm,d=clamp01(state.depth),t=state.seconds,T=FLOOR.thick;
-  const y0=geometry.aimHeightMm-FLOOR.clear+(d-gate.depth)*K+(gate.shift||0);
+  const K=geometry.depthTravelMm,L=m.lengthMm||geometry.stripLengthMm,aimY=m.aimY??geometry.aimHeightMm,wrap=m.wrapDistance||geometry.wrapDistance,toX=m.toX||((x)=>x),d=clamp01(state.depth),t=state.seconds,T=FLOOR.thick;
+  const y0=aimY-FLOOR.clear+(d-gate.depth)*K+(gate.shift||0);
   if(y0<-74||y0-T>70) return;
-  const gx=gate.u*L,hw=gate.half_mm,reach=m.reach||geometry.stripStepMm+18,wreck=gate.kind==='wreck';
-  const open=x=> {const f=clamp01((Math.abs(geometry.wrapDistance(x,gx))-hw)/(hw*0.6));return f*f*(3-2*f);};
+  const gx=gate.u*L,openingFactor=m.lengthMm?0.8:1,hw=gate.half_mm*openingFactor,reach=m.reach||geometry.stripStepMm+18,wreck=gate.kind==='wreck';
+  const floorSolidAt=x=>geometry.floorSolidAt(gate,x,gx,L,openingFactor);
   const prof=x=> {const u=x/L*TAU;return 1.6*Math.sin(u*4+index*2)+0.9*Math.sin(u*9+1.1+index)+0.5*Math.sin(u*21+0.3);};
-  const top=x=>y0+prof(x)-(1-open(x))*T*0.5;
-  const bottom=x=> {const u=x/L*TAU;return top(x)-T*open(x)*(0.82+0.18*Math.sin(u*13+index)+0.1*Math.sin(u*31));};
-  ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);
+  const top=x=>y0+prof(x)-(1-floorSolidAt(x))*T*0.5;
+  const bottom=x=> {const u=x/L*TAU;return top(x)-T*floorSolidAt(x)*(0.82+0.18*Math.sin(u*13+index)+0.1*Math.sin(u*31));};
+  const gateDelta=m.projectX?(m.projectX(gx)-m.projectX(m.cx))/m.scaleAtX(gx):wrap(gx,m.cx);
+  if(m.projectX)ctx.setTransform(m.scaleAtX(gx),0,0,m.d,m.e,m.f);
+  else ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);
   // A soft light rising out of the opening so it can be found from above.
-  const gdx=geometry.wrapDistance(gx,m.cx);
+  const gdx=gateDelta;
   if(Math.abs(gdx)<reach+hw) {
     ctx.globalCompositeOperation='lighter';
     const beam=ctx.createLinearGradient(0,y0-T,0,y0+26);beam.addColorStop(0,wreck?'rgba(90,230,255,0.2)':'rgba(170,235,255,0.2)');beam.addColorStop(1,'rgba(120,220,255,0)');
@@ -482,7 +492,7 @@ function drawFloor(ctx,m,gate,index) {
     ctx.globalCompositeOperation='source-over';
   }
   if(wreck) {
-    const wx=gate.wreck_u*L,wdx=geometry.wrapDistance(wx,m.cx);
+    const wx=gate.wreck_u*L,wdx=m.projectX?(m.projectX(wx)-m.projectX(m.cx))/m.scaleAtX(wx):wrap(wx,m.cx);
     if(Math.abs(wdx)<reach+36) {ctx.save();ctx.translate(wdx,top(wx)-1.3);ctx.rotate(-0.09);drawWreck(ctx,t);ctx.restore();}
   }
   const g=ctx.createLinearGradient(0,y0+3,0,y0-T);
@@ -494,11 +504,11 @@ function drawFloor(ctx,m,gate,index) {
   ctx.closePath();ctx.fill();
   ctx.strokeStyle=wreck?'rgba(130,165,175,0.5)':'rgba(255,244,205,0.75)';ctx.lineWidth=0.24;ctx.beginPath();
   let pen=false;
-  for(let dx=-reach;dx<=reach;dx+=1.5) {const x=m.cx+dx;if(open(x)<0.25) {pen=false;continue;}if(pen)ctx.lineTo(dx,top(x));else ctx.moveTo(dx,top(x));pen=true;}
+  for(let dx=-reach;dx<=reach;dx+=1.5) {const x=m.cx+dx;if(floorSolidAt(x)<0.25) {pen=false;continue;}if(pen)ctx.lineTo(dx,top(x));else ctx.moveTo(dx,top(x));pen=true;}
   ctx.stroke();
   if(wreck) {
     ctx.fillStyle='#2b363d';
-    for(const b of FLOOR.boulders) {const dx=geometry.wrapDistance(b.x,m.cx);if(Math.abs(dx)>reach||open(b.x)<0.95)continue;ctx.beginPath();ctx.ellipse(dx,top(b.x)-0.2,b.w,b.h,0,0,Math.PI);ctx.closePath();ctx.fill();}
+    for(const b of FLOOR.boulders) {const x=toX(b.x),dx=wrap(x,m.cx);if(Math.abs(dx)>reach||floorSolidAt(x)<0.95)continue;ctx.beginPath();ctx.ellipse(dx,top(x)-0.2,b.w,b.h,0,0,Math.PI);ctx.closePath();ctx.fill();}
     // Glowing motes drifting round the rift beside the wreck.
     ctx.globalCompositeOperation='lighter';
     for(let i=0;i<12;i++) {
@@ -509,8 +519,8 @@ function drawFloor(ctx,m,gate,index) {
     ctx.globalCompositeOperation='source-over';
   } else {
     ctx.strokeStyle='rgba(255,246,214,0.35)';ctx.lineWidth=0.14;
-    for(let i=0;i<30;i++) {const x=(i+0.5)*L/30,dx=geometry.wrapDistance(x,m.cx);if(Math.abs(dx)>reach||open(x)<0.95)continue;const y=top(x)-1.1-(i%3)*0.7;ctx.beginPath();ctx.moveTo(dx-1.4,y);ctx.quadraticCurveTo(dx,y+0.35,dx+1.4,y);ctx.stroke();}
-    for(const item of FLOOR.reef) {const dx=geometry.wrapDistance(item.x,m.cx);if(Math.abs(dx)>reach+6||open(item.x)<0.95)continue;reefDeco(ctx,item,dx,top(item.x),t);}
+    for(let i=0;i<30;i++) {const x=(i+0.5)*L/30,dx=wrap(x,m.cx);if(Math.abs(dx)>reach||floorSolidAt(x)<0.95)continue;const y=top(x)-1.1-(i%3)*0.7;ctx.beginPath();ctx.moveTo(dx-1.4,y);ctx.quadraticCurveTo(dx,y+0.35,dx+1.4,y);ctx.stroke();}
+    for(const item of FLOOR.reef) {const x=toX(item.x),dx=wrap(x,m.cx);if(Math.abs(dx)>reach+6||floorSolidAt(x)<0.95)continue;reefDeco(ctx,item,dx,top(x),t);}
     // Bubbles trickling up out of the hole in the reef.
     ctx.strokeStyle='rgba(230,248,255,0.7)';ctx.lineWidth=0.14;
     for(let i=0;i<8;i++) {const age=((t*0.22+i*0.137)%1),dx=gdx+Math.sin(i*2.7)*hw*0.55+Math.sin(t*1.4+i)*0.5;ctx.globalAlpha=1-age;ctx.beginPath();ctx.arc(dx,y0-T*0.6+age*34,0.28+0.3*((i*7)%3)/2,0,TAU);ctx.stroke();}
@@ -520,13 +530,13 @@ function drawFloor(ctx,m,gate,index) {
 // Trench walls: the backdrop of levels 2 and 3. Their edges are a function of real depth, so ledges and strata
 // climb the screen as the sub goes down, and whatever grows on a ledge tells which level it belongs to.
 function drawWalls(ctx,m) {
-  const d=clamp01(state.depth),K=geometry.depthTravelMm,L=geometry.stripLengthMm,aimY=geometry.aimHeightMm,t=state.seconds;
+  const d=clamp01(state.depth),K=geometry.depthTravelMm,L=m.lengthMm||geometry.stripLengthMm,aimY=m.aimY??geometry.aimHeightMm,wrap=m.wrapDistance||geometry.wrapDistance,t=state.seconds;
   const reach=m.reach||geometry.stripStepMm+18,depthAt=y=>d+(aimY-y)/K,yAt=w=>aimY-(w-d)*K;
   if(depthAt(-62)<0.3) return;
   ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);ctx.lineCap='round';
   const deep=clamp01((d-0.6)/0.08);
   FLOOR.walls.forEach((wall,index)=> {
-    const dx0=geometry.wrapDistance(wall.u*L,m.cx);
+    const dx0=wrap(wall.u*L,m.cx);
     if(Math.abs(dx0)>reach+wall.half+16) return;
     const edge=(w,side)=>(wall.half+6*Math.sin(w*23+wall.seed+side*2.1)+3.5*Math.sin(w*61+wall.seed*1.7+side)+1.6*Math.sin(w*140+side*5))*clamp01((w-0.295)/0.04);
     ctx.beginPath();
@@ -574,10 +584,10 @@ function drawWalls(ctx,m) {
 }
 // Small life of the middle water: a school of lanternfish carrying their own lights, and comb jellies.
 function drawMidLife(ctx,m,vis) {
-  const d=clamp01(state.depth),t=state.seconds,reach=m.reach||geometry.stripStepMm+18;
+  const d=clamp01(state.depth),t=state.seconds,reach=m.reach||geometry.stripStepMm+18,wrap=m.wrapDistance||geometry.wrapDistance,toX=m.toX||((x)=>x);
   ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);
   LIFE.lanterns.forEach((sc,si)=> {
-    const dx0=geometry.wrapDistance(sc.x+t*sc.v,m.cx),y0=sc.y+(d-0.45)*170,dir=sc.v>0?1:-1;
+    const dx0=wrap(toX(sc.x+t*sc.v),m.cx),y0=sc.y+(d-0.45)*170,dir=sc.v>0?1:-1;
     if(Math.abs(dx0)>reach+12||y0>72||y0<-72) return;
     for(const f of sc.fish) {
       const x=dx0+f.dx+Math.sin(t*0.7+f.ph)*1.1,y=y0+f.dy+Math.cos(t*0.5+f.ph)*0.7,b=0.45+0.55*Math.max(0,Math.sin(t*2.4+f.ph*3));
@@ -591,7 +601,7 @@ function drawMidLife(ctx,m,vis) {
     }
   });
   for(const c of LIFE.combs) {
-    const dx=geometry.wrapDistance(c.x+Math.sin(t*0.12+c.ph)*5,m.cx),y=((c.y+t*c.v+d*200+60)%120+120)%120-60;
+    const dx=wrap(toX(c.x+Math.sin(t*0.12+c.ph)*5),m.cx),y=((c.y+t*c.v+d*200+60)%120+120)%120-60;
     if(Math.abs(dx)>reach) continue;
     ctx.fillStyle='rgba(170,205,255,'+(0.16*vis).toFixed(3)+')';ctx.strokeStyle='rgba(200,225,255,'+(0.3*vis).toFixed(3)+')';ctx.lineWidth=0.08;
     ctx.beginPath();ctx.ellipse(dx,y,c.size*0.62,c.size,0,0,TAU);ctx.fill();ctx.stroke();
@@ -607,14 +617,14 @@ function drawMidLife(ctx,m,vis) {
 
 // The bottom of the sea: black basalt with glowing cracks, columns, and two smoking vents.
 function drawSeaBed(ctx,m) {
-  const d=clamp01(state.depth),t=state.seconds,base=geometry.aimHeightMm-FLOOR.clear-4+(d-1)*geometry.depthTravelMm;
+  const d=clamp01(state.depth),t=state.seconds,L=m.lengthMm||geometry.stripLengthMm,aimY=m.aimY??geometry.aimHeightMm,wrap=m.wrapDistance||geometry.wrapDistance,toX=m.toX||((x)=>x),base=aimY-FLOOR.clear-4+(d-1)*geometry.depthTravelMm;
   if(base<-70) return;
-  const reach=m.reach||geometry.stripStepMm+18,floor=x=>seaFloor(x,base);
+  const reach=m.reach||geometry.stripStepMm+18,floor=x=>seaFloor(x,base,L);
   ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);
   for(const col of FLOOR.columns) {
-    const dx=geometry.wrapDistance(col.x,m.cx);
+    const x0=toX(col.x),dx=wrap(x0,m.cx);
     if(Math.abs(dx)>reach+10) continue;
-    col.bars.forEach((hgt,i)=> {const x=dx+(i-3)*1.7,foot=floor(col.x+(i-3)*1.7)-1;ctx.fillStyle=i%2?'#161d21':'#1d262b';ctx.fillRect(x-0.8,foot,1.6,hgt+1);ctx.fillStyle='rgba(150,170,175,0.35)';ctx.fillRect(x-0.8,foot+hgt+0.8,1.6,0.22);});
+    col.bars.forEach((hgt,i)=> {const x=dx+(i-3)*1.7,foot=floor(x0+(i-3)*1.7)-1;ctx.fillStyle=i%2?'#161d21':'#1d262b';ctx.fillRect(x-0.8,foot,1.6,hgt+1);ctx.fillStyle='rgba(150,170,175,0.35)';ctx.fillRect(x-0.8,foot+hgt+0.8,1.6,0.22);});
   }
   // The only warm light down here comes up off the lava.
   ctx.globalCompositeOperation='lighter';
@@ -630,34 +640,34 @@ function drawSeaBed(ctx,m) {
   ctx.stroke();
   // Pillow lava: rounded lobes of cooled rock, then pockets where the magma still glows through.
   ctx.strokeStyle='rgba(120,140,150,0.16)';ctx.lineWidth=0.2;
-  for(const b of FLOOR.pillows) {const dx=geometry.wrapDistance(b.x,m.cx);if(Math.abs(dx)>reach)continue;ctx.beginPath();ctx.ellipse(dx,floor(b.x)-b.deep,b.w,b.w*0.55,0,0.15,Math.PI-0.15);ctx.stroke();}
+  for(const b of FLOOR.pillows) {const x=toX(b.x),dx=wrap(x,m.cx);if(Math.abs(dx)>reach)continue;ctx.beginPath();ctx.ellipse(dx,floor(x)-b.deep,b.w,b.w*0.55,0,0.15,Math.PI-0.15);ctx.stroke();}
   ctx.globalCompositeOperation='lighter';ctx.lineCap='round';
   for(const k of FLOOR.pockets) {
-    const dx=geometry.wrapDistance(k.x,m.cx);
+    const x=toX(k.x),dx=wrap(x,m.cx);
     if(Math.abs(dx)>reach+6) continue;
-    const y=floor(k.x)-k.deep,heat=0.5+0.5*Math.sin(t*0.8+k.ph),glow=ctx.createRadialGradient(dx,y,0.1,dx,y,k.size);
+    const y=floor(x)-k.deep,heat=0.5+0.5*Math.sin(t*0.8+k.ph),glow=ctx.createRadialGradient(dx,y,0.1,dx,y,k.size);
     glow.addColorStop(0,'rgba(255,150,60,'+(0.3+0.2*heat).toFixed(3)+')');glow.addColorStop(0.35,'rgba(255,70,20,'+(0.12+0.08*heat).toFixed(3)+')');glow.addColorStop(1,'rgba(255,60,10,0)');
     ctx.fillStyle=glow;ctx.beginPath();ctx.arc(dx,y,k.size,0,TAU);ctx.fill();
   }
   for(const crack of FLOOR.cracks) {
-    const dx=geometry.wrapDistance(crack.x,m.cx);
+    const x0=toX(crack.x),dx=wrap(x0,m.cx);
     if(Math.abs(dx)>reach+4) continue;
     const glow=0.35+0.3*Math.sin(t*1.3+crack.ph);
     for(const pass of [[0.75,'rgba(255,110,35,'+(glow*0.55).toFixed(3)+')'],[0.2,'rgba(255,215,130,'+glow.toFixed(3)+')']]) {
-      let x=dx,y=floor(crack.x)-0.6;ctx.strokeStyle=pass[1];ctx.lineWidth=pass[0];ctx.beginPath();ctx.moveTo(x,y);
+      let x=dx,y=floor(x0)-0.6;ctx.strokeStyle=pass[1];ctx.lineWidth=pass[0];ctx.beginPath();ctx.moveTo(x,y);
       for(const s of crack.steps) {x+=s[0];y-=s[1];ctx.lineTo(x,y);}
       ctx.stroke();
     }
   }
   ctx.globalCompositeOperation='source-over';
   for(const v of LIFE.vents) {
-    const dx=geometry.wrapDistance(v.x,m.cx);
+    const x0=toX(v.x),dx=wrap(x0,m.cx);
     if(Math.abs(dx)>reach+8) continue;
-    const foot=floor(v.x),tip=foot+7;
+    const foot=floor(x0),tip=foot+7;
     ctx.fillStyle='#0c1316';ctx.strokeStyle='rgba(125,150,155,0.5)';ctx.lineWidth=0.22;
     ctx.beginPath();ctx.moveTo(dx-2.4,foot-1);ctx.lineTo(dx-0.8,tip);ctx.lineTo(dx+0.8,tip);ctx.lineTo(dx+2.4,foot-1);ctx.closePath();ctx.fill();ctx.stroke();
     for(const w of v.worms) {
-      const wx=dx+w.dx,wy=floor(v.x+w.dx),sway=Math.sin(t*0.9+w.ph)*0.35;
+      const wx=dx+w.dx,wy=floor(x0+w.dx),sway=Math.sin(t*0.9+w.ph)*0.35;
       ctx.strokeStyle='rgba(235,235,225,0.8)';ctx.lineWidth=0.2;ctx.beginPath();ctx.moveTo(wx,wy-0.3);ctx.lineTo(wx+sway,wy+w.h);ctx.stroke();
       ctx.fillStyle='rgba(255,80,70,0.9)';ctx.beginPath();ctx.arc(wx+sway,wy+w.h,0.3,0,TAU);ctx.fill();
     }
@@ -698,17 +708,25 @@ function lifeMap(faceId,width,ring) {
   const o=at(cx,0),px=at(cx+1,0),py=at(cx,1);
   return {cx,w:width,a:px[0]-o[0],b:px[1]-o[1],c:py[0]-o[0],d:py[1]-o[1],e:o[0],f:o[1],scale:Math.hypot(px[0]-o[0],px[1]-o[1])};
 }
-function seaFloor(x,base) {
-  const u=x/geometry.stripLengthMm*Math.PI*2;
+function ringLifeMap(index,width) {
+  const span=geometry.ringPanelWidth,center=geometry.ringPanel(index,.5,.5).strip_mm[0],scale=width/span;
+  return {cx:center,w:width,reach:span/2+8,a:scale,b:0,c:0,d:-scale,e:width/2,f:width/2,scale,
+    lengthMm:geometry.ringLengthMm,aimY:geometry.ringAimY,wrapDistance:geometry.ringWrapDistance,
+    toX:x=>x/geometry.stripLengthMm*geometry.ringLengthMm,
+    projectX:x=>geometry.ringCanvasX(index,x,width),scaleAtX:()=>scale};
+}
+function seaFloor(x,base,lengthMm=geometry.stripLengthMm) {
+  const u=x/lengthMm*Math.PI*2;
   return base+3.4*Math.sin(u*3)+1.8*Math.sin(u*7+1.3)+0.9*Math.sin(u*17+0.4);
 }
 function drawLife(ctx,m,shown) {
   if(!LIFE.built) buildLife();
   const d=clamp01(state.depth),t=state.seconds,W=m.w,S=m.scale,step=geometry.stripStepMm,reach=m.reach||step+18;
+  const lengthMm=m.lengthMm||geometry.stripLengthMm,wrap=m.wrapDistance||geometry.wrapDistance,toX=m.toX||((x)=>x),aimY=m.aimY??geometry.aimHeightMm;
   const wrapY=v=>((v+60)%120+120)%120-60;
   const band=(a,b,c,e)=>d<=a||d>=e?0:d<b?(d-a)/(b-a):d<=c?1:(e-d)/(e-c);
   let PX=0,PY=0;
-  const put=(x,y)=> {const dx=geometry.wrapDistance(x,m.cx);PX=m.a*dx+m.c*y+m.e;PY=m.b*dx+m.d*y+m.f;return PX>-8&&PY>-8&&PX<W+8&&PY<W+8;};
+  const put=(x,y)=> {const dx=wrap(toX(x),m.cx);PX=m.a*dx+m.c*y+m.e;PY=m.b*dx+m.d*y+m.f;return PX>-8&&PY>-8&&PX<W+8&&PY<W+8;};
   const inStrip=()=>ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);
   ctx.save();
 
@@ -717,7 +735,7 @@ function drawLife(ctx,m,shown) {
   if(sun>0) {
     inStrip();ctx.globalCompositeOperation='lighter';
     for(const s of LIFE.shafts) {
-      const dx=geometry.wrapDistance(s.x+Math.sin(t*0.13+s.ph)*5,m.cx);
+      const dx=wrap(toX(s.x+Math.sin(t*0.13+s.ph)*5),m.cx);
       if(Math.abs(dx)>reach+14) continue;
       const a=sun*(0.085+0.05*Math.sin(t*0.4+s.ph)),g=ctx.createLinearGradient(0,58,0,-45);
       g.addColorStop(0,'rgba(190,240,255,'+a.toFixed(3)+')');g.addColorStop(1,'rgba(190,240,255,0)');
@@ -729,7 +747,7 @@ function drawLife(ctx,m,shown) {
   // A whale passing far off while its call is heard.
   const whale=(performance.now()-(state.whaleAt||-1e9))/(state.whaleFor||1);
   if(whale>=0&&whale<=1&&d<0.7) {
-    const dx=geometry.wrapDistance((state.whaleX||0)+whale*95,m.cx),y=16+Math.sin(whale*5)*3;
+    const dx=wrap(toX((state.whaleX||0)+whale*95),m.cx),y=16+Math.sin(whale*5)*3;
     if(Math.abs(dx)<reach+40) {
       inStrip();ctx.fillStyle='rgba(3,14,28,'+(Math.sin(whale*Math.PI)*0.3).toFixed(3)+')';
       ctx.beginPath();ctx.ellipse(dx,y,23,5,0,0,Math.PI*2);ctx.fill();
@@ -743,7 +761,7 @@ function drawLife(ctx,m,shown) {
   if(shallow>0) {
     inStrip();ctx.fillStyle='rgba(205,236,246,'+(0.6*shallow).toFixed(3)+')';
     for(const sc of LIFE.schools) {
-      const dx0=geometry.wrapDistance(sc.x+t*sc.v,m.cx),y0=sc.y+(d-0.1)*150,dir=sc.v>0?1:-1;
+      const dx0=wrap(toX(sc.x+t*sc.v),m.cx),y0=sc.y+(d-0.1)*150,dir=sc.v>0?1:-1;
       if(Math.abs(dx0)>reach+10||y0>70) continue;
       for(const f of sc.fish) {
         const x=dx0+f.dx+Math.sin(t*0.8+f.ph)*1.2,y=y0+f.dy+Math.cos(t*0.6+f.ph)*0.6;
@@ -765,7 +783,7 @@ function drawLife(ctx,m,shown) {
     for(let i=0;i<n;i++) {
       const s=LIFE.snow[i],sx=s.x+Math.sin(t*0.3+s.ph)*1.5,sy=wrapY(s.y-t*s.v+d*LIFE.travel);
       if(!put(sx,sy)) continue;
-      const lit=lamp>0?clamp01(1-Math.hypot(geometry.wrapDistance(sx,LIFE.aimX),sy-geometry.aimHeightMm)/26)*lamp:0;
+      const lit=lamp>0?clamp01(1-Math.hypot(wrap(toX(sx),LIFE.aimX),sy-aimY)/26)*lamp:0;
       const z=Math.max(1,s.s*S);ctx.globalAlpha=Math.min(1,s.a*(0.5+0.5*snow)*(1-0.55*gloom)*(1+2.2*lit));ctx.fillRect(PX-z/2,PY-z/2,z,z);
     }
     ctx.globalAlpha=1;
@@ -776,7 +794,7 @@ function drawLife(ctx,m,shown) {
   if(mid>0) {
     inStrip();ctx.lineWidth=0.09;
     for(const j of LIFE.jellies) {
-      const dx=geometry.wrapDistance(j.x+Math.sin(t*0.1+j.ph)*6,m.cx),y=wrapY(j.y+t*j.v+d*200);
+      const dx=wrap(toX(j.x+Math.sin(t*0.1+j.ph)*6),m.cx),y=wrapY(j.y+t*j.v+d*200);
       if(Math.abs(dx)>reach) continue;
       const p=0.5+0.5*Math.sin(t*1.6+j.ph),rx=j.size*(0.8+0.2*p),ry=j.size*(0.75-0.2*p),tint=j.pink?'255,175,225':'190,175,255';
       ctx.fillStyle='rgba('+tint+','+(0.42*mid).toFixed(3)+')';ctx.strokeStyle='rgba('+tint+','+(0.5*mid).toFixed(3)+')';
@@ -796,7 +814,7 @@ function drawLife(ctx,m,shown) {
   drawSeaBed(ctx,m);
   // The sub's floodlight: a soft pool of light round the reticle once the sun is gone.
   if(lamp>0) {
-    const lx=geometry.wrapDistance(LIFE.aimX,m.cx),ly=geometry.aimHeightMm;
+      const lx=wrap(LIFE.aimX,m.cx),ly=aimY;
     if(Math.abs(lx)<reach+34) {
       ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);ctx.globalCompositeOperation='lighter';
       const pool=ctx.createRadialGradient(lx,ly,1,lx,ly,32);
@@ -857,7 +875,8 @@ function stepLife(hit) {
   LIFE.aimX=hit.strip_mm[0];
   if(state.bubbleBurstAt&&state.bubbleBurstAt!==LIFE.lastBurst) {
     LIFE.lastBurst=state.bubbleBurstAt;
-    for(let i=0;i<9;i++) LIFE.bursts.push({x:hit.strip_mm[0]+(Math.random()-0.5)*18,y:geometry.aimHeightMm-26+Math.random()*16,v:16+Math.random()*16,
+    const aimY=state.ring||state.sphere?geometry.ringAimY:geometry.aimHeightMm;
+    for(let i=0;i<9;i++) LIFE.bursts.push({x:hit.strip_mm[0]+(Math.random()-0.5)*18,y:aimY-26+Math.random()*16,v:16+Math.random()*16,
       rad:0.16+Math.random()*0.3,ph:Math.random()*6.28,born:t+Math.random()*0.35,life:2.2+Math.random()});
   }
   if(LIFE.bursts.length) LIFE.bursts=LIFE.bursts.filter(b=>t-b.born<b.life);
@@ -869,39 +888,59 @@ function stepLife(hit) {
 // equator). Everything that draws the sea is shared with the cube; only the canvas it lands on is different.
 const BALL={W:960,H:480,ready:false};
 function makeBall() {
-  const W=BALL.W,H=BALL.H,L=geometry.stripLengthMm,span=geometry.stripStepMm*3,n=W*H,k=W/L;
+  const W=BALL.W,H=BALL.H,L=geometry.ringLengthMm,span=L/2,n=W*H,k=W/L;
   const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
   BALL.ctx=canvas.getContext('2d');BALL.tex=new THREE.CanvasTexture(canvas);
   BALL.tex.minFilter=THREE.LinearFilter;BALL.tex.generateMipmaps=false;BALL.tex.wrapS=THREE.RepeatWrapping;
   BALL.stripX=new Float64Array(n);BALL.stripY=new Float64Array(n);
   for(let y=0;y<H;y++) for(let x=0;x<W;x++) {const i=y*W+x;BALL.stripX[i]=(x+0.5)/W*L;BALL.stripY[i]=span/2-(y+0.5)/H*span;}
-  BALL.pre=makeSeaPre(BALL.stripX,BALL.stripY,n);
+  BALL.pre=makeSeaPre(BALL.stripX,BALL.stripY,n,L);
   BALL.image=new ImageData(W,H);BALL.k=k;
   // Three maps: the middle one, and one a whole turn to each side so shapes that cross the seam are completed.
-  BALL.maps=[0,-W,W].map(shift=>({cx:L/2,w:W,reach:L/2+2,a:k,b:0,c:0,d:-k,e:W/2+shift,f:H/2,scale:k}));
+  BALL.maps=[0,-W,W].map(shift=>({cx:L/2,w:W,reach:L/2+2,a:k,b:0,c:0,d:-k,e:W/2+shift,f:H/2,scale:k,
+    lengthMm:L,aimY:geometry.ringAimY,wrapDistance:geometry.ringWrapDistance,toX:x=>x/geometry.stripLengthMm*L}));
   // Line the texture up with the cube: strip x = 0 sits at the same azimuth on both.
   const azimuth=yaw=> {const p=geometry.aim(yaw,0).point_mm;return Math.atan2(p[1],p[0]);};
   let turn=azimuth(20)-azimuth(0);while(turn>Math.PI)turn-=TAU;while(turn<-Math.PI)turn+=TAU;
   if(turn<0) BALL.tex.repeat.x=-1;
-  const mesh=new THREE.Mesh(new THREE.SphereGeometry(L/TAU/faceConfig.physical_face_dimensions_mm.face_edge,72,36),new THREE.MeshBasicMaterial({map:BALL.tex,toneMapped:false}));
+  const radius=geometry.ringRadius/faceConfig.physical_face_dimensions_mm.face_edge;
+  const mesh=new THREE.Mesh(new THREE.SphereGeometry(radius,72,36),new THREE.MeshBasicMaterial({map:BALL.tex,toneMapped:false}));
   mesh.rotation.x=Math.PI/2;
-  BALL.holder=new THREE.Group();BALL.holder.rotation.z=azimuth(0)-Math.PI;BALL.holder.add(mesh);cubeGroup.add(BALL.holder);
-  const radius=L/TAU/faceConfig.physical_face_dimensions_mm.face_edge,top=-radius+0.02,bottom=-Math.sqrt(3)/2;
+  const reticleOffset=(config.ring.reticle_azimuth_deg||0)*Math.PI/180;
+  BALL.holder=new THREE.Group();BALL.holder.rotation.z=-Math.PI/2;BALL.holder.add(mesh);cubeGroup.add(BALL.holder);
+  const bandOn=new URLSearchParams(location.search).get('band')!=='0',bandCount=geometry.ringPanels;
+  BALL.band=new THREE.Group();BALL.band.visible=bandOn;BALL.bandCells=[];BALL.holder.add(BALL.band);
+  if(bandOn)for(let section=0;section<bandCount;section++){
+    const offset=Math.PI+reticleOffset,start=section*TAU/bandCount+offset+.025,end=(section+1)*TAU/bandCount+offset-.025,verts=[],indices=[],steps=24,halfLat=.035,r=radius+.012;
+    for(let j=0;j<=steps;j++) {const a=start+(end-start)*j/steps;for(const lat of [-halfLat,halfLat])verts.push(r*Math.cos(lat)*Math.cos(a),r*Math.cos(lat)*Math.sin(a),r*Math.sin(lat));}
+    for(let j=0;j<steps;j++){const i=j*2;indices.push(i,i+1,i+2,i+1,i+3,i+2);}
+    const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));geo.setIndex(indices);geo.computeVertexNormals();
+    const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x4f9f99,transparent:true,opacity:.38,side:THREE.DoubleSide,depthWrite:false}));BALL.band.add(mesh);BALL.bandCells.push(mesh);
+  }
+  const top=-radius+0.02,bottom=-Math.sqrt(3)/2;
   BALL.stem=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,top-bottom,24),new THREE.MeshStandardMaterial({color:0x75959a}));
   BALL.stem.rotation.x=Math.PI/2;BALL.stem.position.z=(top+bottom)/2;scene.add(BALL.stem);
   BALL.ready=true;
 }
 function applyShape() {
   if(state.sphere&&!BALL.ready) makeBall();
-  mountedGroup.visible=!state.sphere;
+  if(state.ring&&!ringGroup) makeRingModel();
+  mountedGroup.visible=!state.sphere&&!state.ring;
+  if(mountBase)mountBase.visible=!state.ring;
+  if(ringGroup) ringGroup.visible=Boolean(state.ring);
   if(BALL.ready) {BALL.holder.visible=state.sphere;BALL.stem.visible=state.sphere;}
   panels.forEach(p=>{p.cacheKey=null;p.ring.cacheKey=null;p.ring.lastAt=0;});BALL.cacheKey=null;lastRenderKey='';
 }
 function renderBall(hit,shown) {
   const W=BALL.W,H=BALL.H,k=BALL.k,ctx=BALL.ctx,now=performance.now();
+  const targetFace=geometry.ringAim(state.yaw).face;
+  if(BALL.bandCells&&BALL.bandIndex!==targetFace) {
+    BALL.bandIndex=targetFace;
+    BALL.bandCells.forEach((mesh,index)=>{const active=index===BALL.bandIndex;mesh.material.color.setHex(active?0x82e9db:0x4f9f99);mesh.material.opacity=active?.72:.38;});
+  }
   if(state.seaDepth!==state.depth) {state.seaDepth=state.depth;state.seaChangedAt=now;}
   const moving=now-(state.seaChangedAt||0)<220,key=state.depth+'|'+state.grid+'|'+(moving?'c':'f')+'|'+seaShift();
-  if(BALL.cacheKey!==key) {paintSea(BALL.image.data,BALL.stripX,BALL.stripY,BALL.pre,W*H,null,W,moving?4:1,H);BALL.cacheKey=key;}
+  if(BALL.cacheKey!==key) {paintSea(BALL.image.data,BALL.stripX,BALL.stripY,BALL.pre,W*H,null,W,moving?4:1,H,geometry.ringLengthMm);BALL.cacheKey=key;}
   ctx.setTransform(1,0,0,1,0,0);ctx.putImageData(BALL.image,0,0);
   for(const m of BALL.maps) drawLife(ctx,m,shown);
   ctx.setTransform(1,0,0,1,0,0);
@@ -911,13 +950,13 @@ function renderBall(hit,shown) {
     g.addColorStop(0,'rgba(40,255,150,0)');g.addColorStop(0.5,'rgba(40,255,150,0.85)');g.addColorStop(1,'rgba(40,255,150,0)');
     ctx.fillStyle=g;ctx.fillRect(0,y-3*k,W,6*k);
   }
-  const ry=H/2-geometry.aimHeightMm*k,flash=(now-state.collectFlash)/COLLECT_FLASH_MS;
+  const ry=H/2,flash=(now-state.collectFlash)/COLLECT_FLASH_MS;
   for(const rx of [hit.strip_mm[0]*k,hit.strip_mm[0]*k-W,hit.strip_mm[0]*k+W]) {
     if(rx<-80||rx>W+80) continue;
     if(flash>=0&&flash<=1) {ctx.strokeStyle='rgba(0,255,150,'+(1-flash).toFixed(2)+')';ctx.lineWidth=3;ctx.beginPath();ctx.arc(rx,ry,8+flash*55,0,TAU);ctx.stroke();}
-    ctx.strokeStyle=state.gateReady?'#ffd36b':'#00ffcc';ctx.lineWidth=1.5;ctx.lineCap='butt';ctx.beginPath();
-    for(const sign of [-1,1]) {ctx.moveTo(rx+sign*3,ry);ctx.lineTo(rx+sign*10,ry);ctx.moveTo(rx,ry+sign*3);ctx.lineTo(rx,ry+sign*10);}
-    ctx.stroke();ctx.strokeRect(rx-7,ry-7,14,14);
+    ctx.strokeStyle=state.gateReady?'#ffd36b':'#00ffcc';ctx.lineWidth=2;ctx.lineCap='butt';ctx.beginPath();
+    for(const sign of [-1,1]) {ctx.moveTo(rx+sign*5,ry);ctx.lineTo(rx+sign*16,ry);ctx.moveTo(rx,ry+sign*5);ctx.lineTo(rx,ry+sign*16);}
+    ctx.stroke();ctx.strokeRect(rx-12,ry-12,24,24);
     if(state.gateReady) {
       const step=Math.floor(now/170)%3,dir=state.gateReady;
       ctx.lineWidth=2;ctx.lineCap='round';
@@ -931,14 +970,13 @@ function renderBall(hit,shown) {
 // frames, so it tests the creature's box in the sea directly.
 function aimedSubject(hit) {
   if(!hit) return -1;
+  if(state.ring) {
+    if(!hit.onPanel) return -1;
+    const p=ringScreens[hit.face],x=Math.min(PANEL-1,Math.max(0,Math.floor(hit.pixel_uv[0]*PANEL))),y=Math.min(PANEL-1,Math.max(0,Math.floor(hit.pixel_uv[1]*PANEL)));
+    return p.subjects[y*PANEL+x];
+  }
   if(!state.sphere) return hit.onPanel?subjectNear(hit.face,hit.u,hit.v,11):-1;
-  const shown=geometry.poses(state.seconds),aimY=geometry.aimHeightMm,scroll=geometry.stripScrollMm(state.depth);
-  let best=-1,near=1e9;
-  shown.forEach((pos,index)=> {
-    const sub=config.subjects[index],dx=Math.abs(geometry.wrapDistance(hit.strip_mm[0],pos[0])),dy=Math.abs(aimY-(2*aimY-pos[1]+scroll));
-    if(dx<=sub.w_mm/2+1.4&&dy<=sub.h_mm/2+1.4&&dx+dy<near) {near=dx+dy;best=index;}
-  });
-  return best;
+  return geometry.ringSubjectAt(hit.strip_mm[0],geometry.ringAimY,state.depth,geometry.ringPoses(state.seconds));
 }
 
 function makePanel(f) {
@@ -1000,6 +1038,43 @@ function drawRing(ring,face,hit,shown) {
   ring.tex.needsUpdate=true;
 }
 
+function makeRingModel() {
+  ringGroup=new THREE.Group();ringGroup.rotation.z=Math.PI/2;cubeGroup.add(ringGroup);
+  const n=geometry.ringPanels,radius=geometry.ringRadius/faceConfig.physical_face_dimensions_mm.face_edge,width=2*radius*Math.sin(geometry.ringOpeningAngle/2),height=geometry.ringPanelWidth/faceConfig.physical_face_dimensions_mm.face_edge;
+  const shell=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,height,n,1,true),new THREE.MeshStandardMaterial({color:0x152b37,metalness:.55,roughness:.42,side:THREE.DoubleSide}));
+  shell.rotation.x=Math.PI/2;ringGroup.add(shell);
+  const axis=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.05,20),new THREE.MeshStandardMaterial({color:0x75959a,metalness:.5,roughness:.45}));
+  axis.rotation.x=Math.PI/2;ringGroup.add(axis);
+  for(let index=0;index<n;index++) {
+    const canvas=document.createElement('canvas');canvas.width=PANEL;canvas.height=PANEL;
+    const ctx=canvas.getContext('2d'),tex=new THREE.CanvasTexture(canvas);tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.LinearFilter;tex.generateMipmaps=false;
+    const stripX=new Float64Array(PANEL*PANEL),stripY=new Float64Array(PANEL*PANEL);
+    for(let y=0;y<PANEL;y++)for(let x=0;x<PANEL;x++){const i=y*PANEL+x,p=geometry.ringPanel(index,(x+.5)/PANEL,(y+.5)/PANEL);stripX[i]=p.strip_mm[0];stripY[i]=p.strip_mm[1];}
+    const p={canvas,ctx,tex,stripX,stripY,subjects:new Int8Array(PANEL*PANEL),frame:new ImageData(PANEL,PANEL),background:new Uint8ClampedArray(PANEL*PANEL*4),cacheKey:null,index,id:geometry.ringOrder[index%geometry.ringOrder.length]};
+    ringScreens.push(p);
+    const angle=index*TAU/n+(config.ring.reticle_azimuth_deg||0)*Math.PI/180,normal=new THREE.Vector3(Math.cos(angle),Math.sin(angle),0),tangent=new THREE.Vector3(-Math.sin(angle),Math.cos(angle),0),up=new THREE.Vector3(0,0,1);
+    const plane=new THREE.Mesh(new THREE.PlaneGeometry(width,height),new THREE.MeshBasicMaterial({map:tex,toneMapped:false,side:THREE.DoubleSide}));
+    plane.setRotationFromMatrix(new THREE.Matrix4().makeBasis(tangent,up,normal));plane.position.copy(normal.clone().multiplyScalar(radius+.012));ringGroup.add(plane);p.plane=plane;
+    const labelCanvas=document.createElement('canvas');labelCanvas.width=128;labelCanvas.height=48;const lc=labelCanvas.getContext('2d');lc.fillStyle='#d8fff8';lc.font='bold 30px monospace';lc.textAlign='center';lc.fillText(p.id.toUpperCase(),64,35);
+    const label=new THREE.Mesh(new THREE.PlaneGeometry(.22,.08),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(labelCanvas),transparent:true,side:THREE.DoubleSide}));label.quaternion.copy(plane.quaternion);label.position.copy(normal.clone().multiplyScalar(radius+.025)).add(up.clone().multiplyScalar(height*.58));ringGroup.add(label);labels.push(label);
+  }
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(.48,.53,.1,48),new THREE.MeshStandardMaterial({color:0x172d3b,metalness:.5,roughness:.4}));base.rotation.x=Math.PI/2;base.position.z=-.56;ringGroup.add(base);
+}
+
+function renderRingScreens(hit,shown) {
+  const now=performance.now();
+  if(state.seaDepth!==state.depth){state.seaDepth=state.depth;state.seaChangedAt=now;}
+  for(const p of ringScreens) {
+    const moving=now-(state.seaChangedAt||0)<220,key=state.depth+'|'+state.grid+'|'+(moving?'c':'f')+'|'+seaShift();
+    if(p.cacheKey!==key){if(!p.pre)p.pre=makeSeaPre(p.stripX,p.stripY,PANEL*PANEL,geometry.ringLengthMm);paintSea(p.background,p.stripX,p.stripY,p.pre,PANEL*PANEL,null,PANEL,moving?3:1,PANEL,geometry.ringLengthMm);p.cacheKey=key;}
+    p.frame.data.set(p.background);fillSubjects(p.stripX,p.stripY,PANEL*PANEL,null,shown,p.subjects,p.bounds||(p.bounds=seaBounds(p.stripX,p.stripY,PANEL*PANEL,null,geometry.ringLengthMm)),geometry.ringLengthMm,geometry.ringAimY);
+    if(!state.pretty)for(let i=0;i<PANEL*PANEL;i++){const s=p.subjects[i];if(s>=0)p.frame.data.set(SUBJECTS[s].rgb,i*4);}
+    p.ctx.putImageData(p.frame,0,0);drawLife(p.ctx,p.lifeMap||(p.lifeMap=ringLifeMap(p.index,PANEL)),shown);
+    if(hit.face===p.index&&hit.onPanel){const x=hit.pixel_uv[0]*PANEL,y=hit.pixel_uv[1]*PANEL;p.ctx.strokeStyle=state.gateReady?'#ffd36b':'#00ffcc';p.ctx.lineWidth=1.5;p.ctx.strokeRect(x-11.5,y-11.5,23,23);p.ctx.beginPath();p.ctx.moveTo(x-13,y);p.ctx.lineTo(x-4,y);p.ctx.moveTo(x+4,y);p.ctx.lineTo(x+13,y);p.ctx.moveTo(x,y-13);p.ctx.lineTo(x,y-4);p.ctx.moveTo(x,y+4);p.ctx.lineTo(x,y+13);p.ctx.stroke();}
+    p.tex.needsUpdate=true;
+  }
+}
+
 function initThree() {
   const host=document.getElementById('canvas-container');
   scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,0.1,100);
@@ -1016,8 +1091,8 @@ function initThree() {
   mountedGroup.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002,1.002,1.002)),new THREE.LineBasicMaterial({color:0x60dcc7})));
   const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.36,24),new THREE.MeshStandardMaterial({color:0x75959a}));
   pole.rotation.x=Math.PI/2;pole.position.z=-Math.sqrt(3)/2-0.18;scene.add(pole);
-  const base=new THREE.Mesh(new THREE.CylinderGeometry(0.48,0.53,0.1,64),new THREE.MeshStandardMaterial({color:0x172d3b,metalness:0.5,roughness:0.4}));
-  base.rotation.x=Math.PI/2;base.position.z=-Math.sqrt(3)/2-0.39;scene.add(base);
+  mountBase=new THREE.Mesh(new THREE.CylinderGeometry(0.48,0.53,0.1,64),new THREE.MeshStandardMaterial({color:0x172d3b,metalness:0.5,roughness:0.4}));
+  mountBase.rotation.x=Math.PI/2;mountBase.position.z=-Math.sqrt(3)/2-0.39;scene.add(mountBase);
   const axis=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,-1.25),new THREE.Vector3(0,0,1.05)]);
   const axisLine=new THREE.Line(axis,new THREE.LineDashedMaterial({color:0x487668,dashSize:0.03,gapSize:0.025}));
   axisLine.computeLineDistances();scene.add(axisLine);
@@ -1048,7 +1123,7 @@ function fitOrbit() {orbit.dist=Math.max(orbit.dist,Math.min(7,4.4*Math.max(1,0.
 function placeCamera() {
   camera.up.set(0,0,1);
   camera.position.set(orbit.dist*Math.sin(orbit.phi)*Math.cos(orbit.theta),orbit.dist*Math.sin(orbit.phi)*Math.sin(orbit.theta),orbit.dist*Math.cos(orbit.phi));
-  camera.lookAt(0,0,-0.15);
+  camera.lookAt(0,0,state.sphere||state.ring?0:-0.15);
 }
 function drawReticle(p,hit) {
   const x=Math.min(PANEL-1,Math.floor(hit.pixel_uv[0]*PANEL)),y=Math.min(PANEL-1,Math.floor(hit.pixel_uv[1]*PANEL));
@@ -1069,14 +1144,16 @@ function drawReticle(p,hit) {
 }
 
 function updateAimMarker(hit) {
-  aimMarker.visible=hit.onPanel&&!state.sphere;
+  aimMarker.visible=Boolean(state.ring&&hit.onPanel)||Boolean(hit.onPanel&&!state.sphere&&!state.ring);
+  if(state.ring){const p=geometry.ringMarkerPoint(state.yaw),edge=faceConfig.physical_face_dimensions_mm.face_edge,r=Math.hypot(p[0],p[1]),pad=0.035;aimMarker.position.set((p[0]+p[0]/r*pad)/edge,(p[1]+p[1]/r*pad)/edge,p[2]/edge);return;}
   const bp=hit.point_mm.map(x=>x/faceConfig.physical_face_dimensions_mm.face_edge),a=(state.yaw+geometry.aimPhaseDeg)*Math.PI/180;
   aimMarker.position.set(bp[0]*Math.cos(a)+bp[1]*Math.sin(a),-bp[0]*Math.sin(a)+bp[1]*Math.cos(a),bp[2]);
 }
 
 function renderPanels() {
-  const hit=reticleHit(state.yaw),shown=geometry.poses(state.seconds);
+  const hit=reticleHit(state.yaw),shown=(state.ring||state.sphere)?geometry.ringPoses(state.seconds):geometry.poses(state.seconds);
   stepLife(hit);
+  if(state.ring){renderRingScreens(hit,shown);return hit;}
   if(state.sphere) {renderBall(hit,shown);return hit;}
   panels.forEach((p,face)=> {
     if(state.seaDepth!==state.depth) {state.seaDepth=state.depth;state.seaChangedAt=performance.now();}
@@ -1237,6 +1314,7 @@ async function init() {
   const read=async path=> {const r=await fetch(path+'?v='+Date.now(),{cache:'no-store'});if(!r.ok) throw new Error(path+': '+r.status);return r.json();};
   [config,faceConfig,sceneConfig]=await Promise.all(['../config/twin.json','../config/faces.json','../config/scene.json'].map(read));
   geometry=TwinGeometry.create(config,faceConfig,sceneConfig);SUBJECTS=config.subjects;
+  orbit.theta=(config.ring.reticle_azimuth_deg||0)*Math.PI/180;
   FACES=faceConfig.faces.map(f=>({id:f.id,n:f.normal,r:f.right,d:f.down,rect:f.physical_face_uv,on:config.enabled_faces.includes(f.id)}));
   for(let i=0;i<FACES.length;i++) for(let j=i+1;j<FACES.length;j++) {
     const a=FACES[i],b=FACES[j],normalDot=a.n.reduce((sum,v,k)=>sum+v*b.n[k],0);
@@ -1245,7 +1323,7 @@ async function init() {
     edgePairs.push([a.id,b.id,{free,mid,inwards:[inwardA,inwardB]}]);
   }
   edgePairs.forEach((pair,i)=>{const option=document.createElement('option');option.value=i;option.textContent=pair[0].toUpperCase()+' / '+pair[1].toUpperCase();$('edge-select').appendChild(option);});
-  initThree();await initAudio().catch(error=>{console.error(error);audioLog('sound_manifest','silent',error.message);});initInput();initViewControls();placeCamera();
+  initThree();if(state.shape)applyShape();await initAudio().catch(error=>{console.error(error);audioLog('sound_manifest','silent',error.message);});initInput();initViewControls();placeCamera();
   $('btn-start').disabled=false;$('btn-start').textContent='BEGIN EXPLORATION';
   $('btn-start').addEventListener('click',start);requestAnimationFrame(animate);
   if(new URLSearchParams(location.search).get('acceptance')==='1') {

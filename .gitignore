@@ -14,3 +14,6 @@ __pycache__/
 tmp/
 twin_backup_*/
 assets/audio/temp/
+
+# team notes (status / waiting / rules) - not published
+_team/

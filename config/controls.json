@@ -29,14 +29,26 @@
   },
   "buttons": {
     "active_level": 0,
-    "debounce_ms": 35,
     "cooldown_ms": 350,
+    "debounce_ms": 35,
     "scan": 1,
     "collect": 2,
     "analyze": null,
     "analyze_recommended_alternative": null,
     "analyze_pin_note": "Analyze has no physical GPIO assignment because GPIO3 is nx CS. Physical controls are disabled and the laptop numpad is used; GPIO7 is nz CS and is not a button alternative.",
     "wiring_status": "No physical buttons; Scan/Collect/Analyze use the laptop numpad. GPIO1/2 are reserved for AS5600 SDA/SCL in the next phase."
+  },
+  "base_board": {
+    "board": "esp32dev",
+    "serial_baud": 115200,
+    "uart2_rx": 16,
+    "uart2_tx": 17,
+    "wheel_batch_ms": 20,
+    "wheel_depth_per_click": 0.0166666667,
+    "wheel_depth_reverse": true,
+    "wheel_detents_per_revolution": 20,
+    "wheel_pins": {"clk": 32, "dt": 33, "sw": 25},
+    "button_pins": {"scan": 26, "collect": 27, "analyze": 13}
   },
   "laptop_demo_input": {
     "mode": "keyboard_first",

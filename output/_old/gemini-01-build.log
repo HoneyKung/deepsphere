@@ -1,0 +1,32 @@
+﻿Processing esp32-s3-zero (platform: espressif32@6.7.0; board: waveshare_esp32_s3_zero; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/waveshare_esp32_s3_zero.html
+PLATFORM: Espressif 32 (6.7.0) > Waveshare ESP32-S3-Zero 4MB Flash 2MB PSRAM
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (esp-builtin) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20016.0 (2.0.16) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 37 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Adafruit GFX Library @ 1.11.11
+|-- Adafruit ST7735 and ST7789 Library @ 1.10.4
+|-- SPI @ 2.0.0
+Building in release mode
+Retrieving maximum program size .pio\build\esp32-s3-zero\firmware.elf
+Checking size .pio\build\esp32-s3-zero\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   5.9% (used 19384 bytes from 327680 bytes)
+Flash: [==        ]  24.1% (used 315461 bytes from 1310720 bytes)
+========================= [SUCCESS] Took 9.51 seconds =========================
+
+Environment    Status    Duration
+-------------  --------  ------------
+esp32-s3-zero  SUCCESS   00:00:09.509
+========================= 1 succeeded in 00:00:09.509 =========================
