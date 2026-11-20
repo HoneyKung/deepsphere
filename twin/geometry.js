@@ -44,11 +44,13 @@ const TwinGeometry={
     const atlasFace=(x,y,depth)=>{const hit=faceForStrip(x,y);return {face:hit.k,face_id:hit.id,local:hit.local,valid:hit.faceOutside<=1e-9};};
     const horizontalPerimeterMm=()=>stripLengthMm;
     const ringPanelWidth=ringConfig.panel_active_mm||23.4,ringBezel=ringConfig.bezel_mm??6,ringPitch=ringPanelWidth+ringBezel;
-    const ringRadius=ringPitch/(2*Math.tan(Math.PI/ringPanels)),ringLengthMm=2*Math.PI*ringRadius;
+    // continuous (default): the sea runs on from one screen straight onto the next, no strip hidden behind the bezels.
+    const ringContinuous=ringConfig.continuous!==false,ringStep=2*Math.PI/ringPanels;
+    const ringRadius=ringPitch/(2*Math.tan(Math.PI/ringPanels)),ringLengthMm=ringContinuous?ringPanels*ringPanelWidth:2*Math.PI*ringRadius;
     const ringOpeningAngle=2*Math.atan(ringPanelWidth/(2*ringRadius)),ringPanelArcMm=ringRadius*ringOpeningAngle,ringAimY=0;
     const ringCenterAngle=index=>((index/ringPanels)+(ringConfig.reticle_azimuth_deg||0)/360)*Math.PI*2;
     const ringPanel=(index,u,v)=>{
-      const id=ringOrder[index%ringOrder.length],angle=ringCenterAngle(index)+Math.atan((u-.5)*ringPanelWidth/ringRadius);
+      const id=ringOrder[index%ringOrder.length],angle=ringCenterAngle(index)+(ringContinuous?(u-.5)*ringStep:Math.atan((u-.5)*ringPanelWidth/ringRadius));
       const x=((angle/(Math.PI*2))*ringLengthMm%ringLengthMm+ringLengthMm)%ringLengthMm,y=ringAimY+(0.5-v)*ringPanelWidth;
       return {id,index,u,v,angle,strip_mm:[x,y],point_mm:[ringRadius*Math.cos(angle),ringRadius*Math.sin(angle),y-ringAimY],pixel_uv:[u,v]};
     };
@@ -56,21 +58,21 @@ const TwinGeometry={
       const offset=ringConfig.reticle_azimuth_deg||0,a=(((yaw+offset)%360)+360)%360/360*2*Math.PI;
       const stepAngle=2*Math.PI/ringPanels,localAngle=((a-offset*Math.PI/180+Math.PI*2)%(Math.PI*2)),index=Math.floor((localAngle+stepAngle/2)/stepAngle)%ringPanels;
       const center=ringCenterAngle(index),delta=((a-center+Math.PI*3)%(Math.PI*2))-Math.PI;
-      const u=.5+Math.tan(delta)*ringRadius/ringPanelWidth,visible=u>=0&&u<=1;
+      const u=ringContinuous?.5+delta/ringStep:.5+Math.tan(delta)*ringRadius/ringPanelWidth,visible=u>=0&&u<=1;
       const h=ringPanel(index,u,.5);
       return {...h,strip_mm:[((a/(Math.PI*2))*ringLengthMm)%ringLengthMm,ringAimY],face:index,face_id:h.id,u,v:.5,local:[u,.5],pixel_uv:[Math.max(0,Math.min(1,u)),.5],surface_available:true,visible,onPanel:visible,point_mm:h.point_mm};
     };
     const ringPointAt=(index,x,y)=>{
       let dx=x-ringCenterAngle(index)/(Math.PI*2)*ringLengthMm;while(dx>ringLengthMm/2)dx-=ringLengthMm;while(dx<-ringLengthMm/2)dx+=ringLengthMm;
       const delta=dx*Math.PI*2/ringLengthMm;
-      const u=.5+Math.tan(delta)*ringRadius/ringPanelWidth;
+      const u=ringContinuous?.5+dx/ringPanelWidth:.5+Math.tan(delta)*ringRadius/ringPanelWidth;
       return ringPanel(index,u,.5+(ringAimY-y)/ringPanelWidth);
     };
     const ringPoses=seconds=>config.subjects.map(s=>{const x=(s.x_mm/stripLengthMm*ringLengthMm)+(s.speed_mm_s/stripLengthMm*ringLengthMm)*seconds;return [((x%ringLengthMm)+ringLengthMm)%ringLengthMm,s.y_mm-aimY];});
     const ringWrapDistance=(x,center)=>{let d=x-center;while(d>ringLengthMm/2)d-=ringLengthMm;while(d<-ringLengthMm/2)d+=ringLengthMm;return d;};
     const ringCanvasX=(index,x,width)=>{
-      const center=ringCenterAngle(index)/(Math.PI*2)*ringLengthMm,delta=ringWrapDistance(x,center)/ringRadius;
-      return width*(.5+Math.tan(delta)*ringRadius/ringPanelWidth);
+      const center=ringCenterAngle(index)/(Math.PI*2)*ringLengthMm,dx=ringWrapDistance(x,center);
+      return ringContinuous?width*(.5+dx/ringPanelWidth):width*(.5+Math.tan(dx/ringRadius)*ringRadius/ringPanelWidth);
     };
     const gateOffset=(gate,yaw,lengthMm=stripLengthMm,yawOffsetDeg=0)=>{
       let delta=gate.u*lengthMm-((yaw+yawOffsetDeg)/360*lengthMm);

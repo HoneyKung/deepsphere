@@ -1,24 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Deep Sphere — dive the ocean</title>
 <meta name="description" content="Explore the Deep Sphere digital twin, follow marine life, and dive through the layers of the ocean.">
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="deepcore.css?v=20261009i">
+<link rel="stylesheet" href="views.css?v=20261120d">
 </head>
 <body>
 
-<div class="twin-banner">DIGITAL TWIN — SIMULATED PANELS, NO BOARD ATTACHED</div>
+<button class="lang-btn" id="btn-lang" type="button" aria-label="Switch language"><span class="on">TH</span> / <span>EN</span></button>
+
+<div class="twin-banner" data-i18n="banner">DIGITAL TWIN — SIMULATED PANELS, NO BOARD ATTACHED</div>
 
 <div class="intro" id="intro">
     <div class="intro-title">DEEP SPHERE</div>
-    <div class="intro-sub">DEEP SPHERE — DIGITAL TWIN</div>
+    <div class="intro-sub" data-i18n="intro_sub">ภาพสดจากกล้อง 360° ของเรือดำน้ำ ROV · LIVE 360° ROV SUBMARINE CAMERA</div>
     <button class="intro-start" id="btn-start" disabled>LOADING PANELS</button>
-    <div class="intro-hint">Drag to turn the sphere · hold ▼ to dive · Scan → Collect → Analyze<br>The sub has weight: it gathers way slowly and glides to a stop.<br>The sea has three levels. Each ends in a floor: turn the sphere to find the way down.<br>Headphones recommended · the music joins when you move and fades when you stop</div>
+    <div class="intro-hint" data-i18n="intro_hint">You are looking through the 360° camera of a deep-sea submarine (ROV).<br>Drag to turn the camera · hold ▼ to dive · Scan → Collect → Analyze<br>The sub has weight: it gathers way slowly and glides to a stop.<br>The sea has three levels. Each ends in a floor: turn the sphere to find the way down.<br>Headphones recommended · the music joins when you move and fades when you stop</div>
 </div>
 
+<div class="cam-label" aria-hidden="true" data-i18n="cam_label">ROV CAM 360° · กล้องเรือดำน้ำ</div>
 <div id="canvas-container"></div>
 <div id="unfold-view" hidden>
   <div class="unfold-title">AZIMUTH UNFOLD <span>3 UPPER + 3 LOWER / FACET SIDE PROJECTIONS</span></div>
@@ -44,34 +48,34 @@
 <div class="scan-effect" id="scan-effect"></div>
 
 <div class="hud hud-status" id="hud-status">
-    <div class="status-title">DeepCore Navigation</div>
+    <div class="status-title" data-i18n="status_title">DeepCore Navigation</div>
     <div class="status-grid">
-        <span class="status-label">Pressure</span>
+        <span class="status-label" data-i18n="l_pressure">Pressure</span>
         <span class="status-value" id="val-pressure">1.0 ATM</span>
-        <span class="status-label">Temp</span>
+        <span class="status-label" data-i18n="l_temp">Temp</span>
         <span class="status-value" id="val-temp">28.0&deg;C</span>
-        <span class="status-label">Visibility</span>
-        <span class="status-value" id="val-visibility">EXCELLENT</span>
-        <span class="status-label">Salinity</span>
+        <span class="status-label" data-i18n="l_visibility">Visibility</span>
+        <span class="status-value" id="val-visibility">ดีเยี่ยม</span>
+        <span class="status-label" data-i18n="l_salinity">Salinity</span>
         <span class="status-value" id="val-salinity">40.0 PSU</span>
-        <span class="status-label">Coord</span>
+        <span class="status-label" data-i18n="l_coord">Coord</span>
         <span class="status-value" id="val-coord">22.3&deg;N 38.9&deg;E</span>
-        <span class="status-label">Specimens</span>
+        <span class="status-label" data-i18n="l_specimens">Specimens</span>
         <span class="status-value" id="val-specimens">0 / 8</span>
-        <span class="status-label dev-only">Panels lit</span>
+        <span class="status-label dev-only" data-i18n="l_panels">Panels lit</span>
         <span class="status-value dev-only" id="val-panels">6 / 6</span>
-        <span class="status-label dev-only">Heading</span>
+        <span class="status-label dev-only" data-i18n="l_heading">Heading</span>
         <span class="status-value dev-only" id="val-heading">0.0 deg</span>
-        <span class="status-label dev-only">Reticle</span>
+        <span class="status-label dev-only" data-i18n="l_reticle">Reticle</span>
         <span class="status-value dev-only" id="val-reticle">ny</span>
     </div>
 </div>
 
 <div class="hud hud-depth" id="hud-depth">
     <div class="depth-number" id="depth-number">0</div>
-    <div class="depth-unit">METERS</div>
-        <div class="depth-zone" id="depth-zone" data-zone="surface">SURFACE</div>
-    <div class="depth-level" id="depth-level">LEVEL 1 · CORAL REEF</div>
+    <div class="depth-unit" data-i18n="meters">METERS</div>
+        <div class="depth-zone" id="depth-zone" data-zone="surface">ผิวน้ำ</div>
+    <div class="depth-level" id="depth-level">ชั้น 1 · แนวปะการัง</div>
 </div>
 
 <div class="hud hud-bar">
@@ -87,54 +91,68 @@
 </div>
 
 <div class="hud hud-mission">
-    <button class="mission-btn active" id="btn-explore">Explore</button>
-    <button class="mission-btn" id="btn-scan">Scan <kbd class="key">1</kbd></button>
-    <button class="mission-btn" id="btn-collect">Collect <kbd class="key">2</kbd></button>
-    <button class="mission-btn" id="btn-analyze">Analyze <kbd class="key">3</kbd></button>
+    <button class="mission-btn active" id="btn-explore"><span data-i18n="m_explore">Explore</span></button>
+    <button class="mission-btn" id="btn-scan"><span data-i18n="m_scan">Scan</span> <kbd class="key">1</kbd></button>
+    <button class="mission-btn" id="btn-collect"><span data-i18n="m_collect">Collect</span> <kbd class="key">2</kbd></button>
+    <button class="mission-btn" id="btn-analyze"><span data-i18n="m_analyze">Analyze</span> <kbd class="key">3</kbd></button>
 </div>
 
 <div class="hud hud-narration">
     <div class="narration-box">
         <div class="narration-header">
             <div class="narration-dot"></div>
-            <div class="narration-label">Deep Sphere Twin</div>
+            <div class="narration-label" data-i18n="narr_label">Deep Sphere Twin</div>
         </div>
     <div class="narration-text" id="narration">Twin online. No board attached.<span class="cursor"></span></div>
     </div>
 </div>
 
 <div class="hud-keys">
-    <span class="keycap">&#8593;</span><span class="keycap">&#8595;</span> depth<br>
-    <span class="keycap">&#8592;</span><span class="keycap">&#8594;</span> turn the sphere<br>
-    <span class="keycap">1</span> scan <span class="keycap">2</span> collect<br>
-    <span class="keycap">3</span> analyze<br>
-    <span class="keycap">R</span> reset <button class="keycap mute-key" id="btn-mute" type="button" aria-label="Mute audio">M</button> mute
-    <label class="voice-volume-control">Voice <input id="voice-volume" aria-label="Voice volume" type="range" min="0" max="100" value="100"><output id="voice-volume-value">100%</output></label>
+    <span class="keycap">&#8593;</span><span class="keycap">&#8595;</span> <span data-i18n="k_depth">depth</span><br>
+    <span class="keycap">&#8592;</span><span class="keycap">&#8594;</span> <span data-i18n="k_turn">turn the sphere</span><br>
+    <span class="keycap">1</span> <span data-i18n="k_scan">scan</span> <span class="keycap">2</span> <span data-i18n="k_collect">collect</span><br>
+    <span class="keycap">3</span> <span data-i18n="k_analyze">analyze</span><br>
+    <span class="keycap">R</span> <span data-i18n="k_reset">reset</span> <button class="keycap mute-key" id="btn-mute" type="button" aria-label="Mute audio" data-i18n-aria="k_mute_aria">M</button> <span data-i18n="k_mute">mute</span>
+    <label class="voice-volume-control"><span data-i18n="k_voice">Voice</span> <input id="voice-volume" aria-label="Voice volume" data-i18n-aria="k_voice_aria" type="range" min="0" max="100" value="100"><output id="voice-volume-value">100%</output></label>
 </div>
 
 <div class="panel-strip" id="panel-strip"></div>
 
-<div class="pad" id="pad" aria-label="Controls">
-  <button class="pad-btn" id="pad-left" type="button" aria-label="Turn left">◀</button>
+<aside class="hud card-deck" id="card-deck" aria-label="Specimen cards" data-i18n-aria="deck_aria">
+  <div class="deck-title"><span class="i18n-plain" data-i18n="deck_title">SPECIMEN LOG</span> <span id="deck-count">0 / 8</span></div>
+  <div class="deck-grid" id="deck-grid"></div>
+</aside>
+
+<aside class="hud control-guide" id="control-guide" aria-label="How to play" data-i18n-aria="guide_aria">
+  <div class="deck-title"><span class="i18n-plain" data-i18n="guide_title">CONTROLS</span></div>
+  <div class="guide-row"><span class="guide-key key-turn">&#10227;</span><span class="guide-text" data-i18n="g1">หมุนวงจอ = หมุนกล้องเรือดำน้ำ<small>Turn the ring to look around</small></span></div>
+  <div class="guide-row"><span class="guide-key key-wheel">&#9673;</span><span class="guide-text" data-i18n="g2">หมุนล้อ = ดำลง / ขึ้น<small>Wheel dives deeper</small></span></div>
+  <div class="guide-row"><span class="guide-key key-red"></span><span class="guide-text" data-i18n="g3">ปุ่มแดง = สแกน<small>Scan for life</small></span></div>
+  <div class="guide-row"><span class="guide-key key-white"></span><span class="guide-text" data-i18n="g4">ปุ่มขาว = เก็บ<small>Collect what is in the reticle</small></span></div>
+  <div class="guide-row"><span class="guide-key key-blue"></span><span class="guide-text" data-i18n="g5">ปุ่มน้ำเงิน = วิเคราะห์<small>Open the analysis</small></span></div>
+</aside>
+
+<div class="pad" id="pad" aria-label="Controls" data-i18n-aria="pad_aria">
+  <button class="pad-btn" id="pad-left" type="button" aria-label="Turn left" data-i18n-aria="pad_left">◀</button>
   <div class="pad-col">
-    <button class="pad-btn" id="pad-up" type="button" aria-label="Rise">▲<span>UP</span></button>
-    <button class="pad-btn" id="pad-down" type="button" aria-label="Dive">▼<span>DIVE</span></button>
+    <button class="pad-btn" id="pad-up" type="button" aria-label="Rise" data-i18n-aria="pad_up">▲<span data-i18n="pad_up_t">UP</span></button>
+    <button class="pad-btn" id="pad-down" type="button" aria-label="Dive" data-i18n-aria="pad_down">▼<span data-i18n="pad_down_t">DIVE</span></button>
   </div>
-  <button class="pad-btn" id="pad-right" type="button" aria-label="Turn right">▶</button>
+  <button class="pad-btn" id="pad-right" type="button" aria-label="Turn right" data-i18n-aria="pad_right">▶</button>
 </div>
 <div class="top-bar">
-  <button class="sound-btn" id="btn-shape" type="button" aria-pressed="false" title="Switch between the sphere and six-screen ring (B)">Shape: sphere</button>
-  <button class="sound-btn" id="btn-sound" type="button" aria-label="Sound on or off" aria-pressed="true">Sound: on</button>
+  <button class="sound-btn" id="btn-shape" type="button" aria-pressed="false" title="Switch between the sphere and six-screen ring (B)" data-i18n-title="shape_title">รูปทรง: ทรงกลม</button>
+  <button class="sound-btn" id="btn-sound" type="button" aria-label="Sound on or off" data-i18n-aria="sound_aria" aria-pressed="true">Sound: on</button>
 </div>
 
 <div class="discovery-popup" id="discovery-popup" role="dialog" aria-live="polite">
-    <div class="discovery-title" id="discovery-title">★ NEW SPECIMEN COLLECTED ★</div>
+    <div class="discovery-title" id="discovery-title">★ เก็บตัวอย่างใหม่ได้แล้ว ★</div>
     <canvas class="discovery-art" id="discovery-art" width="400" height="220"></canvas>
     <div id="discovery-emoji" hidden></div>
     <div class="discovery-species" id="discovery-species"></div>
     <div class="discovery-sub" id="discovery-sub"></div>
     <div class="discovery-info" id="discovery-info"></div>
-    <button class="discovery-close" id="btn-discovery-close">ACKNOWLEDGE</button>
+    <button class="discovery-close" id="btn-discovery-close" data-i18n="ack">ACKNOWLEDGE</button>
 </div>
 
 <aside class="audio-debug" id="audio-debug" aria-label="Audio diagnostics" hidden>
@@ -152,13 +170,13 @@
 </aside>
 
 <div class="audio-event-pill" id="audio-event-pill" aria-live="polite" hidden>
-  <span id="audio-event-label"></span><button id="audio-event-dismiss" type="button" aria-label="Dismiss event">×</button>
+  <span id="audio-event-label"></span><button id="audio-event-dismiss" type="button" aria-label="Dismiss event" data-i18n-aria="dismiss_aria">×</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="geometry.js?v=20261028c"></script>
+<script src="geometry.js?v=20261030g"></script>
 <script src="ocean.js?v=20261009i"></script>
-<script src="renderer.js?v=20261028c"></script>
-<script src="twin.js?v=20261028c"></script>
+<script src="renderer.js?v=20261106e"></script>
+<script src="twin.js?v=20261120h"></script>
 </body>
 </html>

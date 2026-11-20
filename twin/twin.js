@@ -1,6 +1,19 @@
 // Twin audio, HUD and controls; geometry and rendering live in renderer.js.
 'use strict';
 
+// ---------------------------------------------------------------- language: Thai (default) / English
+// ?lang=en or ?lang=th forces a language; otherwise the saved choice (localStorage), otherwise Thai. Voice-over stays English.
+const LANG_KEY = 'deepSphereLang';
+let LANG = 'th';
+(function pickLang() {
+  let asked = null;
+  try { asked = new URLSearchParams(location.search).get('lang'); } catch (_) {}
+  if (asked === 'en' || asked === 'th') { LANG = asked; return; }
+  try { const saved = window.localStorage.getItem(LANG_KEY); if (saved === 'en' || saved === 'th') LANG = saved; } catch (_) {}
+})();
+const L = (th, en) => ({ th, en });
+const tx = (value) => (value && typeof value === 'object') ? (value[LANG] != null ? value[LANG] : value.en) : (value == null ? '' : String(value));
+
 // ---------------------------------------------------------------- audio (manifest-driven Web Audio)
 
 const AUDIO_DIR = '../assets/audio/';
@@ -60,14 +73,14 @@ const VOICE_SPECIES = {
 };
 
 const AUDIO_EVENT_LABELS = {
-  zone_enter_mid: 'Level 2 · Shipwreck shelf',
-  zone_enter_deep: 'Level 3 · Volcanic vents',
-  zone_up: 'Heading back up',
-  scan_hit: 'Life detected',
-  first_discovery: 'New species found',
-  collect_success: 'Sample collected',
-  mission_complete: 'Mission complete',
-  max_depth_warning: 'Warning: maximum depth'
+  zone_enter_mid: L('ชั้น 2 · ซากเรือจม', 'Level 2 · Shipwreck shelf'),
+  zone_enter_deep: L('ชั้น 3 · ปล่องภูเขาไฟใต้ทะเล', 'Level 3 · Volcanic vents'),
+  zone_up: L('กำลังลอยขึ้น', 'Heading back up'),
+  scan_hit: L('พบสิ่งมีชีวิต', 'Life detected'),
+  first_discovery: L('พบสายพันธุ์ใหม่', 'New species found'),
+  collect_success: L('เก็บตัวอย่างแล้ว', 'Sample collected'),
+  mission_complete: L('ภารกิจสำเร็จ', 'Mission complete'),
+  max_depth_warning: L('คำเตือน: ถึงความลึกสูงสุดแล้ว', 'Warning: maximum depth')
 };
 
 function showAudioEvent(cueId) {
@@ -79,7 +92,7 @@ function showPill(text, ms) {
   const label = $('audio-event-label');
   if (!text || !pill || !label) return;
   clearTimeout(audio.eventPillTimer);
-  label.textContent = String(text).replace(/\bthe box\b/gi, 'the sphere').replace(/\bthe cube\b/gi, 'the sphere');
+  label.textContent = String(tx(text)).replace(/\bthe box\b/gi, 'the sphere').replace(/\bthe cube\b/gi, 'the sphere');
   pill.hidden = false;
   pill.classList.remove('show');
   void pill.offsetWidth;
@@ -319,7 +332,7 @@ async function preloadSession() {
   const button = $('btn-start');
   const progress = (path) => {
     loaded++;
-    if (button) button.textContent = 'LOADING SOUND ' + loaded + '/' + paths.length;
+    setStartLabel('sound', loaded, paths.length);
     audioLog(path, 'file', 'loaded');
   };
   await Promise.all(invitePaths.map((path) => loadBuffer(path).then(() => progress(path)).catch((error) => {
@@ -892,8 +905,8 @@ function toggleMute() {
   setMasterGain();
   if (audio.muted && 'speechSynthesis' in window) speechSynthesis.cancel();
   const sound = $('btn-sound');
-  if (sound) { sound.setAttribute('aria-pressed', audio.muted ? 'false' : 'true'); sound.textContent = audio.muted ? 'Sound: off' : 'Sound: on'; }
-  say(audio.muted ? 'Audio muted.' : 'Audio on.');
+  if (sound) { sound.setAttribute('aria-pressed', audio.muted ? 'false' : 'true'); updateSoundButton(); }
+  say(audio.muted ? L('ปิดเสียงแล้ว', 'Audio muted.') : L('เปิดเสียงแล้ว', 'Audio on.'));
   audioLog('master_mute', audio.muted ? 'silent' : 'file', audio.muted ? 'muted' : 'unmuted');
 }
 
@@ -1374,21 +1387,29 @@ const $ = (id) => document.getElementById(id);
 // (22.3°N 38.9°E). Pressure rises one atmosphere every ten metres; the deep Red Sea stays near 21 °C and is
 // saltier than the open ocean.
 const SEA_ZONES = [
-  { name: 'SURFACE', max: 30, visibility: 'EXCELLENT', told: true,
-    note: 'Surface zone, 0 to 30 metres. 28 °C and about 40 PSU: the Red Sea is one of the warmest and saltiest seas on Earth.' },
-  { name: 'SUNLIGHT ZONE', max: 88, visibility: 'GOOD',
-    note: 'Sunlight zone, 30 to 88 metres. Still bright enough for reef-building corals and the fish that live among them.' },
-  { name: 'MESOPHOTIC', max: 200, visibility: 'MODERATE',
-    note: 'Mesophotic zone, 88 to 200 metres. About one percent of the surface light is left; only low-light corals still photosynthesise.' },
-  { name: 'TWILIGHT ZONE', max: 494, visibility: 'LOW',
-    note: 'Twilight zone, 200 to 494 metres. Too dark for photosynthesis. From here down, most light is made by animals.' },
-  { name: 'BATHYAL ZONE', max: 1000, visibility: 'MINIMAL',
-    note: 'Bathyal zone, 494 to 1,000 metres. Pressure passes 50 atmospheres, yet the Red Sea stays near 21 °C, unusually warm for deep water.' },
-  { name: 'MIDNIGHT ZONE', max: 2000, visibility: 'NONE',
-    note: 'Midnight zone, 1,000 to 2,000 metres. No sunlight at all. Brine pools were found on the Red Sea floor at about 1,770 metres.' },
-  { name: 'ABYSSAL ZONE', max: 1e9, visibility: 'NONE',
-    note: 'Below 2,000 metres. The Red Sea is a young ocean, a rift still opening between Africa and Arabia, about 3,040 metres at its deepest.' }
+  { name: 'SURFACE', max: 30, visibility: 'EXCELLENT', told: true, nameTh: 'ผิวน้ำ',
+    note: 'Surface zone, 0 to 30 metres. 28 °C and about 40 PSU: the Red Sea is one of the warmest and saltiest seas on Earth.',
+    noteTh: 'โซนผิวน้ำ ลึก 0–30 เมตร อุณหภูมิ 28 °C ความเค็มราว 40 PSU ทะเลแดงเป็นหนึ่งในทะเลที่อุ่นและเค็มที่สุดในโลก' },
+  { name: 'SUNLIGHT ZONE', max: 88, visibility: 'GOOD', nameTh: 'ชั้นแสงแดด',
+    note: 'Sunlight zone, 30 to 88 metres. Still bright enough for reef-building corals and the fish that live among them.',
+    noteTh: 'ชั้นแสงแดด ลึก 30–88 เมตร ยังสว่างพอให้ปะการังสร้างแนวได้ และมีปลาอาศัยอยู่ท่ามกลางปะการังเหล่านั้น' },
+  { name: 'MESOPHOTIC', max: 200, visibility: 'MODERATE', nameTh: 'ชั้นแสงรำไร',
+    note: 'Mesophotic zone, 88 to 200 metres. About one percent of the surface light is left; only low-light corals still photosynthesise.',
+    noteTh: 'ชั้นแสงรำไร ลึก 88–200 เมตร เหลือแสงจากผิวน้ำราว 1 เปอร์เซ็นต์ มีเพียงปะการังที่ทนแสงน้อยเท่านั้นที่ยังสังเคราะห์แสงได้' },
+  { name: 'TWILIGHT ZONE', max: 494, visibility: 'LOW', nameTh: 'ชั้นสนธยา',
+    note: 'Twilight zone, 200 to 494 metres. Too dark for photosynthesis. From here down, most light is made by animals.',
+    noteTh: 'ชั้นสนธยา ลึก 200–494 เมตร มืดเกินกว่าจะสังเคราะห์แสงได้ จากตรงนี้ลงไป แสงส่วนใหญ่มาจากตัวสัตว์เอง' },
+  { name: 'BATHYAL ZONE', max: 1000, visibility: 'MINIMAL', nameTh: 'ชั้นบาทิอัล',
+    note: 'Bathyal zone, 494 to 1,000 metres. Pressure passes 50 atmospheres, yet the Red Sea stays near 21 °C, unusually warm for deep water.',
+    noteTh: 'ชั้นบาทิอัล ลึก 494–1,000 เมตร ความดันเกิน 50 บรรยากาศ แต่ทะเลแดงยังอุ่นราว 21 °C ซึ่งอุ่นผิดปกติสำหรับน้ำลึก' },
+  { name: 'MIDNIGHT ZONE', max: 2000, visibility: 'NONE', nameTh: 'ชั้นเที่ยงคืน',
+    note: 'Midnight zone, 1,000 to 2,000 metres. No sunlight at all. Brine pools were found on the Red Sea floor at about 1,770 metres.',
+    noteTh: 'ชั้นเที่ยงคืน ลึก 1,000–2,000 เมตร ไม่มีแสงอาทิตย์เลย เคยพบแอ่งน้ำเกลือเข้มข้นบนพื้นทะเลแดงที่ความลึกราว 1,770 เมตร' },
+  { name: 'ABYSSAL ZONE', max: 1e9, visibility: 'NONE', nameTh: 'ชั้นอบิสซัล',
+    note: 'Below 2,000 metres. The Red Sea is a young ocean, a rift still opening between Africa and Arabia, about 3,040 metres at its deepest.',
+    noteTh: 'ลึกกว่า 2,000 เมตร ทะเลแดงเป็นมหาสมุทรอายุน้อย เป็นรอยแยกที่ยังค่อย ๆ เปิดกว้างขึ้นระหว่างแอฟริกากับคาบสมุทรอาหรับ ลึกที่สุดราว 3,040 เมตร' }
 ];
+const VISIBILITY_TH = { EXCELLENT: 'ดีเยี่ยม', GOOD: 'ดี', MODERATE: 'ปานกลาง', LOW: 'ต่ำ', MINIMAL: 'น้อยมาก', NONE: 'ไม่มี' };
 function seaZone(metres) { return SEA_ZONES.find((zone) => metres < zone.max) || SEA_ZONES[SEA_ZONES.length - 1]; }
 
 function updateHUD(hit) {
@@ -1400,21 +1421,22 @@ function updateHUD(hit) {
   const sea = seaZone(m);
   $('val-pressure').classList.toggle('warning', m > 500);
   $('val-temp').textContent = Math.max(21, 28 - m * 0.007).toFixed(1) + '°C';
-  $('val-visibility').textContent = sea.visibility;
+  $('val-visibility').textContent = tx(L(VISIBILITY_TH[sea.visibility] || sea.visibility, sea.visibility));
   $('val-salinity').textContent = (40 + 0.6 * clamp01(m / 300)).toFixed(1) + ' PSU';
   $('val-panels').textContent = FACES.filter((f) => f.on).length + ' / 6';
   $('val-reticle').textContent = hit ? FACES[hit.face].id + (hit.onPanel ? '' : ' (frame)') : '—';
   $('val-specimens').textContent = state.collected.length + ' / ' + SUBJECTS.length;
+  renderDeck();
   $('depth-marker').style.top = (state.depth * 100) + '%';
 
   const el = $('depth-zone');
   el.dataset.zone = state.zone;
-  el.textContent = sea.name;
-  $('depth-level').textContent = LEVEL_LABELS[state.zone] || '';
+  el.textContent = tx(L(sea.nameTh || sea.name, sea.name));
+  $('depth-level').textContent = tx(LEVEL_LABELS[state.zone]);
   // The first time each zone is reached, the narration box says what is known about it.
   if (state.started && audio.seaZone !== sea) {
     audio.seaZone = sea;
-    if (!sea.told) { sea.told = true; say(sea.note); }
+    if (!sea.told) { sea.told = true; say(L(sea.noteTh || sea.note, sea.note)); }
   }
 }
 
@@ -1424,28 +1446,208 @@ function setLiveBanner(status, deg, reason) {
   audio.boardConnected = connected;
   const banner = document.querySelector('.twin-banner');
   if (!banner) return;
-  if (status === 'live') banner.textContent = 'LIVE — MAGNET yaw ' + deg.toFixed(1) + '°';
-  else if (status === 'simulated') banner.textContent = 'SIMULATED — NO BOARD';
+  banner.removeAttribute('data-i18n');
+  if (status === 'live') bannerState.text = L('LIVE — มุมหันแม่เหล็ก ' + deg.toFixed(1) + '°', 'LIVE — MAGNET yaw ' + deg.toFixed(1) + '°');
+  else if (status === 'simulated') bannerState.text = L('จำลอง — ไม่ได้ต่อบอร์ด', 'SIMULATED — NO BOARD');
   else if (status === 'disconnected') {
     const message = String(reason || 'board disconnected');
     const labels = {
-      'port not found': 'BOARD — PORT NOT FOUND',
-      'no data (wrong firmware?)': 'BOARD — NO DATA; CHECK LIVE-YAW FIRMWARE',
-      'board is running diagnostic firmware, flash live-yaw': 'BOARD — DIAGNOSTIC FIRMWARE; USE LIVE-YAW',
-      'sensor unavailable (AS5600 not responding)': 'BOARD — AS5600 SENSOR UNAVAILABLE',
-      'bridge unavailable': 'BOARD — BRIDGE UNAVAILABLE'
+      'port not found': L('บอร์ด — ไม่พบพอร์ต', 'BOARD — PORT NOT FOUND'),
+      'no data (wrong firmware?)': L('บอร์ด — ไม่มีข้อมูล ตรวจเฟิร์มแวร์ live-yaw', 'BOARD — NO DATA; CHECK LIVE-YAW FIRMWARE'),
+      'board is running diagnostic firmware, flash live-yaw': L('บอร์ดใช้เฟิร์มแวร์ตรวจสอบอยู่ ให้ใช้ live-yaw', 'BOARD — DIAGNOSTIC FIRMWARE; USE LIVE-YAW'),
+      'sensor unavailable (AS5600 not responding)': L('บอร์ด — เซนเซอร์ AS5600 ไม่ตอบสนอง', 'BOARD — AS5600 SENSOR UNAVAILABLE'),
+      'bridge unavailable': L('บอร์ด — เชื่อมต่อสะพานไม่ได้', 'BOARD — BRIDGE UNAVAILABLE'),
+      'mqtt offline': L('บอร์ดออฟไลน์ (MQTT)', 'BOARD OFFLINE (MQTT)'),
+      'mqtt no data': L('บอร์ด — ไม่มีข้อมูลจาก MQTT เกิน 5 วินาที', 'BOARD — NO MQTT DATA FOR 5 S'),
+      'mqtt connecting': L('กำลังเชื่อมต่อ MQTT…', 'CONNECTING TO MQTT…'),
+      'mqtt broker unavailable': L('เชื่อมต่อ MQTT broker ไม่ได้', 'MQTT BROKER UNAVAILABLE'),
+      'mqtt library failed': L('โหลดไลบรารี MQTT ไม่สำเร็จ', 'MQTT LIBRARY FAILED TO LOAD')
     };
-    banner.textContent = labels[message] || ('BOARD DISCONNECTED — ' + message.toUpperCase());
+    bannerState.text = labels[message] || L('บอร์ดหลุดการเชื่อมต่อ — ' + message, 'BOARD DISCONNECTED — ' + message.toUpperCase());
   }
+  renderBanner();
+}
+
+// ---- MQTT live source (?mqtt=<chip>) ----------------------------------------------------------------------
+// The base ESP32 publishes the same raw serial lines to broker.hivemq.com (firmware/include/base_online.h):
+//   deepsphere/<chip>/state  retained {"v":1,"type":"state","ch":N,"yaw":<yaw line|null>,"scene":<scene line|null>}
+//   deepsphere/<chip>/events one raw line per message; deepsphere/<chip>/status "online" / "offline".
+// mqttTranslator turns them into the same object GET /yaw returns (mirrors laptop/twin_bridge.py YawState), so the
+// page's one update path (consume, inside initLiveYaw) serves both sources. Pure: no DOM, no network, no clock.
+// MQTT-PURE-BEGIN
+function mqttChipFromSearch(search) {
+  const p = new URLSearchParams(search);
+  const v = (p.get('mqtt') || '').toLowerCase();
+  return /^[0-9a-f]{6}$/.test(v) ? v : null;
+}
+function mqttTranslator(opts) {
+  const o = opts || {};
+  const sceneMaxAgeMs = o.sceneMaxAgeMs || 750, noDataMs = o.noDataMs || 5000;
+  const seedFor = o.seedFor, session = 'mqtt-' + Math.random().toString(36).slice(2, 8);
+  const st = { ok: false, magnet: 'missing', reason: 'mqtt no data', deg: 0, yawAt: 0, scene: null, sceneAt: 0, stateAt: 0,
+    status: null, events: [], seq: 0, sceneRejected: 0, ever: false };
+  const parse = (x) => { if (x && typeof x === 'object') return x; try { return JSON.parse(String(x)); } catch (e) { return null; } };
+  const pushEvent = (m) => { st.seq++; st.events.push({ ...m, id: st.seq }); st.events = st.events.slice(-256); };
+  const takeYaw = (m, now) => {   // YawState.update, message type "yaw"
+    const ok = !!m.ok;
+    const magnet = String(m.magnet || (ok ? 'ok' : 'missing'));
+    st.magnet = magnet; st.ok = ok;
+    if (!ok) {
+      st.reason = ['missing', 'absent', 'not_found'].includes(magnet.toLowerCase()) ? 'sensor unavailable (AS5600 not responding)'
+        : String(m.reason || 'sensor unavailable (AS5600 not responding)');
+      return;
+    }
+    const v = (m.deg === null || m.deg === undefined || m.deg === '' || typeof m.deg === 'boolean') ? NaN : Number(m.deg);
+    if (!Number.isFinite(v)) { st.ok = false; st.reason = 'invalid yaw'; return; }
+    st.deg = ((v % 360) + 360) % 360; st.yawAt = now; st.reason = '';
+  };
+  const takeScene = (m, now) => {   // YawState.update, message type "scene" (the ck check sum needs the raw line, which the state JSON no longer has)
+    const t_ms = Number(m.t_ms), depth = Number(m.depth), expedition = Number(m.expedition), seed = Number(m.seed) >>> 0;
+    const bad = !Number.isInteger(t_ms) || t_ms < 0 || !Number.isFinite(depth) || depth < 0 || depth > 1 ||
+      !Number.isInteger(expedition) || expedition < 1 || expedition > 100000 || (seedFor && seed !== seedFor(expedition));
+    if (bad) { st.sceneRejected++; return; }
+    st.scene = { v: 1, type: 'scene', t_ms, depth, expedition, seed };
+    if (Number.isInteger(m.tray) && m.tray >= 0 && m.tray <= 255) st.scene.tray = m.tray;
+    st.sceneAt = now;
+  };
+  return {
+    state: st,
+    onStatus(text) { st.status = String(text).trim().toLowerCase(); },
+    onState(payload, now, retained) {
+      const m = parse(payload);
+      if (!m || m.type !== 'state') return false;
+      if (m.yaw && typeof m.yaw === 'object') takeYaw(m.yaw, now);
+      if (m.scene && typeof m.scene === 'object') takeScene(m.scene, now);
+      st.ever = true;
+      if (!retained) st.stateAt = now;   // a retained copy is only the broker's last memory, not proof the board is alive
+      return true;
+    },
+    onEvent(payload) {   // YawState.update for wheel / button / hello
+      const m = parse(payload);
+      if (!m || typeof m !== 'object') return false;
+      if (m.type === 'wheel') { if (!Number.isInteger(m.delta) || m.delta === 0) return false; }
+      else if (m.type === 'button') { if (!['scan', 'collect', 'analyze', 'wheel'].includes(m.name) || !['down', 'up'].includes(m.state)) return false; }
+      else if (m.type === 'hello') { if (m.board !== 'base-io') return false; }
+      else return false;
+      pushEvent(m); return true;
+    },
+    // The /yaw-shaped snapshot. afterId = events newer than that id (same as /yaw?after=).
+    snapshot(now, afterId) {
+      const events = st.events.filter((e) => e.id > (afterId || 0));
+      const base = { events, event_session: session, event_latest_id: st.seq, source: 'mqtt' };
+      const scene = st.scene && now - st.sceneAt <= sceneMaxAgeMs ? { ...st.scene, rejected: st.sceneRejected } : null;
+      let reason = null;
+      if (st.status === 'offline') reason = 'mqtt offline';
+      else if (!st.stateAt || now - st.stateAt > noDataMs) reason = st.ever ? 'mqtt no data' : 'mqtt connecting';
+      else if (!st.ok) reason = st.reason || 'mqtt no data';
+      if (reason) return { ...base, ok: false, reason, magnet: st.magnet, scene };
+      return { ...base, deg: Math.round(st.deg * 100) / 100, ok: true, magnet: st.magnet, age_ms: Math.max(0, Math.round(now - st.yawAt)), simulated: false, scene };
+    }
+  };
+}
+// MQTT-PURE-END
+function startMqttSource(chip, consume) {
+  const tr = mqttTranslator({ seedFor: expeditionSeedFor });
+  const top = 'deepsphere/' + chip + '/';
+  let client = null, lastEventId = 0, brokerDown = false, libFailed = false;
+  const tick = () => {
+    const now = performance.now();
+    const snap = tr.snapshot(now, lastEventId);
+    if (libFailed) { snap.ok = false; snap.reason = 'mqtt library failed'; delete snap.deg; }
+    else if (brokerDown) { snap.ok = false; snap.reason = 'mqtt broker unavailable'; delete snap.deg; }
+    if (snap.events.length) lastEventId = snap.events[snap.events.length - 1].id;
+    consume(snap);
+  };
+  const connect = () => {
+    try {
+      client = window.mqtt.connect('wss://broker.hivemq.com:8884/mqtt', { reconnectPeriod: 2000, connectTimeout: 8000, clean: true,
+        clientId: 'deepsphere-twin-' + Math.random().toString(16).slice(2, 10) });
+    } catch (e) { libFailed = true; return; }
+    client.on('connect', () => { brokerDown = false; client.subscribe([top + 'state', top + 'events', top + 'status'], { qos: 0 }); });
+    client.on('close', () => { brokerDown = true; });
+    client.on('error', () => { brokerDown = true; });
+    client.on('message', (topic, payload, packet) => {
+      const text = payload.toString();
+      const now = performance.now();
+      if (topic === top + 'state') tr.onState(text, now, !!(packet && packet.retain));
+      else if (topic === top + 'events') tr.onEvent(text);
+      else if (topic === top + 'status') tr.onStatus(text);
+    });
+  };
+  // mqtt.js is loaded only in this mode, from a pinned CDN version.
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js';
+  script.onload = connect;
+  script.onerror = () => { libFailed = true; };
+  document.head.appendChild(script);
+  tick();
+  setInterval(tick, 50);
 }
 
 function initLiveYaw() {
-  if (new URLSearchParams(location.search).get('live') !== '1') return;
+  const mqttChip = mqttChipFromSearch(location.search);
+  if (new URLSearchParams(location.search).get('live') !== '1' && !mqttChip) return;
   state.liveMode = true;
+  state.mqttMode = !!mqttChip;   // view only: never POST /command; data comes from MQTT instead of /yaw
   state.liveConnected = false;
   state.liveTargetYaw = state.yaw;
   setLiveBanner('disconnected');
   let inFlight = false;
+  const boardSync = { restoreDepth: 0, restoreUntil: 0 };
+  const applyBoardScene = (scene) => {
+    const valid = scene && scene.v === 1 && scene.type === 'scene' && Number.isFinite(Number(scene.t_ms)) &&
+      Number.isFinite(Number(scene.depth)) && Number(scene.depth) >= 0 && Number(scene.depth) <= 1;
+    if (!valid) return false;
+    const now = performance.now();
+    const reconnecting = !state.boardScene || now - (state.boardSceneReceivedAt || 0) > 750;
+    // The board restarted mid-show: its clock went back. It wakes at depth 0.1 and expedition 1, so give it the
+    // show's depth back (the expedition count is re-sent by syncBoardExpedition below).
+    const rebooted = !reconnecting && Number(scene.t_ms) + 2000 < Number(state.boardScene.t_ms);
+    state.boardScene = scene;
+    state.boardSceneReceivedAt = now;
+    // 11-06 owner: the web was jerky because it jumped to each board time (3-6 a second). Keep the web's own
+    // clock running and pull it gently toward the board; snap only when far off (reconnect, board reboot).
+    const boardSeconds = Number(scene.t_ms) / 1000, clockErr = boardSeconds - state.seconds;
+    if (reconnecting || Math.abs(clockErr) > 1.5) state.seconds = boardSeconds;
+    else state.seconds += clockErr * 0.15;
+    // 11-06: the board's tray (bit i = SUBJECTS[i] stored on the panels). New bits play the normal collect.
+    if (Number.isInteger(scene.tray)) {
+      const tray = scene.tray;
+      const inTray = (i) => (tray >> i) & 1;
+      if (state.collected.some((c) => !inTray(SUBJECTS.findIndex((x) => x.id === c.id)))) {
+        state.collected = state.collected.filter((c) => inTray(SUBJECTS.findIndex((x) => x.id === c.id)));
+      }
+      for (let i = 0; i < SUBJECTS.length; i++) {
+        if (inTray(i) && !state.collected.some((c) => c.id === SUBJECTS[i].id)) storeSample(i, reticleHit(state.yaw));
+      }
+    }
+    if (rebooted) {
+      boardSync.restoreDepth = state.depth;
+      boardSync.restoreUntil = now + 3000;
+      postBoardCommand({ type: 'command', action: 'depth', value: Math.round(state.depth * 100000) / 100000 })
+        .catch((error) => console.warn('Depth restore after board restart failed', error));
+    }
+    const boardDepth = Number(scene.depth);
+    const restoring = boardSync.restoreUntil > now && Math.abs(boardDepth - boardSync.restoreDepth) > 0.002;
+    if (!restoring) {
+      boardSync.restoreUntil = 0;
+      if (reconnecting) {
+        // first scene after a (re)connect: take the board's depth quietly, no dive sounds for the jump
+        state.depth = clamp01(boardDepth); state.boardTargetDepth = state.depth;
+        syncLevel(state.depth);
+        updateZone(state.depth);
+        const depthInput = $('depth-input');
+        if (depthInput) depthInput.value = state.depth;
+      } else {
+        // Same path as the web's own depth changes (free: the board has no gate rule), so the dive bed, bubbles,
+        // depth notes and the surface / max-depth voice lines play while the wheel on the box is turned.
+        // syncLevel inside setDepth keeps the passed floors where the board has them.
+        state.boardTargetDepth = boardDepth;  // motionStep glides to it every frame (smooth web, 11-06)
+      }
+    }
+    if (Number.isFinite(Number(scene.expedition))) syncBoardExpedition(Math.max(1, Number(scene.expedition) >>> 0), now);
+    return true;
+  };
   let lastBridgeEventId = 0;
   let bridgeEventSession = null;
   let hasBridgeCursor = false;
@@ -1455,68 +1657,286 @@ function initLiveYaw() {
     if (Number.isFinite(configuredStep) && configuredStep > 0 && configuredStep <= 1) wheelDepthPerClick = configuredStep;
     if (typeof baseBoard.wheel_depth_reverse === 'boolean') wheelDepthReverse = baseBoard.wheel_depth_reverse;
   }).catch(() => {});
+  // Turn direction: key 9 flips it on the spot and the browser remembers (owner said 10-30 the flip was wrong way round).
+  let LIVE_YAW_REVERSE = true;   // owner 10-30 05:05: with reverse off the twin still turned against the real ring
+  // Front set by the owner 10-30 05:00: raw magnet 151.9 deg = the real front. Key 0 re-sets it (saved per browser).
+  let liveYawZero = 151.9;
+  try { const z = localStorage.getItem('deepSphereYawFront'); if (z !== null && Number.isFinite(Number(z))) liveYawZero = Number(z); } catch (e) {}
+  try { const r = localStorage.getItem('deepSphereYawReverse2'); if (r !== null) LIVE_YAW_REVERSE = r === '1'; } catch (e) {}
+  // 11-06: ?yawfront=N sets the front to the same raw angle the ring-fish board uses (its reticle and its
+  // collect test), so web and panels agree on what is in the reticle. Clears the 6-face calibration and reverse
+  // override, which the board does not have.
+  try {
+    const qf = Number(new URLSearchParams(location.search).get('yawfront'));
+    if (new URLSearchParams(location.search).has('yawfront') && Number.isFinite(qf)) {
+      liveYawZero = qf; LIVE_YAW_REVERSE = true;
+      localStorage.setItem('deepSphereYawFront', String(qf));
+      localStorage.setItem('deepSphereYawReverse2', '1');
+      localStorage.removeItem('deepSphereYawCal6');
+    }
+  } catch (e) {}
+  // Key 0: the screen now facing the visitor becomes the front (the twin's start view).
+  addEventListener('keydown', (e) => {
+    if (e.code === 'Digit9' || e.code === 'Numpad9') {
+      LIVE_YAW_REVERSE = !LIVE_YAW_REVERSE;
+      try { localStorage.setItem('deepSphereYawReverse2', LIVE_YAW_REVERSE ? '1' : '0'); } catch (err) {}
+    }
+    if ((e.code === 'Digit0' || e.code === 'Numpad0') && Number.isFinite(state.liveRawYaw)) {
+      liveYawZero = state.liveRawYaw;
+      try { localStorage.setItem('deepSphereYawFront', String(liveYawZero)); } catch (err) {}
+    }
+  });
+  // Steady the magnet: median of the last 7 readings (drops single spikes), then a 1.5 deg dead band so a still
+  // ring holds dead still, then a gentle glide toward the new angle.
+  // Raw clean-up (log output/base-test/yaw-rotate.log, 10-30): on a small turn the sensor sometimes flips by ~180 deg
+  // and stays there, and throws single 10-40 deg spikes. A jump of 140-220 deg in one 50 ms sample is treated as that
+  // flip and cancelled; a jump of 40-140 deg (no hand turns that fast) is dropped as a spike.
+  let rawLast = null, rawFlip = 0, rawSpikes = 0;
+  const cleanRaw = (deg) => {
+    const fixed = (deg + rawFlip + 360) % 360;
+    if (rawLast === null) { rawLast = fixed; return fixed; }
+    let d = fixed - rawLast; while (d > 180) d -= 360; while (d < -180) d += 360;
+    if (Math.abs(d) >= 140) { rawFlip = (rawFlip + 180) % 360; return rawLast; }
+    if (Math.abs(d) >= 60 && rawSpikes < 2) { rawSpikes++; return rawLast; }   // short hold only, so a real turn is never stuck
+    rawSpikes = 0; rawLast = fixed; return fixed;
+  };
+  const yawHistory = [];
+  let steady = null;
+  const steadyYaw = (deg) => {
+    const last = yawHistory.length ? yawHistory[yawHistory.length - 1] : deg;
+    let d = deg - (((last % 360) + 360) % 360); while (d > 180) d -= 360; while (d < -180) d += 360;
+    yawHistory.push(last + d); if (yawHistory.length > 7) yawHistory.shift();   // unwrapped, so 359 -> 1 is +2
+    const median = [...yawHistory].sort((a, b) => a - b)[yawHistory.length >> 1];
+    if (steady === null) steady = median;
+    let gap = median - steady; while (gap > 180) gap -= 360; while (gap < -180) gap += 360;
+    if (Math.abs(gap) > 1.5) steady += gap - Math.sign(gap) * 1.5 * 0.5;
+    return ((steady % 360) + 360) % 360;
+  };
+  // Six-face calibration (key C): turn the ring one screen at a time, pressing C with each screen facing the visitor,
+  // starting at the front. The raw magnet angle at each press maps to 0, 60, 120 ... so an off-centre or uneven magnet
+  // still lands exactly on every screen; between presses the angle is interpolated.
+  let yawCal = null, calPresses = [];
+  try { const c = JSON.parse(localStorage.getItem('deepSphereYawCal6') || 'null'); if (Array.isArray(c) && c.length === 6) yawCal = c; } catch (e) {}
+  const shortest = (a, b) => { let d = b - a; while (d > 180) d -= 360; while (d < -180) d += 360; return d; };
+  const calibratedYaw = (raw) => {
+    if (!yawCal) return null;
+    const steps = yawCal.map((r, i) => shortest(r, yawCal[(i + 1) % 6]));
+    const s = Math.sign(steps.reduce((a, b) => a + b, 0)) || 1;
+    const cum = [0]; for (const st of steps) cum.push(cum[cum.length - 1] + Math.abs(st));
+    const d = ((((raw - yawCal[0]) * s) % 360) + 360) % 360 * cum[6] / 360;
+    let k = 0; while (k < 5 && d >= cum[k + 1]) k++;
+    const frac = (d - cum[k]) / Math.max(1e-6, cum[k + 1] - cum[k]);
+    const yawSign = LIVE_YAW_REVERSE ? -s : s;   // keeps the turn direction the owner confirmed
+    return ((yawSign * (k + frac) * 60) % 360 + 360) % 360;
+  };
+  const calNote = document.createElement('div');
+  calNote.style.cssText = 'position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:50;padding:8px 14px;border:1px solid #e5c07b;border-radius:6px;background:rgba(0,10,14,.85);color:#e5c07b;font:600 14px monospace;display:none';
+  document.body.appendChild(calNote);
+  const showCal = (text, ms) => { calNote.textContent = text; calNote.style.display = 'block'; clearTimeout(showCal.t); if (ms) showCal.t = setTimeout(() => { calNote.style.display = 'none'; }, ms); };
+  addEventListener('keydown', (e) => {
+    // 11-06 owner: C was pressed by accident at the show and wrecked the angles. Now Shift+C only.
+    if (e.code !== 'KeyC' || !e.shiftKey || !Number.isFinite(state.liveRawYaw)) return;
+    calPresses.push(state.liveRawYaw);
+    if (calPresses.length < 6) { showCal('CALIBRATE ' + calPresses.length + '/6 — turn to the next screen, press C', 0); return; }
+    yawCal = calPresses; calPresses = [];
+    try { localStorage.setItem('deepSphereYawCal6', JSON.stringify(yawCal)); } catch (err) {}
+    console.log('yaw calibration', JSON.stringify(yawCal));
+    showCal('CALIBRATED ✓', 2500);
+  });
+  // One /yaw-shaped snapshot in, all page updates out. Used by the /yaw poll and by the MQTT source alike.
+  const consume = (data) => {
+    const latestId = Number.isInteger(data.event_latest_id) ? data.event_latest_id : null;
+    const sessionChanged = bridgeEventSession !== null && data.event_session && data.event_session !== bridgeEventSession;
+    const sequenceReset = latestId !== null && latestId < lastBridgeEventId;
+    if (!hasBridgeCursor || sessionChanged || sequenceReset) {
+      bridgeEventSession = data.event_session || null;
+      lastBridgeEventId = latestId === null ? Math.max(0, ...((data.events || []).map((event) => Number.isInteger(event.id) ? event.id : 0))) : latestId;
+      hasBridgeCursor = true;
+    } else {
+      bridgeEventSession = data.event_session || bridgeEventSession;
+      if (Array.isArray(data.events)) {
+        for (const event of data.events) {
+          if (!Number.isInteger(event.id) || event.id <= lastBridgeEventId) continue;
+          handleBridgeEvent(event);
+          lastBridgeEventId = event.id;
+        }
+      }
+      if (latestId !== null) lastBridgeEventId = Math.max(lastBridgeEventId, latestId);
+    }
+    if (data.ok === true && Number.isFinite(Number(data.deg))) {
+      state.liveConnected = true;
+      // Key 9 flips the turn direction, key 0 sets which screen is the front.
+      state.liveRawYaw = cleanRaw(Number(data.deg));
+      const calibrated = calibratedYaw(state.liveRawYaw);
+      const target = calibrated !== null ? calibrated : (((LIVE_YAW_REVERSE ? -1 : 1) * (state.liveRawYaw - liveYawZero)) % 360 + 360) % 360;
+      state.liveTargetYaw = steadyYaw(target);
+      setLiveBanner(data.simulated ? 'simulated' : 'live', state.liveTargetYaw);
+      if (!applyBoardScene(data.scene) && performance.now() - (state.boardSceneReceivedAt || 0) > 750) state.boardScene = null;
+    } else {
+      state.liveConnected = false;
+      if (!applyBoardScene(data.scene) && performance.now() - (state.boardSceneReceivedAt || 0) > 750) state.boardScene = null;
+      setLiveBanner('disconnected', null, data.reason);
+    }
+  };
   const poll = async () => {
     if (inFlight) return;
     inFlight = true;
     try {
       const response = await fetch('/yaw?after=' + lastBridgeEventId + '&ts=' + Date.now(), { cache: 'no-store' });
       if (!response.ok) throw new Error('HTTP ' + response.status);
-      const data = await response.json();
-      const latestId = Number.isInteger(data.event_latest_id) ? data.event_latest_id : null;
-      const sessionChanged = bridgeEventSession !== null && data.event_session && data.event_session !== bridgeEventSession;
-      const sequenceReset = latestId !== null && latestId < lastBridgeEventId;
-      if (!hasBridgeCursor || sessionChanged || sequenceReset) {
-        bridgeEventSession = data.event_session || null;
-        lastBridgeEventId = latestId === null ? Math.max(0, ...((data.events || []).map((event) => Number.isInteger(event.id) ? event.id : 0))) : latestId;
-        hasBridgeCursor = true;
-      } else {
-        bridgeEventSession = data.event_session || bridgeEventSession;
-        if (Array.isArray(data.events)) {
-          for (const event of data.events) {
-            if (!Number.isInteger(event.id) || event.id <= lastBridgeEventId) continue;
-            handleBridgeEvent(event);
-            lastBridgeEventId = event.id;
-          }
-        }
-        if (latestId !== null) lastBridgeEventId = Math.max(lastBridgeEventId, latestId);
-      }
-      if (data.ok === true && Number.isFinite(Number(data.deg))) {
-        state.liveConnected = true;
-        state.liveTargetYaw = ((Number(data.deg) % 360) + 360) % 360;
-        setLiveBanner(data.simulated ? 'simulated' : 'live', state.liveTargetYaw);
-      } else {
-        state.liveConnected = false;
-        setLiveBanner('disconnected', null, data.reason);
-      }
+      consume(await response.json());
     } catch (error) {
       state.liveConnected = false;
+      if (performance.now() - (state.boardSceneReceivedAt || 0) > 750) state.boardScene = null;
       setLiveBanner('disconnected', null, 'bridge unavailable');
     } finally {
       inFlight = false;
     }
   };
+  if (state.mqttMode) { startMqttSource(mqttChip, consume); return; }
   poll();
   setInterval(poll, 50);
 }
 
-const say = (text) => {
+// say() takes a plain string or L(th, en); the line is kept so a language switch repaints it at once.
+let narrationSrc = null;
+function paintNarration() {
   const narration = $('narration');
+  if (!narration || narrationSrc === null) return;
   const cursor = document.createElement('span');
   cursor.className = 'cursor';
-  narration.replaceChildren(document.createTextNode(String(text)), cursor);
-};
+  narration.replaceChildren(document.createTextNode(tx(narrationSrc)), cursor);
+}
+const say = (text) => { narrationSrc = text; paintNarration(); };
 
 function showVoiceNarration(id, values) {
   const lines = VOICE_LINES[id];
   if (!lines || !$('narration')) return;
   const params = values || {};
-  say(String(lines.en || '').replace('{names}', params.enNames || params.names || ''));
+  say(L(String(lines.th || lines.en || '').replace('{names}', params.thNames || params.names || ''),
+    String(lines.en || '').replace('{names}', params.enNames || params.names || '')));
+}
+
+// ---------------------------------------------------------------- Thai / English: fixed page text, toggle button
+const UI = {
+  banner: ['ดิจิทัลทวิน — จอจำลอง ไม่ได้ต่อบอร์ด', 'DIGITAL TWIN — SIMULATED PANELS, NO BOARD ATTACHED'],
+  intro_sub: ['ภาพสดจากกล้อง 360° ของเรือดำน้ำ ROV', 'LIVE 360° ROV SUBMARINE CAMERA'],
+  intro_hint: ['คุณกำลังมองผ่านกล้อง 360° ของเรือดำน้ำสำรวจทะเลลึก (ROV)<br>จับวงจอหมุนรอบตัวเหมือนส่องกล้องเพริสโคป<br>ลากเพื่อหมุนกล้อง · กด ▼ ค้างไว้เพื่อดำลง · สแกน → เก็บตัวอย่าง → วิเคราะห์<br>เรือดำน้ำมีน้ำหนัก จึงค่อย ๆ เร่งความเร็ว และไหลต่ออีกนิดก่อนจะหยุด<br>ทะเลมีสามชั้น แต่ละชั้นมีพื้นขวางอยู่ ให้หมุนกล้องเพื่อหาช่องลงไปต่อ<br>แนะนำให้ใส่หูฟัง · ดนตรีจะดังขึ้นเมื่อคุณเคลื่อนที่ และค่อย ๆ เบาลงเมื่อหยุด<br>(เสียงพากย์เป็นภาษาอังกฤษ)',
+    'You are looking through the 360° camera of a deep-sea submarine (ROV).<br>Grab the ring and turn it like a periscope.<br>Drag to turn the camera · hold ▼ to dive · Scan → Collect → Analyze<br>The sub has weight: it gathers way slowly and glides to a stop.<br>The sea has three levels. Each ends in a floor: turn the sphere to find the way down.<br>Headphones recommended · the music joins when you move and fades when you stop'],
+  cam_label: ['ROV CAM 360° · กล้องเรือดำน้ำ', 'ROV CAM 360° · SUBMARINE CAMERA'],
+  status_title: ['ระบบนำทาง DeepCore', 'DeepCore Navigation'],
+  l_pressure: ['ความดัน', 'Pressure'], l_temp: ['อุณหภูมิ', 'Temp'], l_visibility: ['ทัศนวิสัย', 'Visibility'],
+  l_salinity: ['ความเค็ม', 'Salinity'], l_coord: ['พิกัด', 'Coord'], l_specimens: ['ตัวอย่าง', 'Specimens'],
+  l_panels: ['จอที่ติด', 'Panels lit'], l_heading: ['ทิศที่หัน', 'Heading'], l_reticle: ['เป้าเล็ง', 'Reticle'],
+  meters: ['เมตร', 'METERS'],
+  m_explore: ['สำรวจ', 'Explore'], m_scan: ['สแกน', 'Scan'], m_collect: ['เก็บ', 'Collect'], m_analyze: ['วิเคราะห์', 'Analyze'],
+  narr_label: ['Deep Sphere · ภาพจำลอง', 'Deep Sphere Twin'],
+  k_depth: ['ความลึก', 'depth'], k_turn: ['หมุนทรงกลม', 'turn the sphere'], k_scan: ['สแกน', 'scan'], k_collect: ['เก็บ', 'collect'],
+  k_analyze: ['วิเคราะห์', 'analyze'], k_reset: ['รีเซ็ต', 'reset'], k_mute: ['ปิดเสียง', 'mute'], k_mute_aria: ['ปิดเสียง', 'Mute audio'],
+  k_voice: ['เสียงพากย์', 'Voice'], k_voice_aria: ['ระดับเสียงพากย์', 'Voice volume'],
+  deck_aria: ['การ์ดตัวอย่าง', 'Specimen cards'], deck_title: ['บันทึกตัวอย่าง', 'SPECIMEN LOG'],
+  guide_aria: ['วิธีเล่น', 'How to play'], guide_title: ['ปุ่มควบคุม', 'CONTROLS'],
+  g1: ['หมุนวงจอแบบเพริสโคป<small>หมุนกล้องเรือดำน้ำ มองรอบตัว</small>', 'Turn the ring like a periscope<small>Turn the ROV camera to look around</small>'],
+  g2: ['หมุนล้อ = ดำลง / ลอยขึ้น<small>หมุนล้อเพื่อดำให้ลึกขึ้น</small>', 'Turn the wheel = dive / rise<small>Wheel dives deeper</small>'],
+  g3: ['ปุ่มแดง = สแกน<small>ค้นหาสิ่งมีชีวิต</small>', 'Red button = scan<small>Scan for life</small>'],
+  g4: ['ปุ่มขาว = เก็บ<small>เก็บสิ่งที่อยู่ในเป้าเล็ง</small>', 'White button = collect<small>Collect what is in the reticle</small>'],
+  g5: ['ปุ่มน้ำเงิน = วิเคราะห์<small>เปิดผลวิเคราะห์</small>', 'Blue button = analyze<small>Open the analysis</small>'],
+  pad_aria: ['ปุ่มควบคุม', 'Controls'], pad_left: ['หมุนซ้าย', 'Turn left'], pad_right: ['หมุนขวา', 'Turn right'],
+  pad_up: ['ลอยขึ้น', 'Rise'], pad_down: ['ดำลง', 'Dive'], pad_up_t: ['ขึ้น', 'UP'], pad_down_t: ['ดำลง', 'DIVE'],
+  shape_title: ['สลับระหว่างทรงกลมกับวงแหวนหกจอ (กด B)', 'Switch between the sphere and six-screen ring (B)'],
+  sound_aria: ['เปิดหรือปิดเสียง', 'Sound on or off'],
+  ack: ['รับทราบ', 'ACKNOWLEDGE'], dismiss_aria: ['ปิดการแจ้งเตือน', 'Dismiss event']
+};
+const SHAPE_NAMES = { sphere: L('ทรงกลม', 'sphere'), ring: L('วงแหวน', 'ring'), cube: L('ลูกบาศก์', 'cube') };
+const START_LABELS = { loading: L('กำลังโหลดแผงจอ', 'LOADING PANELS'), begin: L('เริ่มสำรวจ', 'BEGIN EXPLORATION'),
+  sound: L('กำลังโหลดเสียง', 'LOADING SOUND'), retry: L('เปิดเสียงไม่ได้ — ลองอีกครั้ง', 'AUDIO UNAVAILABLE — RETRY'),
+  failed: L('โหลดไม่สำเร็จ — โหลดหน้าใหม่', 'LOAD FAILED - RELOAD') };
+const startLabel = { key: 'loading', n: 0, total: 0, shown: null };
+const bannerState = { text: null };
+const popupState = { mode: '', subject: null, sample: null };
+
+function setStartLabel(key, n, total) {
+  if (key) { startLabel.key = key; startLabel.n = n || 0; startLabel.total = total || 0; }
+  const button = $('btn-start');
+  if (!button) return;
+  let text = tx(START_LABELS[startLabel.key]);
+  if (startLabel.key === 'sound') text += ' ' + startLabel.n + '/' + startLabel.total;
+  startLabel.shown = text;
+  if (button.textContent !== text) button.textContent = text;
+}
+// renderer.js writes BEGIN EXPLORATION straight into the button; catch it and show it in the chosen language.
+function watchStartButton() {
+  const button = $('btn-start');
+  if (!button || !window.MutationObserver) return;
+  new MutationObserver(() => {
+    const now = button.textContent;
+    if (now === startLabel.shown) return;
+    if (now === 'BEGIN EXPLORATION') setStartLabel('begin');
+  }).observe(button, { childList: true, characterData: true, subtree: true });
+}
+function updateSoundButton() {
+  const sound = $('btn-sound');
+  if (sound) sound.textContent = tx(audio.muted ? L('เสียง: ปิด', 'Sound: off') : L('เสียง: เปิด', 'Sound: on'));
+}
+function updateShapeButton() {
+  const button = $('btn-shape');
+  if (!button || !state.shape) return;
+  button.textContent = tx(L('รูปทรง: ', 'Shape: ')) + tx(SHAPE_NAMES[state.shape] || state.shape);
+}
+function renderBanner() {
+  const banner = document.querySelector('.twin-banner');
+  if (banner && bannerState.text) banner.textContent = tx(bannerState.text);
+}
+function renderLangButton() {
+  const button = $('btn-lang');
+  if (!button) return;
+  button.innerHTML = '<span class="' + (LANG === 'th' ? 'on' : '') + '">TH</span> / <span class="' + (LANG === 'en' ? 'on' : '') + '">EN</span>';
+  button.setAttribute('aria-label', tx(L('เปลี่ยนภาษา (ไทย / English)', 'Switch language (Thai / English)')));
+}
+function refreshPopup() {
+  const popup = $('discovery-popup');
+  if (!popup || !popup.classList.contains('show')) return;
+  if (popupState.mode === 'card' && popupState.subject) showSpeciesCard(popupState.subject, popupState.sample);
+  else if (popupState.mode === 'analysis') showAnalysis();
+}
+function applyLang() {
+  const index = LANG === 'th' ? 0 : 1;
+  document.documentElement.lang = LANG;
+  document.title = LANG === 'th' ? 'Deep Sphere — ดำดิ่งสู่ทะเลลึก' : 'Deep Sphere — dive the ocean';
+  const meta = document.querySelector('meta[name="description"]');
+  if (meta) meta.setAttribute('content', LANG === 'th' ? 'สำรวจ Deep Sphere ภาพจำลองดิจิทัล ตามหาสัตว์ทะเล และดำผ่านชั้นต่าง ๆ ของมหาสมุทร' : 'Explore the Deep Sphere digital twin, follow marine life, and dive through the layers of the ocean.');
+  document.querySelectorAll('[data-i18n]').forEach((el) => { const entry = UI[el.dataset.i18n]; if (entry) el.innerHTML = entry[index]; });
+  document.querySelectorAll('[data-i18n-aria]').forEach((el) => { const entry = UI[el.dataset.i18nAria]; if (entry) el.setAttribute('aria-label', entry[index]); });
+  document.querySelectorAll('[data-i18n-title]').forEach((el) => { const entry = UI[el.dataset.i18nTitle]; if (entry) el.title = entry[index]; });
+  renderLangButton();
+  setStartLabel();
+  updateSoundButton();
+  try { updateShapeButton(); } catch (_) {}
+  paintNarration();
+  renderBanner();
+  try { if (typeof FACES !== 'undefined' && SUBJECTS.length) updateHUD(null); } catch (_) {}
+  try { renderDeck(); } catch (_) {}
+  try { refreshPopup(); } catch (_) {}
+}
+function setLang(next, remember) {
+  if (next !== 'th' && next !== 'en') return;
+  LANG = next;
+  if (remember) { try { window.localStorage.setItem(LANG_KEY, next); } catch (_) {} }
+  applyLang();
+}
+function initLang() {
+  const button = $('btn-lang');
+  if (button) button.addEventListener('click', () => setLang(LANG === 'th' ? 'en' : 'th', true));
+  watchStartButton();
+  if (narrationSrc === null) narrationSrc = L('ระบบจำลองพร้อมแล้ว ยังไม่ได้ต่อบอร์ด', 'Twin online. No board attached.');
+  applyLang();
 }
 
 // ---------------------------------------------------------------- actions
 
 // ---------------------------------------------------------------- species card and analysis list
-const LEVEL_LABELS = { surface: 'LEVEL 1 · CORAL REEF', mid: 'LEVEL 2 · SHIPWRECK', deep: 'LEVEL 3 · VOLCANIC VENTS' };
+const LEVEL_LABELS = { surface: L('ชั้น 1 · แนวปะการัง', 'LEVEL 1 · CORAL REEF'), mid: L('ชั้น 2 · ซากเรือจม', 'LEVEL 2 · SHIPWRECK'),
+  deep: L('ชั้น 3 · ปล่องภูเขาไฟใต้ทะเล', 'LEVEL 3 · VOLCANIC VENTS') };
 // What each creature on the cube stands for. sci = scientific name, range = where it really lives.
 const SPECIES = {
   shoal: { sci: 'Pseudanthias squamipinnis', common: 'Sea Goldie (Lyretail Anthias)',
@@ -1552,6 +1972,48 @@ const SPECIES = {
       'Lives where there is almost no oxygen, carries light organs on its arm tips, and squirts glowing mucus instead of ink.'],
     range: 'Depth: about 600–1,200 m / Oxygen minimum zone', source: 'SeaLifeBase' }
 };
+// Thai text for the species cards (scientific names stay Latin; sources stay as published).
+const SPECIES_TH = {
+  shoal: { common: 'ปลาแอนเทียสหางพิณ',
+    lines: ['ฝูงปลาสีส้มทองเหล่านี้ลอยเป็นกลุ่มเหนือแนวปะการังทะเลแดง คอยจับแพลงก์ตอนจากกระแสน้ำกินเป็นอาหาร',
+      'ปลาทุกตัวเกิดมาเป็นเพศเมีย ตัวที่ใหญ่ที่สุดในฝูงจะเปลี่ยนเป็นเพศผู้'],
+    range: 'ความลึก: 0–55 ม. / แนวปะการัง' },
+  reef: { common: 'ปลาการ์ตูนทะเลแดง',
+    lines: ['ปลาการ์ตูนสองแถบ พบในทะเลแดงและอ่าวเอเดน',
+      'อาศัยอยู่ท่ามกลางหนวดพิษของดอกไม้ทะเล โดยมีเมือกที่ตัวเองสร้างขึ้นคอยป้องกัน'],
+    range: 'ความลึก: 1–30 ม. / แนวปะการัง' },
+  seahorse: { common: 'ม้าน้ำพอนี',
+    lines: ['ม้าน้ำตัวเล็กที่อยู่ตามแหล่งหญ้าทะเลที่กำบังลมในทะเลแดงและมหาสมุทรอินเดีย ใช้หางเกาะยึดตัวไว้กับที่',
+      'ตัวผู้เป็นฝ่ายอุ้มไข่ไว้ในถุงที่ท้อง และเป็นฝ่ายให้กำเนิดลูก'],
+    range: 'ความลึก: น้ำตื้น ลึกถึงราว 10 ม. / แหล่งหญ้าทะเล' },
+  manta: { common: 'กระเบนราหูแนวปะการัง',
+    lines: ['กินแพลงก์ตอนโดยกรองจากน้ำ ปีกกางกว้างได้ถึงราว 5 เมตร',
+      'กระเบนราหูมีสมองใหญ่ที่สุดในบรรดาปลาทั้งหมด ตัวในทะเลแดงที่ติดเครื่องติดตามเคยดำลงลึกเกิน 400 เมตร'],
+    range: 'ความลึก: ส่วนใหญ่อยู่ใน 30 ม. บนสุด แต่ดำลึกได้เกิน 400 ม. / แนวปะการังและน้ำเปิด' },
+  lantern: { common: 'ปลาตะเกียงแก้มเรียว',
+    lines: ['ปลาที่มีมากที่สุดในชั้นสนธยาของทะเลแดง ยาวราว 5 ซม. มีแถวอวัยวะเรืองแสงเรียงตามท้อง',
+      'กลางวันหลบอยู่ในความมืดลึกลงไปมาก ตกกลางคืนจึงว่ายขึ้นมาใกล้ผิวน้ำเพื่อหาอาหาร'],
+    range: 'ความลึก: ใกล้ผิวน้ำตอนกลางคืน ราว 300–800 ม. ตอนกลางวัน / น้ำเปิด' },
+  jelly: { common: 'แมงกะพรุนอะโทลลา (แมงกะพรุนมงกุฎ)',
+    lines: ['แมงกะพรุนสีแดงเข้มแห่งชั้นเที่ยงคืน พบได้ในมหาสมุทรทั่วโลก',
+      'เมื่อถูกโจมตี มันจะปล่อยวงแสงสีน้ำเงินหมุนวน เหมือน "สัญญาณกันขโมย" ที่ล่อให้ผู้ล่าตัวใหญ่กว่าเข้ามา'],
+    range: 'ความลึก: ราว 1,000–4,000 ม. / น้ำเปิด' },
+  angler: { common: 'ปลาตกเบ็ดหลังค่อม',
+    lines: ['นักล่าที่ซุ่มรออยู่ในทะเลลึก ตัวเมียห้อยเหยื่อเรืองแสงไว้หน้าปากที่เต็มไปด้วยฟันยาว',
+      'แสงนั้นมาจากแบคทีเรียที่อาศัยอยู่ในเหยื่อ ตัวเมียยาวราว 15 ซม. ส่วนตัวผู้เล็กกว่า 3 ซม.'],
+    range: 'ความลึก: ราว 200–1,500 ม. / น้ำเปิด' },
+  squid: { common: 'หมึกแวมไพร์',
+    lines: ['ไม่ใช่หมึกกล้วยแท้ และไม่ใช่ปลาหมึกยักษ์ แต่เป็นสมาชิกเพียงชนิดเดียวที่ยังมีชีวิตอยู่ในอันดับของมันเอง',
+      'อาศัยอยู่ในที่ที่แทบไม่มีออกซิเจน มีอวัยวะเรืองแสงที่ปลายแขน และพ่นเมือกเรืองแสงแทนการพ่นหมึก'],
+    range: 'ความลึก: ราว 600–1,200 ม. / ชั้นที่มีออกซิเจนต่ำสุด' }
+};
+function spec(key) {
+  const base = SPECIES[key];
+  if (!base) return { lines: [] };
+  return LANG === 'th' && SPECIES_TH[key] ? Object.assign({}, base, SPECIES_TH[key]) : base;
+}
+// A creature's name in both languages (the English one is the name in config/twin.json).
+function subjName(subject) { return L(VOICE_SPECIES[subjectCueKey(subject)] || subject.name, subject.name); }
 const card = { timer: 0, items: [] };
 
 function cardAnimate() {
@@ -1567,19 +2029,20 @@ function cardAnimate() {
 }
 
 function showSpeciesCard(subject, sample) {
-  const key = subjectCueKey(subject), info = SPECIES[key] || { lines: [] }, done = state.collected.length >= SUBJECTS.length;
-  $('discovery-title').textContent = (done ? '★ ALL SPECIMENS COLLECTED ★' : '★ NEW SPECIMEN COLLECTED ★') + '  ' + state.collected.length + ' / ' + SUBJECTS.length;
+  const key = subjectCueKey(subject), info = spec(key), done = state.collected.length >= SUBJECTS.length;
+  popupState.mode = 'card'; popupState.subject = subject; popupState.sample = sample;
+  $('discovery-title').textContent = tx(done ? L('★ เก็บครบทุกตัวอย่างแล้ว ★', '★ ALL SPECIMENS COLLECTED ★') : L('★ เก็บตัวอย่างใหม่ได้แล้ว ★', '★ NEW SPECIMEN COLLECTED ★')) + '  ' + state.collected.length + ' / ' + SUBJECTS.length;
   const art = $('discovery-art');
   art.hidden = false;
   $('discovery-emoji').textContent = '';
   $('discovery-species').textContent = info.sci || subject.name;
-  $('discovery-sub').textContent = (info.common || subject.name) + ' · in view: ' + subject.name;
+  $('discovery-sub').textContent = (info.common || tx(subjName(subject))) + tx(L(' · ในภาพ: ', ' · in view: ')) + tx(subjName(subject));
   const rows = (info.lines || []).map((text) => { const row = document.createElement('div'); row.textContent = text; return row; });
   const range = document.createElement('div'), log = document.createElement('div');
   range.className = 'fact';
-  range.textContent = (info.range || '') + (info.source ? ' / Source: ' + info.source : '');
+  range.textContent = (info.range || '') + (info.source ? tx(L(' / แหล่งข้อมูล: ', ' / Source: ')) + info.source : '');
   log.className = 'logged';
-  log.textContent = 'Sample logged at ' + Math.round(sample.depth * MAX_METRES) + ' m · ' + (LEVEL_LABELS[sample.zone] || '') + ' · 22.3°N 38.9°E';
+  log.textContent = tx(L('บันทึกตัวอย่างที่ความลึก ', 'Sample logged at ')) + Math.round(sample.depth * MAX_METRES) + tx(L(' ม. · ', ' m · ')) + tx(LEVEL_LABELS[sample.zone]) + ' · 22.3°N 38.9°E';
   $('discovery-info').replaceChildren(...rows, range, log);
   card.items = [{ canvas: art, subject, depth: sample.depth }];
   $('discovery-popup').classList.add('show');
@@ -1587,15 +2050,16 @@ function showSpeciesCard(subject, sample) {
 }
 
 function showAnalysis() {
-  $('discovery-title').textContent = 'ANALYSIS';
+  popupState.mode = 'analysis'; popupState.subject = null; popupState.sample = null;
+  $('discovery-title').textContent = tx(L('ผลวิเคราะห์', 'ANALYSIS'));
   $('discovery-art').hidden = true;
   $('discovery-emoji').textContent = 'ANALYSIS';
-  $('discovery-species').textContent = state.collected.length + ' / ' + SUBJECTS.length + ' specimens';
-  $('discovery-sub').textContent = state.collected.length >= SUBJECTS.length ? 'Every species in this survey has been collected.' : 'Species not found yet are listed with the level they live on.';
+  $('discovery-species').textContent = LANG === 'th' ? 'ตัวอย่าง ' + state.collected.length + ' / ' + SUBJECTS.length : state.collected.length + ' / ' + SUBJECTS.length + ' specimens';
+  $('discovery-sub').textContent = state.collected.length >= SUBJECTS.length ? tx(L('เก็บครบทุกสายพันธุ์ในการสำรวจนี้แล้ว', 'Every species in this survey has been collected.')) : tx(L('สายพันธุ์ที่ยังไม่พบ จะแสดงชั้นที่มันอาศัยอยู่', 'Species not found yet are listed with the level they live on.'));
   const rows = [], items = [];
   const order = SUBJECTS.map((_, index) => index).sort((x, y) => SUBJECTS[x].y_mm - SUBJECTS[y].y_mm);
   for (const index of order) {
-    const subject = SUBJECTS[index], sample = state.collected.find((c) => c.id === subject.id), info = SPECIES[subjectCueKey(subject)] || {};
+    const subject = SUBJECTS[index], sample = state.collected.find((c) => c.id === subject.id), info = spec(subjectCueKey(subject));
     const row = document.createElement('div'), text = document.createElement('div'), name = document.createElement('div'), meta = document.createElement('div');
     row.className = 'specimen-row' + (sample ? '' : ' missing');
     name.className = 'name'; meta.className = 'meta';
@@ -1607,14 +2071,14 @@ function showAnalysis() {
       const sci = document.createElement('i');
       sci.textContent = info.sci || subject.name;
       name.append(sci);
-      meta.textContent = (info.common || subject.name) + ' · logged at ' + Math.round(sample.depth * MAX_METRES) + ' m';
+      meta.textContent = (info.common || tx(subjName(subject))) + tx(L(' · เก็บที่ความลึก ', ' · logged at ')) + Math.round(sample.depth * MAX_METRES) + tx(L(' ม.', ' m'));
     } else {
       const unknown = document.createElement('div');
       unknown.className = 'unknown'; unknown.textContent = '?';
       row.append(unknown);
       const home = 0.1 + (subject.y_mm - geometry.aimHeightMm) / geometry.depthTravelMm;
-      name.textContent = 'Not found yet';
-      meta.textContent = LEVEL_LABELS[home < ZONE_BOUNDS[0] ? 'surface' : home < ZONE_BOUNDS[1] ? 'mid' : 'deep'];
+      name.textContent = tx(L('ยังไม่พบ', 'Not found yet'));
+      meta.textContent = tx(LEVEL_LABELS[home < ZONE_BOUNDS[0] ? 'surface' : home < ZONE_BOUNDS[1] ? 'mid' : 'deep']);
     }
     text.append(name, meta); row.append(text); rows.push(row);
   }
@@ -1630,9 +2094,10 @@ function showAnalysis() {
 const GATES_ON = !/[?&](acceptance=1|gates=0)/.test(location.search);
 state.gatesOff = !GATES_ON;
 const GATE_AHEAD = {
-  reef: 'Sand and a coral reef below · turn the sphere to find the way down',
-  wreck: 'A shipwreck on a rock shelf below · look for the glowing rift to go deeper'
+  reef: L('ด้านล่างเป็นพื้นทรายและแนวปะการัง · หมุนทรงกลมเพื่อหาทางลง', 'Sand and a coral reef below · turn the sphere to find the way down'),
+  wreck: L('ด้านล่างมีซากเรืออับปางบนหิ้งหิน · มองหารอยแยกที่เรืองแสงเพื่อดำลงลึกขึ้น', 'A shipwreck on a rock shelf below · look for the glowing rift to go deeper')
 };
+const GATE_AHEAD_DEFAULT = L('หมุนทรงกลมเพื่อหาทางลง', 'Turn the sphere to find the way down');
 
 function gateList() { return GATES_ON && config && config.gates || []; }
 // Millimetres along the strip from the reticle to the opening; positive means turn right.
@@ -1668,9 +2133,11 @@ function gateBump(gate, dir) {
     speakLine('vo_gate_hint');
   }
   cue('hull_creak', { minGap: 0 });
-  const way = dir > 0 ? 'the way down' : 'the way up';
-  const side = gateOffset(gate) > 0 ? 'turn right ▶' : '◀ turn left';
-  const text = (dir > 0 ? 'The floor is in the way' : 'Rock overhead') + ' · ' + (gate.bumps > 1 ? side + ' to find ' + way : 'turn the sphere to find ' + way);
+  const wayEn = dir > 0 ? 'the way down' : 'the way up', wayTh = dir > 0 ? 'ทางลง' : 'ทางขึ้น';
+  const right = gateOffset(gate) > 0;
+  const sideEn = right ? 'turn right ▶' : '◀ turn left', sideTh = right ? 'หมุนไปทางขวา ▶' : '◀ หมุนไปทางซ้าย';
+  const text = L((dir > 0 ? 'พื้นขวางทางอยู่' : 'มีโขดหินอยู่ด้านบน') + ' · ' + (gate.bumps > 1 ? sideTh + ' เพื่อหา' + wayTh : 'หมุนทรงกลมเพื่อหา' + wayTh),
+    (dir > 0 ? 'The floor is in the way' : 'Rock overhead') + ' · ' + (gate.bumps > 1 ? sideEn + ' to find ' + wayEn : 'turn the sphere to find ' + wayEn));
   showPill(text, 3200);
   say(text);
 }
@@ -1690,7 +2157,8 @@ function gatePassed(gate, dir) {
       if (audio.voiceCurrentId === 'vo_gate_pass' || audio.voicePendingId === 'vo_gate_pass') audio.gatePassVoiceZone = nextZone;
     }
   }
-  say((dir > 0 ? 'Through the gap, down to ' : 'Back up to ') + LEVEL_LABELS[['surface', 'mid', 'deep'][Math.min(2, state.level)]] + '.');
+  const toLevel = LEVEL_LABELS[['surface', 'mid', 'deep'][Math.min(2, state.level)]];
+  say(L((dir > 0 ? 'ผ่านช่องแล้ว ลงสู่ ' : 'ขึ้นกลับสู่ ') + toLevel.th, (dir > 0 ? 'Through the gap, down to ' : 'Back up to ') + toLevel.en + '.'));
 }
 
 // Where the sub actually ends up when it tries to go from one depth to another.
@@ -1721,12 +2189,12 @@ function updateGates() {
     else if (above && state.depth - above.depth < 0.06 && gateOpen(above)) ready = -1;
     if (below && !below.seen && below.depth - state.depth < 0.11) {
       below.seen = true;
-      showPill(GATE_AHEAD[below.kind] || 'Turn the sphere to find the way down', 4200);
-      say(GATE_AHEAD[below.kind] || 'Turn the sphere to find the way down');
+      showPill(GATE_AHEAD[below.kind] || GATE_AHEAD_DEFAULT, 4200);
+      say(GATE_AHEAD[below.kind] || GATE_AHEAD_DEFAULT);
     }
     if (!below && !audio.seaBedSeen && state.depth > 0.9) {
       audio.seaBedSeen = true;
-      say('The sea bed: black basalt, glowing lava cracks and hydrothermal vents.');
+      say(L('พื้นทะเล: หินบะซอลต์สีดำ รอยแตกที่มีลาวาเรืองแสง และปล่องน้ำร้อนใต้ทะเล', 'The sea bed: black basalt, glowing lava cracks and hydrothermal vents.'));
     }
   }
   if (ready && ready !== state.gateReady && performance.now() - (audio.gatePassAt || 0) > 2500) {
@@ -1735,7 +2203,7 @@ function updateGates() {
       readyGate.voiceFoundAt = performance.now();
       speakLine('vo_gate_found');
     }
-    showPill(ready > 0 ? 'Found the gap · hold ▼ to dive' : 'Found the gap · hold ▲ to rise', 2600);
+    showPill(ready > 0 ? L('พบช่องแล้ว · กด ▼ ค้างเพื่อดำลง', 'Found the gap · hold ▼ to dive') : L('พบช่องแล้ว · กด ▲ ค้างเพื่อลอยขึ้น', 'Found the gap · hold ▲ to rise'), 2600);
     handNote(74, 1);
     window.setTimeout(() => handNote(81, 1), 170);
   }
@@ -1747,7 +2215,7 @@ function doScan() {
   const hit = reticleHit(state.yaw);
   if (!hit || !hit.onPanel) {
     cue('action_error'); speakLine('vo_on_frame');
-    say('The reticle is on the printed frame, not on a panel. Nothing to scan.'); return;
+    say(L('เป้าเล็งอยู่บนขอบจอ ไม่ได้อยู่บนแผงจอ ไม่มีอะไรให้สแกน', 'The reticle is on the printed frame, not on a panel. Nothing to scan.')); return;
   }
   const s = aimedSubject(hit);
   const fx = $('scan-effect');
@@ -1757,8 +2225,8 @@ function doScan() {
   cue('scan_sweep', { minGap: 0 });
   activity('act');
   beginSonarWindow();
-  if (s < 0) say('Scan on face ' + FACES[hit.face].id + ': open water.');
-  else say('Scan on face ' + FACES[hit.face].id + ': ' + SUBJECTS[s].name + ' is in the reticle. Press 2 to collect.');
+  if (s < 0) say(L('สแกนที่จอ ' + FACES[hit.face].id + ': มีแต่น้ำ', 'Scan on face ' + FACES[hit.face].id + ': open water.'));
+  else { const nm = subjName(SUBJECTS[s]); say(L('สแกนที่จอ ' + FACES[hit.face].id + ': พบ' + nm.th + 'ในเป้าเล็ง กด 2 เพื่อเก็บตัวอย่าง', 'Scan on face ' + FACES[hit.face].id + ': ' + nm.en + ' is in the reticle. Press 2 to collect.')); }
   const sweepFile = cueRecord('scan_sweep') && cueRecord('scan_sweep').files[0];
   const sweepBuffer = sweepFile && audio.buffers.get(sweepFile);
   const resultDelay = Math.max(500, ((sweepBuffer && sweepBuffer.duration) || 1.8) * 1000 + 500);
@@ -1786,13 +2254,20 @@ function doScan() {
 
 function doCollect() {
   renderPanels();
+  // 11-06 owner: the panels decide (their reticle, their tray); the web follows the board's "tray" in the scene.
+  if (state.boardScene && Number.isInteger(state.boardScene.tray)) return;
   const hit = reticleHit(state.yaw);
   const s = aimedSubject(hit);
-  if (s < 0) { cue('action_error'); speakLine('vo_nothing'); say('Nothing under the reticle to collect.'); return; }
+  if (s < 0) { cue('action_error'); speakLine('vo_nothing'); say(L('ไม่มีอะไรในเป้าเล็งให้เก็บ', 'Nothing under the reticle to collect.')); return; }
   if (state.collected.some((c) => c.id === SUBJECTS[s].id)) {
     cue('collect_duplicate'); speakLine('vo_duplicate');
-    say(SUBJECTS[s].name + ' is already in the sample tray.'); return;
+    const nm = subjName(SUBJECTS[s]); say(L(nm.th + ' อยู่ในถาดตัวอย่างแล้ว', nm.en + ' is already in the sample tray.')); return;
   }
+  storeSample(s, hit);
+}
+
+// One sample goes into the tray (from the web's own collect, or from the board's tray in its scene line).
+function storeSample(s, hit) {
   state.collectFlash = performance.now();
   activity('act'); sparkleFor(6);
   state.collectFace = hit.face;
@@ -1801,15 +2276,119 @@ function doCollect() {
   if (state.collected.length >= SUBJECTS.length) {
     prioritySound('mission_complete', 3);
     window.setTimeout(() => speakLine('vo_complete'), 550);
+    clearTimeout(EXPEDITION.timer);
+    EXPEDITION.timer = window.setTimeout(() => newExpedition('complete'), EXPEDITION.afterCompleteMs);
   } else {
     prioritySound('collect_success', 1);
     window.setTimeout(() => speakLine('vo_collect'), 500);
   }
   // A collected sample brings up its species card; Analyze lists the whole tray.
-  say('Sample stored: ' + SUBJECTS[s].name + ' — ' + state.collected.length + ' of ' + SUBJECTS.length +
-    ' in the tray. Press 3 to analyse.');
+  const nm = subjName(SUBJECTS[s]);
+  say(L('เก็บตัวอย่างแล้ว: ' + nm.th + ' — ในถาดมี ' + state.collected.length + ' จาก ' + SUBJECTS.length + ' กด 3 เพื่อวิเคราะห์',
+    'Sample stored: ' + nm.en + ' — ' + state.collected.length + ' of ' + SUBJECTS.length + ' in the tray. Press 3 to analyse.'));
   showSpeciesCard(SUBJECTS[s], state.collected[state.collected.length - 1]);
 }
+
+// Endless play for the exhibition (owner 11-05): a full tray, or a long time with nobody at the box,
+// starts a new expedition. The tray empties and every creature moves to a new spot round the ring,
+// at its own depth, so the next visitor has to hunt again. No reload needed.
+const EXPEDITION = { afterCompleteMs: 15000, idleMs: 4 * 60 * 1000, retryMs: 5000, timer: 0, count: 1, syncedN: 0, pending: false,
+  mismatchSince: 0, resentAt: 0 };
+
+function postBoardCommand(body) {
+  if (state.mqttMode) return Promise.resolve();   // MQTT mode is view only: no POST /command
+  return fetch('/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    .then((response) => { if (!response.ok) throw new Error('Board command: HTTP ' + response.status); });
+}
+
+// Every scene carries the board's expedition count. Board ahead (page reloaded, or the web missed it): take its
+// count and replay the positions. Board behind for over a second (a lost command, or the board restarted):
+// send the web's count down again instead of moving the creatures back.
+function syncBoardExpedition(boardN, now) {
+  if (boardN > EXPEDITION.count) {
+    applyExpeditionPositions(boardN);
+    EXPEDITION.count = boardN;
+    EXPEDITION.syncedN = boardN;
+    EXPEDITION.mismatchSince = 0;
+    return;
+  }
+  if (boardN === EXPEDITION.count) { EXPEDITION.mismatchSince = 0; return; }
+  if (!EXPEDITION.mismatchSince) { EXPEDITION.mismatchSince = now; return; }
+  if (EXPEDITION.pending || now - EXPEDITION.mismatchSince < 1000 || now - EXPEDITION.resentAt < 2000) return;
+  EXPEDITION.resentAt = now;
+  const n = EXPEDITION.count;
+  postBoardCommand({ type: 'command', action: 'expedition', n, seed: expeditionSeedFor(n) })
+    .catch((error) => console.warn('Expedition re-send failed', error));
+}
+
+// Shared with ring-fish firmware: xorshift32, unsigned seed, one draw per subject in config order.
+function expeditionShift(seed) {
+  let value = seed >>> 0;
+  value ^= value << 13; value >>>= 0;
+  value ^= value >>> 17; value >>>= 0;
+  value ^= value << 5; value >>>= 0;
+  return { seed: value, mm: 40 + value * (400 / 4294967296) };
+}
+
+// Each expedition n has a fixed seed (same function as ring_fish.cpp expeditionSeedFor), so the web and the board
+// can both rebuild the positions from the count alone, e.g. after a page reload or a missed command.
+function expeditionSeedFor(n) {
+  let v = (Math.imul(n >>> 0, 0x9e3779b9) ^ 0x7f4a7c15) >>> 0;
+  v ^= v >>> 16; v = Math.imul(v, 0x85ebca6b) >>> 0; v ^= v >>> 13; v = Math.imul(v, 0xc2b2ae35) >>> 0; v ^= v >>> 16;
+  return (v >>> 0) || 1;
+}
+
+// Positions after expedition n: the config position plus every expedition's shift from 2 to n.
+function applyExpeditionPositions(n) {
+  const total = SUBJECTS.map(() => 0);
+  for (let k = 2; k <= n; k++) {
+    let shiftSeed = expeditionSeedFor(k);
+    SUBJECTS.forEach((subject, i) => {
+      const shift = expeditionShift(shiftSeed);
+      shiftSeed = shift.seed;
+      total[i] += shift.mm;
+    });
+  }
+  SUBJECTS.forEach((subject, i) => {
+    if (subject.baseX_mm === undefined) subject.baseX_mm = subject.x_mm;
+    subject.x_mm = subject.baseX_mm + total[i] % geometry.stripLengthMm;   // positions wrap round the ring
+  });
+}
+
+function newExpedition(reason) {
+  clearTimeout(EXPEDITION.timer);
+  if (EXPEDITION.pending) return;
+  const next = EXPEDITION.count + 1;
+  const begin = () => {
+    EXPEDITION.count = next;
+    EXPEDITION.syncedN = next;
+    state.collected = [];
+    state.scannedSubjects = [];
+    applyExpeditionPositions(next);
+    $('discovery-popup').classList.remove('show');
+    audio.mus.lastActive = performance.now();
+    if (reason === 'complete') speakLine('vo_welcome');
+    say(L('ภารกิจรอบที่ ' + EXPEDITION.count + ': ถาดว่างแล้ว และสัตว์ทะเลย้ายที่แล้ว ลองหาให้ครบทั้ง ' + SUBJECTS.length + ' ชนิดอีกครั้ง',
+      'Expedition ' + EXPEDITION.count + ': the tray is empty and the creatures have moved. Find all ' + SUBJECTS.length + ' again.'));
+  };
+  // Without a board (plain web page) there is nothing to keep in step with.
+  if (!state.liveMode) { begin(); return; }
+  if (state.mqttMode) return;   // view only: the board starts new expeditions; the scene's expedition count follows it
+  // With the board: move the creatures only once the bridge has taken the command, so both sides agree.
+  EXPEDITION.pending = true;
+  fetch('/command', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'command', action: 'expedition', n: next, seed: expeditionSeedFor(next) }) })
+    .then((response) => { if (!response.ok) throw new Error('Expedition command: HTTP ' + response.status); begin(); })
+    .catch((error) => {
+      console.warn('Expedition command failed; creatures stay where they are, retrying', error);
+      EXPEDITION.timer = window.setTimeout(() => newExpedition(reason), EXPEDITION.retryMs);
+    })
+    .finally(() => { EXPEDITION.pending = false; });
+}
+
+setInterval(() => {
+  if (state.collected.length && performance.now() - audio.mus.lastActive > EXPEDITION.idleMs) newExpedition('idle');
+}, 5000);
 
 // Dive assist: keep every creature outlined until it is switched off again.
 function toggleHighlight() {
@@ -1817,11 +2396,11 @@ function toggleHighlight() {
   const button = $('btn-highlight');
   if (button) button.setAttribute('aria-pressed', state.highlight ? 'true' : 'false');
   cue(state.highlight ? 'dive_assist_on' : 'dive_assist_off');
-  say(state.highlight ? 'Dive assist on: every creature in view is outlined.' : 'Dive assist off.');
+  say(state.highlight ? L('เปิดโหมดช่วยดำแล้ว: สัตว์ทุกตัวในภาพจะมีเส้นขอบ', 'Dive assist on: every creature in view is outlined.') : L('ปิดโหมดช่วยดำแล้ว', 'Dive assist off.'));
 }
 
 function doAnalyze() {
-  if (state.collected.length === 0) { cue('action_error'); speakLine('vo_tray_empty'); say('The sample tray is empty. Collect something first.'); return; }
+  if (state.collected.length === 0) { cue('action_error'); speakLine('vo_tray_empty'); say(L('ถาดตัวอย่างยังว่าง เก็บตัวอย่างก่อนนะ', 'The sample tray is empty. Collect something first.')); return; }
   cue('analyze_open');
   activity('act');
   const names = state.collected.map((c) => SUBJECTS.find((s) => s.id === c.id).name);
@@ -1834,7 +2413,8 @@ function doAnalyze() {
   const thNames = nameKeys.map((key) => VOICE_SPECIES[key]).filter(Boolean).join(' ');
   const enNames = names.join(', ');
   window.setTimeout(() => speakLine('vo_analyze', { thNames, enNames, nameKeys }), 500);
-  say('Analysis of ' + state.collected.length + ' sample(s): ' + names.join(', ') + '.');
+  say(L('วิเคราะห์ตัวอย่าง ' + state.collected.length + ' ชิ้น: ' + state.collected.map((c) => subjName(SUBJECTS.find((x) => x.id === c.id)).th).join(', '),
+    'Analysis of ' + state.collected.length + ' sample(s): ' + names.join(', ') + '.'));
 }
 
 // ---------------------------------------------------------------- input
@@ -1871,6 +2451,15 @@ function motionStep(now) {
   const dt = Math.min(0.2, Math.max(0, (now - (motion.last || now)) / 1000));   // stays true to the clock on a slow device
   motion.last = now;
   if (!state.started) return;
+  const boardSceneFresh = !!state.boardScene && performance.now() - (state.boardSceneReceivedAt || 0) <= 750;
+  if (state.boardScene && !boardSceneFresh) state.boardScene = null;
+  if (boardSceneFresh) {
+    motion.depthVel = 0;
+    motion.wheelDepthPending = 0;
+    motion.wheelDepthVel = 0;
+    if (Number.isFinite(state.boardTargetDepth) && Math.abs(state.boardTargetDepth - state.depth) > 0.00005)
+      setDepth(state.depth + (state.boardTargetDepth - state.depth) * (1 - Math.exp(-dt / 0.12)), true);
+  }
   const depthStart = state.depth;
   const depthInput = Math.max(-1, Math.min(1, (motion.key.down ? 1 : 0) - (motion.key.up ? 1 : 0) + motion.pad.depth));
   motion.depthVel = easeSpeed(motion.depthVel, depthInput * MOTION.depthSpeed, dt, MOTION.depthRise, MOTION.depthFall);
@@ -1884,7 +2473,7 @@ function motionStep(now) {
   if (wheelDirection && wheelDelta * wheelDirection < 0) wheelDelta = 0;
   if (wheelDirection && Math.abs(wheelDelta) >= Math.abs(motion.wheelDepthPending)) wheelDelta = motion.wheelDepthPending;
   const depthWant = clamp01(depthStart + motion.depthVel * dt + wheelDelta);
-  if (Math.abs(motion.depthVel) > 0.0003 || Math.abs(wheelDelta) > 0) setDepth(depthWant);
+  if (!boardSceneFresh && (Math.abs(motion.depthVel) > 0.0003 || Math.abs(wheelDelta) > 0)) setDepth(depthWant);
   // Stop a control that is pushing against a gate, the surface or the sea bed.
   const depthBlocked = Math.abs(state.depth - depthWant) > 1e-9;
   if (depthBlocked) {
@@ -1933,6 +2522,8 @@ function handleBridgeEvent(event) {
     return;
   }
   if (event.type !== 'button' || event.state !== 'down') return;
+  // Exhibition: with a card open, any console button just closes it (no laptop needed).
+  if ($('discovery-popup').classList.contains('show')) { $('btn-discovery-close').click(); return; }
   if (event.name === 'scan') doScan();
   else if (event.name === 'collect') doCollect();
   else if (event.name === 'analyze') doAnalyze();
@@ -1941,13 +2532,74 @@ function handleBridgeEvent(event) {
 
 // Friends open the page with no hardware: the player view hides the engineering controls and adds on-screen
 // buttons. ?dev=1 (and the live-board and acceptance runs) keep the full twin.
-const DEV_MODE = /[?&](dev|live|acceptance)=1/.test(location.search);
+const DEV_MODE = /[?&](dev|acceptance)=1/.test(location.search);  // 10-30: live=1 keeps the clean exhibition view
 state.pretty = !/[?&](acceptance=1|sprites=blocks)/.test(location.search);
 if (!DEV_MODE) {
   document.body.classList.add('player', 'hide-labels');
   state.labels = false;
   state.grid = false;
-  orbit.dist = 3.5;
+  orbit.dist = 2.2;  // exhibition: start zoomed in on the screen box / sphere
+}
+// 11-06: two live pages for the show, both following the board. ?view=screen = the simulation alone, full
+// window, silent, no popups. ?view=console = submarine console: viewport, values, specimen cards, popups, sound.
+const VIEW = new URLSearchParams(location.search).get('view');
+if (VIEW === 'screen' || VIEW === 'console') document.body.classList.add('view-' + VIEW);
+if (VIEW === 'screen') {
+  $('intro').classList.add('hide');
+  orbit.dist = 1.6;  // the sphere fills the window
+  window.addEventListener('dblclick', () => setShape(state.shape === 'sphere' ? 'ring' : 'sphere'));  // or key B
+}
+if (VIEW === 'console') {
+  const col = document.createElement('div');
+  col.className = 'console-col';
+  orbit.dist = 1.8;
+  col.append($('hud-depth'), $('hud-status'), $('card-deck'));
+  // controls guide: under the viewport in landscape, in the column (after the cards) in portrait
+  const narrow = matchMedia('(max-width: 900px)');
+  const placeGuide = () => (narrow.matches ? col : document.body).append($('control-guide'));
+  placeGuide();
+  narrow.addEventListener('change', placeGuide);
+  document.body.append(col);
+}
+
+const deck = { key: null, items: [], timer: 0, lang: '' };
+function renderDeck() {
+  if (VIEW !== 'console') return;
+  if (!SUBJECTS.length) return;   // 11-20: applyLang runs before the creatures load; don't lock in an empty deck
+  const key = state.collected.map((c) => c.id).join(',');
+  if (key === deck.key && deck.lang === LANG) return;
+  deck.lang = LANG;
+  const fresh = deck.key === null ? [] : state.collected.filter((c) => !deck.key.split(',').includes(String(c.id))).map((c) => c.id);
+  deck.key = key;
+  deck.items = [];
+  $('deck-count').textContent = state.collected.length + ' / ' + SUBJECTS.length;
+  $('deck-grid').replaceChildren(...SUBJECTS.map((subject, index) => {
+    const sample = state.collected.find((c) => c.id === subject.id), info = spec(subjectCueKey(subject));
+    const cardEl = document.createElement('div'), name = document.createElement('div'), meta = document.createElement('div');
+    cardEl.className = 'deck-card' + (sample ? ' got' : '') + (fresh.includes(subject.id) ? ' fresh' : '');
+    name.className = 'deck-name'; meta.className = 'deck-meta';
+    if (sample) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 168; canvas.height = 100;
+      cardEl.append(canvas);
+      deck.items.push({ canvas, subject, depth: sample.depth });
+      name.textContent = info.common || tx(subjName(subject));
+      meta.textContent = Math.round(sample.depth * MAX_METRES) + tx(L(' ม.', ' m'));
+    } else {
+      const unknown = document.createElement('div');
+      unknown.className = 'deck-unknown'; unknown.textContent = '?';
+      cardEl.append(unknown);
+      name.textContent = tx(L('ยังไม่พบ', 'UNKNOWN'));
+      meta.textContent = tx(L('ลำดับ ', 'NO. ')) + String(index + 1).padStart(2, '0');
+    }
+    cardEl.append(name, meta);
+    return cardEl;
+  }));
+  clearInterval(deck.timer);
+  let t = state.seconds;
+  const paint = () => { t += 0.1; deck.items.forEach((item, i) => paintCreature(item.canvas, item.subject, t + i * 1.3, item.depth)); };
+  paint();
+  if (deck.items.length) deck.timer = window.setInterval(paint, 100);
 }
 
 function yawHoldStop() { motion.pad.yaw = 0; }
@@ -1963,12 +2615,13 @@ function setShape(shape, remember) {
   state.ring = shape === 'ring';
   if (cubeGroup) applyShape();
   const button = $('btn-shape');
-  if (button) { button.textContent = 'Shape: ' + shape; button.setAttribute('aria-pressed', state.sphere ? 'true' : 'false'); }
+  if (button) { updateShapeButton(); button.setAttribute('aria-pressed', state.sphere ? 'true' : 'false'); }
 }
 function initShape() {
   const asked = new URLSearchParams(location.search).get('shape');
   const initial = ['sphere', 'ring', 'cube'].includes(asked) ? asked :
-    (!DEV_MODE ? 'sphere' : 'ring');
+    VIEW ? 'sphere' :  // 11-06 show pages start on the sphere (B switches)
+    'ring';  // 10-30: the hex ring is the default view; sphere stays on the Shape button
   setShape(initial, false);
   const button = $('btn-shape');
   if (button) button.addEventListener('click', () => setShape(state.shape === 'sphere' ? 'ring' : 'sphere'));
@@ -2030,11 +2683,11 @@ function initInput() {
       case 'Digit1': case 'Numpad1': e.preventDefault(); doScan(); break;
       case 'Digit2': case 'Numpad2': e.preventDefault(); doCollect(); break;
       case 'Digit3': case 'Numpad3': e.preventDefault(); doAnalyze(); break;
-      case 'KeyR': orbit = { theta: -1.3, phi: 1.32, dist: DEV_MODE ? 4.4 : 3.5 }; fitOrbit(); motion.depthVel = 0; motion.wheelDepthPending = 0; motion.wheelDepthVel = 0; motion.yawVel = 0; setYaw(0); setDepth(0, true); break;
+      case 'KeyR': orbit = { theta: -1.3, phi: 1.32, dist: DEV_MODE ? 4.4 : 2.2 }; fitOrbit(); motion.depthVel = 0; motion.wheelDepthPending = 0; motion.wheelDepthVel = 0; motion.yawVel = 0; setYaw(0); setDepth(0, true); break;
       case 'Enter': case 'Escape': if ($('discovery-popup').classList.contains('show')) $('btn-discovery-close').click(); break;
       case 'KeyD': e.preventDefault(); setDebug(!audio.debug); break;
       case 'KeyB': setShape(state.shape === 'sphere' ? 'ring' : 'sphere'); break;
-      case 'KeyN': audio.handNotes = !audio.handNotes; say(audio.handNotes ? 'Hand notes on.' : 'Hand notes off.'); break;
+      case 'KeyN': audio.handNotes = !audio.handNotes; say(audio.handNotes ? L('เปิดโน้ตเสียงประกอบแล้ว', 'Hand notes on.') : L('ปิดโน้ตเสียงประกอบแล้ว', 'Hand notes off.')); break;
       case 'KeyM':
         toggleMute();
         break;
@@ -2092,20 +2745,22 @@ async function start() {
     // The opening: two phrases of the invitation, then the sea is left alone until the player moves.
     window.setTimeout(() => startPerformance('invite', { fromStart: true, phrases: 2, hold: BEAT.phrase }), 900);
     if (audio.boardConnected) cue('board_link_on');
-    say('Deep Sphere online. Red Sea survey, 22.3°N 38.9°E. Drag to turn the sphere, hold ▼ to dive, and find the way down through each level.');
+    say(L('Deep Sphere ออนไลน์ กำลังสำรวจทะเลแดง พิกัด 22.3°N 38.9°E ลากเพื่อหมุนทรงกลม กด ▼ ค้างเพื่อดำลง แล้วหาทางลงของแต่ละชั้น',
+      'Deep Sphere online. Red Sea survey, 22.3°N 38.9°E. Drag to turn the sphere, hold ▼ to dive, and find the way down through each level.'));
   } catch (error) {
     console.error(error);
-    button.textContent = 'AUDIO UNAVAILABLE — RETRY';
+    setStartLabel('retry');
     button.disabled = false;
   } finally {
     state.starting = false;
   }
 }
 
+initLang();
 init().catch(error => {
   console.error(error);
-  $('btn-start').textContent = 'LOAD FAILED - RELOAD';
-  $('narration').textContent = error.message;
+  setStartLabel('failed');
+  say(error.message);
 });
 
 initLiveYaw();

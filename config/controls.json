@@ -44,7 +44,7 @@
     "uart2_rx": 16,
     "uart2_tx": 17,
     "wheel_batch_ms": 20,
-    "wheel_depth_per_click": 0.0166666667,
+    "wheel_depth_per_click": 0.0033333333,
     "wheel_depth_reverse": true,
     "wheel_detents_per_revolution": 20,
     "wheel_pins": {"clk": 32, "dt": 33, "sw": 25},

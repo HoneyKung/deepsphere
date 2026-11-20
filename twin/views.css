@@ -1,0 +1,225 @@
+/* 11-06: the two show pages (twin.js VIEW). ?view=screen = simulation only; ?view=console = submarine console. */
+
+.card-deck, .control-guide, .console-col { display: none; }
+
+/* === SCREEN: the simulation alone, as big as the window === */
+body.view-screen { background: #000; cursor: none; }
+body.view-screen .hud,
+body.view-screen .hud-keys,
+body.view-screen .twin-banner,
+body.view-screen .panel-strip,
+body.view-screen .pad,
+body.view-screen .top-bar,
+body.view-screen .discovery-popup,
+body.view-screen .audio-event-pill,
+body.view-screen .intro { display: none !important; }
+
+/* === CONSOLE: viewport left, instruments + specimen cards right === */
+body.view-console {
+  background:
+    linear-gradient(rgba(99, 214, 207, 0.035) 1px, transparent 1px) 0 0 / 100% 4px,
+    radial-gradient(ellipse at 30% 30%, #0e2630 0%, #061219 60%, #03090d 100%);
+}
+body.view-console .hud-mission,
+body.view-console .hud-keys,
+body.view-console .panel-strip,
+body.view-console .pad { display: none !important; }
+
+body.view-console #canvas-container {
+  inset: auto;
+  left: 24px; top: 24px;
+  width: 50vw; height: 64vh;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 0 4px rgba(11, 27, 35, 0.9), 0 0 0 5px var(--line), 0 0 40px rgba(99, 214, 207, 0.12);
+}
+body.view-console #canvas-container canvas { width: 100% !important; height: 100% !important; }
+body.view-console #canvas-container::after {
+  content: 'ROV CAM 360°';
+  position: absolute; left: 16px; top: 12px;
+  font: 600 11px/1 var(--font-mono); letter-spacing: 3px; color: var(--accent);
+  text-shadow: 0 0 8px rgba(99, 214, 207, 0.6);
+  pointer-events: none;
+}
+body.view-console #canvas-container::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    linear-gradient(var(--accent), var(--accent)) left 10px top 10px / 22px 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) left 10px top 10px / 2px 22px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) right 10px top 10px / 22px 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) right 10px top 10px / 2px 22px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) left 10px bottom 10px / 22px 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) left 10px bottom 10px / 2px 22px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) right 10px bottom 10px / 22px 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) right 10px bottom 10px / 2px 22px no-repeat;
+  opacity: 0.7;
+}
+
+body.view-console .hud-narration {
+  left: 24px !important; right: auto !important;
+  top: calc(24px + 64vh + 18px); bottom: auto !important;
+  transform: none !important;
+  width: 50vw !important;
+}
+body.view-console .twin-banner { left: 24px; right: auto; bottom: 16px; top: auto; }
+
+body.view-console .console-col {
+  display: flex; flex-direction: column; gap: 14px;
+  position: fixed; z-index: 10;
+  top: 24px; bottom: 24px; right: 24px;
+  width: calc(50vw - 72px);
+  overflow-y: auto;
+}
+body.view-console .console-col > .hud {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  width: auto !important;
+  display: block !important;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: rgba(11, 27, 35, 0.82);
+  box-shadow: inset 0 0 24px rgba(99, 214, 207, 0.05);
+}
+body.view-console .hud-status .dev-only { display: none; }
+
+/* specimen cards */
+body.view-console .card-deck { flex: 0 0 auto; }
+.deck-title {
+  font: 600 12px/1 var(--font-mono); letter-spacing: 3px; color: var(--accent);
+  display: flex; justify-content: space-between; margin-bottom: 12px;
+}
+.deck-title span { color: var(--brass); }
+.deck-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.deck-card {
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  padding: 6px;
+  background: rgba(5, 15, 21, 0.7);
+  text-align: center;
+  min-width: 0;
+}
+.deck-card canvas, .deck-unknown {
+  display: block; width: 100%; aspect-ratio: 168 / 100; border-radius: 6px;
+}
+.deck-unknown {
+  display: flex; align-items: center; justify-content: center;
+  font: 600 28px/1 var(--font-display); color: var(--text-muted);
+  background: repeating-linear-gradient(45deg, rgba(28, 58, 69, 0.35) 0 6px, transparent 6px 12px);
+}
+.deck-name {
+  margin-top: 6px;
+  font: 600 11px/1.2 var(--font-display); color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.deck-meta { font: 500 10px/1.2 var(--font-mono); color: var(--text-muted); margin-top: 2px; }
+.deck-card.got { border: 1px solid var(--accent); box-shadow: 0 0 14px rgba(99, 214, 207, 0.18); }
+.deck-card.got .deck-name { color: var(--brass); }
+.deck-card.got .deck-meta { color: var(--text-dim); }
+.deck-card.fresh { animation: deck-fresh 1.2s ease-out 3; }
+@keyframes deck-fresh {
+  0% { box-shadow: 0 0 0 0 rgba(217, 184, 120, 0.9); border-color: var(--brass); }
+  100% { box-shadow: 0 0 0 14px rgba(217, 184, 120, 0); }
+}
+
+/* bigger type for a tablet across the room */
+body.view-console .status-row, body.view-console .status-label, body.view-console .status-value { font-size: 14px; }
+body.view-console .narration-text { font-size: 16px; line-height: 1.5; }
+.deck-title { font-size: 14px; }
+.deck-name { font-size: 13px; }
+.deck-meta { font-size: 12px; }
+.deck-unknown { font-size: 36px; }
+
+/* collect popup: big on the console */
+body.view-console .discovery-popup { width: min(720px, 94vw); padding: 28px 32px; }
+body.view-console .discovery-title { font-size: 15px; }
+body.view-console .discovery-species { font-size: 32px; }
+body.view-console .discovery-sub { font-size: 15px; }
+body.view-console .discovery-info { font-size: 17px; }
+body.view-console .discovery-info .logged { font-size: 13px; }
+body.view-console .discovery-close { font-size: 16px; padding: 14px 36px; }
+
+/* portrait tablet / phone: viewport on top, cards under it, instruments last */
+@media (max-width: 900px) {
+  body.view-console { overflow-y: auto; }
+  body.view-console #canvas-container { width: calc(100vw - 32px); height: 44vh; left: 16px; top: 16px; }
+  body.view-console .hud-narration { left: 16px !important; width: calc(100vw - 32px) !important; top: calc(16px + 44vh + 12px); }
+  body.view-console .console-col { position: absolute; top: calc(44vh + 140px); left: 16px; right: 16px; bottom: auto; width: auto; overflow: visible; }
+  body.view-console .card-deck { order: -1; }
+  body.view-console .hud-bar { display: none; }
+}
+
+/* 11-06: which control does what, in the console's spare space */
+body.view-console .control-guide {
+  display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px;
+  position: fixed; z-index: 10; left: 24px; bottom: 20px; width: 50vw;
+  padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 12px;
+  background: rgba(11, 27, 35, 0.82);
+}
+body.view-console .control-guide .deck-title { display: none; }
+body.view-console .guide-row { flex-direction: column; text-align: center; gap: 8px; padding: 0; border: 0; }
+.guide-row { display: flex; align-items: center; gap: 14px; padding: 7px 0; border-top: 1px solid rgba(40, 80, 93, 0.5); }
+.guide-row:first-of-type { border-top: 0; }
+.guide-key {
+  flex: 0 0 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font: 600 20px/1 var(--font-display); color: var(--accent);
+  border: 2px solid var(--line-strong);
+}
+.key-turn, .key-wheel { border-color: var(--accent); }
+.key-red { background: #e5484d; border-color: #ff8a8d; box-shadow: 0 0 12px rgba(229, 72, 77, 0.55); }
+.key-white { background: #f2f5f5; border-color: #ffffff; box-shadow: 0 0 12px rgba(255, 255, 255, 0.4); }
+.key-blue { background: #2f7cf6; border-color: #7fb0ff; box-shadow: 0 0 12px rgba(47, 124, 246, 0.55); }
+.guide-text { font: 600 16px/1.25 var(--font-body); color: var(--text); }
+.guide-text small { display: block; font: 500 12px/1.3 var(--font-mono); color: var(--text-muted); letter-spacing: 0.03em; }
+@media (max-width: 900px) { body.view-console .control-guide { position: static; width: auto; order: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 14px; } }
+
+/* 11-06 fixes: round control dots, depth number not clipped, shape/sound buttons inside the viewport */
+.guide-key { flex: none; width: 34px; height: 34px; }
+body.view-console .hud-depth { padding-top: 20px; }
+body.view-console .depth-number { line-height: 1; }
+body.view-console .top-bar { top: 34px; right: auto; left: calc(24px + 50vw - 210px); transform: none; z-index: 20; }
+@media (max-width: 900px) { body.view-console .top-bar { left: auto; right: 30px; top: 28px; } }
+
+/* 11-20: say on screen that the view is the submarine (ROV) 360° camera. */
+.cam-label{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:30;pointer-events:none;
+  font:600 13px/1.2 system-ui,sans-serif;letter-spacing:.12em;color:#7ff3ff;background:rgba(2,16,30,.55);
+  border:1px solid rgba(127,243,255,.35);border-radius:6px;padding:5px 12px;white-space:nowrap}
+body.view-screen .cam-label{top:14px;font-size:15px}
+@media (max-width:520px){.cam-label{font-size:11px;letter-spacing:.06em}}
+body.view-console .cam-label{display:none}
+@media (max-width:520px){.intro-sub{white-space:normal;letter-spacing:.08em;font-size:13px;line-height:1.5;padding:0 16px}}
+
+/* 11-20: Thai / English. TH-EN toggle top-right in every view; Thai-capable fonts; no wide letter-spacing on Thai. */
+.lang-btn {
+  position: fixed; top: 3px; right: 8px; z-index: 260;
+  height: 22px; padding: 0 10px; display: flex; align-items: center; gap: 4px;
+  font: 600 11px/1 'Chakra Petch', 'IBM Plex Mono', monospace; letter-spacing: 0.06em;
+  color: var(--text-dim); background: rgba(11, 27, 35, 0.86);
+  border: 1px solid var(--line-strong); border-radius: 999px;
+  cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.lang-btn .on { color: var(--brass); }
+.lang-btn:hover { border-color: var(--accent); }
+body.view-screen .lang-btn { opacity: 0.5; cursor: pointer; }
+body.view-screen .lang-btn:hover { opacity: 1; }
+.deck-title .i18n-plain { color: inherit; }
+html[lang="th"] {
+  --font-display: 'Chakra Petch', 'IBM Plex Sans Thai', 'Noto Sans Thai', 'Sarabun', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'IBM Plex Sans Thai', 'Noto Sans Thai', 'Sarabun', 'Consolas', monospace;
+  --font-body: 'IBM Plex Sans Thai', 'Noto Sans Thai', 'Sarabun', 'IBM Plex Sans', 'Tahoma', sans-serif;
+}
+html[lang="th"] body *:not(.intro-title):not(.depth-number) { letter-spacing: 0.01em !important; }
+html[lang="th"] .narration-text, html[lang="th"] .discovery-info, html[lang="th"] .guide-text,
+html[lang="th"] .intro-hint, html[lang="th"] .hud-keys { line-height: 1.7; }
+html[lang="th"] .intro-sub { white-space: normal; }
+/* phones / tablets: make room under the toggle for the Shape / Sound buttons and the status box */
+@media (max-width: 900px), (pointer: coarse) {
+  body.player:not(.view-console):not(.view-screen) .top-bar { top: 30px; }
+  body.player:not(.view-console):not(.view-screen) .hud-status { top: 72px; }
+}

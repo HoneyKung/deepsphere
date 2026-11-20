@@ -14,7 +14,7 @@ const state={depth:0,pretty:true,level:0,gateReady:0,frame:false,yaw:0,zone:'sur
 const SCAN_SWEEP_MS=1400, HIGHLIGHT_MS=10000, COLLECT_FLASH_MS=700;
 const panels=[], labels=[];
 let edgePairs=[];
-let scene,camera,renderer,cubeGroup,mountedGroup,ringGroup,aimMarker,mountBase;
+let scene,camera,renderer,cubeGroup,mountedGroup,ringGroup,ringStatic,aimMarker,mountBase,cubePole,axisLine;
 const ringScreens=[];
 let dragging=false,lastX=0,lastY=0;
 let orbit={theta:-1.3,phi:1.32,dist:4.4};
@@ -732,7 +732,7 @@ function drawLife(ctx,m,shown) {
 
   // Sunlight: slanted shafts that sway, gone by ~700 m.
   const sun=band(-1,-0.5,0.02,0.24);
-  if(sun>0) {
+  if(sun>0&&(!state.bakeStaticBackground||state.bakeSunOnly)) {
     inStrip();ctx.globalCompositeOperation='lighter';
     for(const s of LIFE.shafts) {
       const dx=wrap(toX(s.x+Math.sin(t*0.13+s.ph)*5),m.cx);
@@ -743,10 +743,11 @@ function drawLife(ctx,m,shown) {
     }
     ctx.globalCompositeOperation='source-over';
   }
+  if(state.bakeSunOnly) {ctx.restore();return;}
 
   // A whale passing far off while its call is heard.
   const whale=(performance.now()-(state.whaleAt||-1e9))/(state.whaleFor||1);
-  if(whale>=0&&whale<=1&&d<0.7) {
+  if(!state.bakeStaticBackground&&whale>=0&&whale<=1&&d<0.7) {
     const dx=wrap(toX((state.whaleX||0)+whale*95),m.cx),y=16+Math.sin(whale*5)*3;
     if(Math.abs(dx)<reach+40) {
       inStrip();ctx.fillStyle='rgba(3,14,28,'+(Math.sin(whale*Math.PI)*0.3).toFixed(3)+')';
@@ -758,7 +759,7 @@ function drawLife(ctx,m,shown) {
 
   // Small fish in loose schools near the surface.
   const shallow=band(-1,-0.5,0.2,0.32);
-  if(shallow>0) {
+  if(shallow>0&&!state.bakeStaticBackground) {
     inStrip();ctx.fillStyle='rgba(205,236,246,'+(0.6*shallow).toFixed(3)+')';
     for(const sc of LIFE.schools) {
       const dx0=wrap(toX(sc.x+t*sc.v),m.cx),y0=sc.y+(d-0.1)*150,dir=sc.v>0?1:-1;
@@ -777,7 +778,7 @@ function drawLife(ctx,m,shown) {
 
   // Marine snow from the twilight zone down. lamp = the sub's own light, gloom = how dark the water has become.
   const snow=band(0.16,0.4,2,3),lamp=band(0.24,0.34,2,3),gloom=band(0.6,0.7,2,3);
-  if(snow>0) {
+  if(snow>0&&!state.bakeStaticBackground) {
     ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='rgb(200,225,240)';
     const n=Math.floor(LIFE.snow.length*snow);
     for(let i=0;i<n;i++) {
@@ -791,7 +792,7 @@ function drawLife(ctx,m,shown) {
 
   // Little jellies pulsing upwards through the middle water.
   const mid=band(0.2,0.32,0.62,0.74);
-  if(mid>0) {
+  if(mid>0&&!state.bakeStaticBackground) {
     inStrip();ctx.lineWidth=0.09;
     for(const j of LIFE.jellies) {
       const dx=wrap(toX(j.x+Math.sin(t*0.1+j.ph)*6),m.cx),y=wrapY(j.y+t*j.v+d*200);
@@ -806,14 +807,14 @@ function drawLife(ctx,m,shown) {
   }
 
   const twilight=band(0.27,0.36,0.6,0.67);
-  if(twilight>0) drawMidLife(ctx,m,twilight);
+  if(twilight>0&&!state.bakeStaticBackground) drawMidLife(ctx,m,twilight);
 
   // The creatures themselves, then the level floors and the sea bed in front of them.
-  if(state.pretty) drawCreatures(ctx,m,shown);
+  if(state.pretty&&!state.bakeStaticBackground) drawCreatures(ctx,m,shown);
   if(!state.gatesOff) (config.gates||[]).forEach((gate,i)=>drawFloor(ctx,m,gate,i));
   drawSeaBed(ctx,m);
   // The sub's floodlight: a soft pool of light round the reticle once the sun is gone.
-  if(lamp>0) {
+  if(lamp>0&&!state.bakeStaticBackground) {
       const lx=wrap(LIFE.aimX,m.cx),ly=aimY;
     if(Math.abs(lx)<reach+34) {
       ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);ctx.globalCompositeOperation='lighter';
@@ -827,7 +828,7 @@ function drawLife(ctx,m,shown) {
   // Bioluminescent plankton in the dark: it twinkles by itself, flares when the water is stirred (turning,
   // diving, scanning) and breathes faintly with the beat of the music.
   const dark=band(0.45,0.66,2,3);
-  if(dark>0) {
+  if(dark>0&&!state.bakeStaticBackground) {
     ctx.setTransform(1,0,0,1,0,0);ctx.globalCompositeOperation='lighter';
     const n=Math.floor(LIFE.plankton.length*dark*0.42),stir=state.stir||0,pulse=state.beatPulse||0,tints=['80,255,230','110,170,255','150,255,170'];
     for(let i=0;i<n;i++) {
@@ -854,7 +855,7 @@ function drawLife(ctx,m,shown) {
 
   // Bubbles: a few always rising, more near the surface, and a burst from the hull with every bubble sound.
   ctx.setTransform(1,0,0,1,0,0);ctx.lineWidth=1;
-  const count=Math.floor(LIFE.bubbles.length*clamp01(0.7-0.5*d+(state.diving?0.25:0)));
+  const count=state.bakeStaticBackground?0:Math.floor(LIFE.bubbles.length*clamp01(0.7-0.5*d+(state.diving?0.25:0)));
   ctx.strokeStyle='rgba(225,247,255,'+(0.62-0.5*d).toFixed(3)+')';ctx.fillStyle='rgba(255,255,255,'+(0.5-0.42*d).toFixed(3)+')';
   for(let i=0;i<count;i++) {
     const b=LIFE.bubbles[i];
@@ -908,7 +909,7 @@ function makeBall() {
   mesh.rotation.x=Math.PI/2;
   const reticleOffset=(config.ring.reticle_azimuth_deg||0)*Math.PI/180;
   BALL.holder=new THREE.Group();BALL.holder.rotation.z=-Math.PI/2;BALL.holder.add(mesh);cubeGroup.add(BALL.holder);
-  const bandOn=new URLSearchParams(location.search).get('band')!=='0',bandCount=geometry.ringPanels;
+  const bandOn=new URLSearchParams(location.search).get('band')!=='0'&&!/[?&]view=(screen|console)/.test(location.search),bandCount=geometry.ringPanels;
   BALL.band=new THREE.Group();BALL.band.visible=bandOn;BALL.bandCells=[];BALL.holder.add(BALL.band);
   if(bandOn)for(let section=0;section<bandCount;section++){
     const offset=Math.PI+reticleOffset,start=section*TAU/bandCount+offset+.025,end=(section+1)*TAU/bandCount+offset-.025,verts=[],indices=[],steps=24,halfLat=.035,r=radius+.012;
@@ -928,7 +929,12 @@ function applyShape() {
   mountedGroup.visible=!state.sphere&&!state.ring;
   if(mountBase)mountBase.visible=!state.ring;
   if(ringGroup) ringGroup.visible=Boolean(state.ring);
-  if(BALL.ready) {BALL.holder.visible=state.sphere;BALL.stem.visible=state.sphere;}
+  if(ringStatic) ringStatic.visible=Boolean(state.ring);
+  if(cubePole) cubePole.visible=!state.sphere&&!state.ring;   // cube-era stand
+  if(axisLine) axisLine.visible=!document.body.classList.contains('player');
+  const exhibit=document.body.classList.contains('player');   // exhibition: the sphere floats on its own, no stand
+  if(BALL.ready) {BALL.holder.visible=state.sphere;BALL.stem.visible=state.sphere&&!exhibit;}
+  if(mountBase&&exhibit) mountBase.visible=false;
   panels.forEach(p=>{p.cacheKey=null;p.ring.cacheKey=null;p.ring.lastAt=0;});BALL.cacheKey=null;lastRenderKey='';
 }
 function renderBall(hit,shown) {
@@ -1041,10 +1047,18 @@ function drawRing(ring,face,hit,shown) {
 function makeRingModel() {
   ringGroup=new THREE.Group();ringGroup.rotation.z=Math.PI/2;cubeGroup.add(ringGroup);
   const n=geometry.ringPanels,radius=geometry.ringRadius/faceConfig.physical_face_dimensions_mm.face_edge,width=2*radius*Math.sin(geometry.ringOpeningAngle/2),height=geometry.ringPanelWidth/faceConfig.physical_face_dimensions_mm.face_edge;
-  const shell=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,height,n,1,true),new THREE.MeshStandardMaterial({color:0x152b37,metalness:.55,roughness:.42,side:THREE.DoubleSide}));
-  shell.rotation.x=Math.PI/2;ringGroup.add(shell);
-  const axis=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.05,20),new THREE.MeshStandardMaterial({color:0x75959a,metalness:.5,roughness:.45}));
-  axis.rotation.x=Math.PI/2;ringGroup.add(axis);
+  // Hex screen box at the real ring radius (cad/hex-shell apothem 29.8 mm); S = mm -> twin units.
+  // 10-30 owner: no frame round the picture. Each face is all screen (one full hex side, square), thin 1 mm caps only.
+  const S=radius/29.8,hexR=(radius+.004)/Math.cos(Math.PI/n),shell=0x2b3f4a;
+  const face=2*radius*Math.tan(Math.PI/n),zTop=face/2+1.0*S,zBot=-zTop,shellH=zTop-zBot,capT=1.0*S;
+  ringStatic=new THREE.Group();scene.add(ringStatic);
+  const mat=(color,extra)=>new THREE.MeshStandardMaterial({color,metalness:.35,roughness:.6,...extra});
+  const prism=(group,r,h,z,color,sides,open)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,sides,1,Boolean(open)),mat(color,open?{side:THREE.DoubleSide}:{}));m.rotation.x=Math.PI/2;m.position.z=z;group.add(m);return m;};
+  prism(ringGroup,hexR,shellH,(zTop+zBot)/2,shell,n,true);             // shell behind the screens
+  prism(ringGroup,hexR,capT,zTop-capT/2,shell,n);                      // lid cap
+  prism(ringGroup,hexR,capT,zBot+capT/2,shell,n);                      // base floor
+  prism(ringGroup,2*S,.01,zTop+.005,0xb8c4cc,24);                      // magnet on the lid centre
+  // 10-30 owner: show the screen box alone (deck, base station and arm left out).
   for(let index=0;index<n;index++) {
     const canvas=document.createElement('canvas');canvas.width=PANEL;canvas.height=PANEL;
     const ctx=canvas.getContext('2d'),tex=new THREE.CanvasTexture(canvas);tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.LinearFilter;tex.generateMipmaps=false;
@@ -1053,12 +1067,11 @@ function makeRingModel() {
     const p={canvas,ctx,tex,stripX,stripY,subjects:new Int8Array(PANEL*PANEL),frame:new ImageData(PANEL,PANEL),background:new Uint8ClampedArray(PANEL*PANEL*4),cacheKey:null,index,id:geometry.ringOrder[index%geometry.ringOrder.length]};
     ringScreens.push(p);
     const angle=index*TAU/n+(config.ring.reticle_azimuth_deg||0)*Math.PI/180,normal=new THREE.Vector3(Math.cos(angle),Math.sin(angle),0),tangent=new THREE.Vector3(-Math.sin(angle),Math.cos(angle),0),up=new THREE.Vector3(0,0,1);
-    const plane=new THREE.Mesh(new THREE.PlaneGeometry(width,height),new THREE.MeshBasicMaterial({map:tex,toneMapped:false,side:THREE.DoubleSide}));
+    const plane=new THREE.Mesh(new THREE.PlaneGeometry(face,face),new THREE.MeshBasicMaterial({map:tex,toneMapped:false,side:THREE.DoubleSide}));
     plane.setRotationFromMatrix(new THREE.Matrix4().makeBasis(tangent,up,normal));plane.position.copy(normal.clone().multiplyScalar(radius+.012));ringGroup.add(plane);p.plane=plane;
     const labelCanvas=document.createElement('canvas');labelCanvas.width=128;labelCanvas.height=48;const lc=labelCanvas.getContext('2d');lc.fillStyle='#d8fff8';lc.font='bold 30px monospace';lc.textAlign='center';lc.fillText(p.id.toUpperCase(),64,35);
     const label=new THREE.Mesh(new THREE.PlaneGeometry(.22,.08),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(labelCanvas),transparent:true,side:THREE.DoubleSide}));label.quaternion.copy(plane.quaternion);label.position.copy(normal.clone().multiplyScalar(radius+.025)).add(up.clone().multiplyScalar(height*.58));ringGroup.add(label);labels.push(label);
   }
-  const base=new THREE.Mesh(new THREE.CylinderGeometry(.48,.53,.1,48),new THREE.MeshStandardMaterial({color:0x172d3b,metalness:.5,roughness:.4}));base.rotation.x=Math.PI/2;base.position.z=-.56;ringGroup.add(base);
 }
 
 function renderRingScreens(hit,shown) {
@@ -1069,7 +1082,16 @@ function renderRingScreens(hit,shown) {
     if(p.cacheKey!==key){if(!p.pre)p.pre=makeSeaPre(p.stripX,p.stripY,PANEL*PANEL,geometry.ringLengthMm);paintSea(p.background,p.stripX,p.stripY,p.pre,PANEL*PANEL,null,PANEL,moving?3:1,PANEL,geometry.ringLengthMm);p.cacheKey=key;}
     p.frame.data.set(p.background);fillSubjects(p.stripX,p.stripY,PANEL*PANEL,null,shown,p.subjects,p.bounds||(p.bounds=seaBounds(p.stripX,p.stripY,PANEL*PANEL,null,geometry.ringLengthMm)),geometry.ringLengthMm,geometry.ringAimY);
     if(!state.pretty)for(let i=0;i<PANEL*PANEL;i++){const s=p.subjects[i];if(s>=0)p.frame.data.set(SUBJECTS[s].rgb,i*4);}
+    // Scan sweep on the ring: one green band crossing all six screens together, top to bottom.
+    const sweep=(now-state.sweepStart)/SCAN_SWEEP_MS;
+    if(sweep>=0&&sweep<=1) {
+      const top=geometry.ringPanelWidth*.6,band=geometry.ringAimY+top-sweep*2*top,d=p.frame.data;
+      for(let i=0;i<PANEL*PANEL;i++){const away=Math.abs(p.stripY[i]-band);if(away>=1.6)continue;const w=1-away/1.6;
+        d[i*4]=d[i*4]*(1-w)+40*w;d[i*4+1]=d[i*4+1]*(1-w)+255*w;d[i*4+2]=d[i*4+2]*(1-w)+150*w;}
+    }
     p.ctx.putImageData(p.frame,0,0);drawLife(p.ctx,p.lifeMap||(p.lifeMap=ringLifeMap(p.index,PANEL)),shown);
+    const flash=(now-state.collectFlash)/COLLECT_FLASH_MS;
+    if(flash>=0&&flash<=1&&hit.face===p.index){p.ctx.strokeStyle='rgba(0,255,150,'+(1-flash).toFixed(2)+')';p.ctx.lineWidth=3;p.ctx.beginPath();p.ctx.arc(hit.pixel_uv[0]*PANEL,hit.pixel_uv[1]*PANEL,8+flash*55,0,TAU);p.ctx.stroke();}
     if(hit.face===p.index&&hit.onPanel){const x=hit.pixel_uv[0]*PANEL,y=hit.pixel_uv[1]*PANEL;p.ctx.strokeStyle=state.gateReady?'#ffd36b':'#00ffcc';p.ctx.lineWidth=1.5;p.ctx.strokeRect(x-11.5,y-11.5,23,23);p.ctx.beginPath();p.ctx.moveTo(x-13,y);p.ctx.lineTo(x-4,y);p.ctx.moveTo(x+4,y);p.ctx.lineTo(x+13,y);p.ctx.moveTo(x,y-13);p.ctx.lineTo(x,y-4);p.ctx.moveTo(x,y+4);p.ctx.lineTo(x,y+13);p.ctx.stroke();}
     p.tex.needsUpdate=true;
   }
@@ -1077,9 +1099,9 @@ function renderRingScreens(hit,shown) {
 
 function initThree() {
   const host=document.getElementById('canvas-container');
-  scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,0.1,100);
+  scene=new THREE.Scene();const [vw,vh]=viewSize();camera=new THREE.PerspectiveCamera(52,vw/vh,0.1,100);
   renderer=new THREE.WebGLRenderer({antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(vw,vh);
   renderer.setClearColor(0x000508,1);host.appendChild(renderer.domElement);
   scene.add(new THREE.AmbientLight(0x708aa0,1.2));
   const light=new THREE.DirectionalLight(0xb5e5ff,1.3);light.position.set(3,-4,5);scene.add(light);
@@ -1090,11 +1112,11 @@ function initThree() {
   mountedGroup.add(new THREE.Mesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshStandardMaterial({color:0x253746,roughness:0.7,metalness:0.15})));
   mountedGroup.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002,1.002,1.002)),new THREE.LineBasicMaterial({color:0x60dcc7})));
   const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.36,24),new THREE.MeshStandardMaterial({color:0x75959a}));
-  pole.rotation.x=Math.PI/2;pole.position.z=-Math.sqrt(3)/2-0.18;scene.add(pole);
+  pole.rotation.x=Math.PI/2;pole.position.z=-Math.sqrt(3)/2-0.18;scene.add(pole);cubePole=pole;
   mountBase=new THREE.Mesh(new THREE.CylinderGeometry(0.48,0.53,0.1,64),new THREE.MeshStandardMaterial({color:0x172d3b,metalness:0.5,roughness:0.4}));
   mountBase.rotation.x=Math.PI/2;mountBase.position.z=-Math.sqrt(3)/2-0.39;scene.add(mountBase);
   const axis=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,-1.25),new THREE.Vector3(0,0,1.05)]);
-  const axisLine=new THREE.Line(axis,new THREE.LineDashedMaterial({color:0x487668,dashSize:0.03,gapSize:0.025}));
+  axisLine=new THREE.Line(axis,new THREE.LineDashedMaterial({color:0x487668,dashSize:0.03,gapSize:0.025}));
   axisLine.computeLineDistances();scene.add(axisLine);
   aimMarker=new THREE.Mesh(new THREE.SphereGeometry(0.013,12,12),new THREE.MeshBasicMaterial({color:0xffbc64}));scene.add(aimMarker);
   FACES.forEach(f=> {
@@ -1117,9 +1139,11 @@ function initThree() {
   window.addEventListener('resize',onResize);fitOrbit();
 }
 
-function onResize() {camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);fitOrbit();}
+// 11-06 console view: the 3D view sits in a framed box, so size to the box or the sphere is squashed.
+function viewSize() {const h=document.getElementById('canvas-container');return document.body.classList.contains('view-console')&&h&&h.clientWidth?[h.clientWidth,h.clientHeight]:[innerWidth,innerHeight];}
+function onResize() {const [vw,vh]=viewSize();camera.aspect=vw/vh;camera.updateProjectionMatrix();renderer.setSize(vw,vh);fitOrbit();}
 // A phone held upright has a narrow view: stand further back so the whole cube stays in frame.
-function fitOrbit() {orbit.dist=Math.max(orbit.dist,Math.min(7,4.4*Math.max(1,0.72/(innerWidth/innerHeight))));}
+function fitOrbit() {const near=document.body.classList.contains('view-screen')?1.6:document.body.classList.contains('view-console')?1.8:document.body.classList.contains('player')?2.2:4.4;orbit.dist=Math.max(orbit.dist,Math.min(7,near*Math.max(1,0.72/(innerWidth/innerHeight))));}  // player: start close, the box fills the view
 function placeCamera() {
   camera.up.set(0,0,1);
   camera.position.set(orbit.dist*Math.sin(orbit.phi)*Math.cos(orbit.theta),orbit.dist*Math.sin(orbit.phi)*Math.sin(orbit.theta),orbit.dist*Math.cos(orbit.phi));
@@ -1277,7 +1301,8 @@ function animate(now) {
   requestAnimationFrame(animate);
   if(now-lastFrame<30) return;
   const dt=previousTime?Math.min((now-previousTime)/1000,0.15):0;previousTime=now;lastFrame=now;
-  if(state.liveMode&&state.liveConnected){let delta=state.liveTargetYaw-state.yaw;while(delta>180)delta-=360;while(delta<-180)delta+=360;setYaw((state.yaw+delta*Math.min(1,dt*12)+360)%360);}
+  if(state.liveMode&&state.liveConnected){let delta=state.liveTargetYaw-state.yaw;while(delta>180)delta-=360;while(delta<-180)delta+=360;setYaw((state.yaw+delta*Math.min(1,dt*8)+360)%360);}
+  // 11-06 owner: the web runs its own smooth clock; board scenes only nudge it (twin.js applyBoardScene).
   if(state.started&&!state.paused) state.seconds+=dt;
   state.stir=(state.stir||0)*Math.exp(-dt/1.4);state.diving=Boolean(audio.descending);
   if(audio.context&&audio.clock0!=null) state.beatPulse=Math.exp(-(((audio.context.currentTime-audio.clock0)/(BEAT.eighth*3))%1)*4);
