@@ -2058,7 +2058,8 @@ function showAnalysis() {
   $('discovery-art').hidden = true;
   $('discovery-emoji').textContent = 'ANALYSIS';
   $('discovery-species').textContent = LANG === 'th' ? 'ตัวอย่าง ' + state.collected.length + ' / ' + SUBJECTS.length : state.collected.length + ' / ' + SUBJECTS.length + ' specimens';
-  $('discovery-sub').textContent = state.collected.length >= SUBJECTS.length ? tx(L('เก็บครบทุกสายพันธุ์ในการสำรวจนี้แล้ว', 'Every species in this survey has been collected.')) : tx(L('สายพันธุ์ที่ยังไม่พบ จะแสดงชั้นที่มันอาศัยอยู่', 'Species not found yet are listed with the level they live on.'));
+  $('discovery-sub').textContent = (state.collected.length >= SUBJECTS.length ? tx(L('เก็บครบทุกสายพันธุ์ในการสำรวจนี้แล้ว', 'Every species in this survey has been collected.')) : tx(L('สายพันธุ์ที่ยังไม่พบ จะแสดงชั้นที่มันอาศัยอยู่', 'Species not found yet are listed with the level they live on.')))
+    + (state.liveMode ? tx(L('  ·  กดปุ่มน้ำเงินค้าง 3 วินาที = เริ่มรอบใหม่', '  ·  Hold the blue button 3 s = start a new round')) : '');  // 11-20 owner: restart from the analysis
   const rows = [], items = [];
   const order = SUBJECTS.map((_, index) => index).sort((x, y) => SUBJECTS[x].y_mm - SUBJECTS[y].y_mm);
   for (const index of order) {
