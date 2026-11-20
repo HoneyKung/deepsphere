@@ -1675,6 +1675,9 @@ function initLiveYaw() {
       localStorage.removeItem('deepSphereYawCal6');
     }
   } catch (e) {}
+  // 11-20: the QR page (?mqtt=...) opens on visitors' phones with no saved front, so it used the old 151.9 and the
+  // web did not match the ring. Use the front the laptop link uses (yawfront=276.4) unless the URL gives one.
+  if (mqttChipFromSearch(location.search) && !new URLSearchParams(location.search).has('yawfront')) { liveYawZero = 276.4; LIVE_YAW_REVERSE = true; }
   // Key 0: the screen now facing the visitor becomes the front (the twin's start view).
   addEventListener('keydown', (e) => {
     if (e.code === 'Digit9' || e.code === 'Numpad9') {
