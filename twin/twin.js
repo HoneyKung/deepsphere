@@ -1584,6 +1584,28 @@ function startMqttSource(chip, consume) {
   setInterval(tick, 50);
 }
 
+const OFFLINE_FALLBACK_MS = 12000;
+// 11-27: banner on the play-it-yourself page reached from the QR when the machine was offline.
+function initOfflineBanner() {
+  const chip = new URLSearchParams(location.search).get('offline');
+  if (!chip || !/^[0-9a-f]{6}$/i.test(chip)) return;
+  const q = new URLSearchParams(location.search);
+  q.delete('offline'); q.set('mqtt', chip);
+  const bar = document.createElement('div');
+  bar.id = 'offline-banner';
+  bar.style.cssText = 'position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:9999;max-width:calc(100% - 32px);'
+    + 'background:rgba(8,20,32,.92);color:#f3d27a;border:1px solid rgba(243,210,122,.5);border-radius:10px;'
+    + 'padding:8px 12px;font:600 14px/1.4 "IBM Plex Sans Thai",Tahoma,sans-serif;text-align:center;';
+  const msg = document.createElement('span');
+  msg.textContent = tx(L('เครื่องออฟไลน์อยู่ · เล่นแบบจำลองได้เลย ', 'Machine offline · play the simulation '));
+  const link = document.createElement('a');
+  link.href = location.pathname + '?' + q.toString();
+  link.textContent = tx(L('ลองเชื่อมเครื่องอีกครั้ง', 'Try the live machine again'));
+  link.style.cssText = 'color:#7fe3d6;text-decoration:underline;white-space:nowrap;';
+  bar.append(msg, link);
+  document.body.appendChild(bar);
+}
+
 function initLiveYaw() {
   const mqttChip = mqttChipFromSearch(location.search);
   if (new URLSearchParams(location.search).get('live') !== '1' && !mqttChip) return;
@@ -1767,7 +1789,7 @@ function initLiveYaw() {
       if (latestId !== null) lastBridgeEventId = Math.max(lastBridgeEventId, latestId);
     }
     if (data.ok === true && Number.isFinite(Number(data.deg))) {
-      state.liveConnected = true;
+      state.liveConnected = true; state.liveEverConnected = true;
       // Key 9 flips the turn direction, key 0 sets which screen is the front.
       state.liveRawYaw = cleanRaw(Number(data.deg));
       const calibrated = calibratedYaw(state.liveRawYaw);
@@ -1796,7 +1818,18 @@ function initLiveYaw() {
       inFlight = false;
     }
   };
-  if (state.mqttMode) { startMqttSource(mqttChip, consume); return; }
+  if (state.mqttMode) {
+    startMqttSource(mqttChip, consume);
+    // 11-27 owner: one printed QR for both days. If the machine sends nothing in the first 12 s (no hotspot),
+    // reopen the same page in play-it-yourself mode instead of a frozen view.
+    setTimeout(() => {
+      if (state.liveEverConnected) return;
+      const q = new URLSearchParams(location.search);
+      q.delete('mqtt'); q.delete('yawfront'); q.set('offline', mqttChip);
+      location.replace(location.pathname + '?' + q.toString());
+    }, OFFLINE_FALLBACK_MS);
+    return;
+  }
   poll();
   setInterval(poll, 50);
 }
@@ -2768,3 +2801,4 @@ init().catch(error => {
 });
 
 initLiveYaw();
+initOfflineBanner();
