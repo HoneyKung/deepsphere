@@ -2539,7 +2539,22 @@ function dragTurn(clientX) {
   motion.dragAt = now;
   setYaw(state.yaw + turn);
 }
-function dragStart() { dragging = true; motion.dragVel = 0; motion.yawVel = 0; motion.dragAt = performance.now(); }
+// 11-27: a drag picks one axis after a few pixels: sideways turns the ROV camera, up/down dives / rises
+// (finger down = dive deeper, like the pad's ▼). Depth by drag only once the dive has started.
+const DRAG_DEPTH_PER_PX = 1 / 900;
+let dragAxis = null, dragX0 = 0, dragY0 = 0;
+function dragMove(x, y) {
+  if (!dragAxis) {
+    const dx = Math.abs(x - dragX0), dy = Math.abs(y - dragY0);
+    if (Math.max(dx, dy) < 8) return;
+    dragAxis = dy > dx ? 'y' : 'x';
+    lastX = x; lastY = y;
+    return;
+  }
+  if (dragAxis === 'x') dragTurn(x);
+  else if (state.started) setDepth(state.depth + (y - lastY) * DRAG_DEPTH_PER_PX);
+}
+function dragStart() { dragAxis = null; dragging = true; motion.dragVel = 0; motion.yawVel = 0; motion.dragAt = performance.now(); }
 function dragEnd() {
   if (dragging && performance.now() - motion.dragAt < 90) motion.yawVel = Math.max(-MOTION.fling, Math.min(MOTION.fling, motion.dragVel));
   dragging = false;
@@ -2683,13 +2698,13 @@ function initPad() {
 
 function initInput() {
   const el = renderer.domElement;
-  el.addEventListener('mousedown', (e) => { if (state.liveMode && state.liveConnected) return; dragStart(); lastX = e.clientX; lastY = e.clientY; document.body.style.cursor = 'grabbing'; });
+  el.addEventListener('mousedown', (e) => { if (state.liveMode && state.liveConnected) return; dragStart(); lastX = dragX0 = e.clientX; lastY = dragY0 = e.clientY; document.body.style.cursor = 'grabbing'; });
   window.addEventListener('mouseup', () => { dragEnd(); document.body.style.cursor = 'grab'; });
   window.addEventListener('mousemove', (e) => {
     if (!dragging || (state.liveMode && state.liveConnected)) return;
     // Sideways drag turns the box on its own standing axis, the same one the arrow keys drive.
     // The mounted body diagonal remains vertical during yaw.
-    dragTurn(e.clientX);
+    dragMove(e.clientX, e.clientY);
     lastX = e.clientX; lastY = e.clientY;
   });
   el.addEventListener('wheel', (e) => {
@@ -2698,11 +2713,11 @@ function initInput() {
   }, { passive: false });
 
   el.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1 && !(state.liveMode && state.liveConnected)) { dragStart(); lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; }
+    if (e.touches.length === 1 && !(state.liveMode && state.liveConnected)) { dragStart(); lastX = dragX0 = e.touches[0].clientX; lastY = dragY0 = e.touches[0].clientY; }
   }, { passive: true });
   el.addEventListener('touchmove', (e) => {
     if (!dragging || e.touches.length !== 1 || (state.liveMode && state.liveConnected)) return;
-    dragTurn(e.touches[0].clientX);
+    dragMove(e.touches[0].clientX, e.touches[0].clientY);
     lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
   }, { passive: true });
   el.addEventListener('touchend', dragEnd);
