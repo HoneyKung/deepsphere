@@ -2802,3 +2802,10 @@ init().catch(error => {
 
 initLiveYaw();
 initOfflineBanner();
+// 11-27: play-it-yourself console (no machine linked): show the dive/rise pad and scan/collect/analyze
+// buttons inside the camera viewport so touch players (iPad/phone) can do more than turn left/right.
+if (VIEW === 'console' && !state.liveMode) {
+  document.body.classList.add('self-play');
+  const cam = $('canvas-container');
+  ['pad', 'btn-scan'].forEach((id) => { const el = $(id); const box = id === 'pad' ? el : el && el.parentElement; if (cam && box) cam.append(box); });
+}

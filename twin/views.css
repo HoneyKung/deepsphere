@@ -223,3 +223,12 @@ html[lang="th"] .intro-sub { white-space: normal; }
   body.player:not(.view-console):not(.view-screen) .top-bar { top: 30px; }
   body.player:not(.view-console):not(.view-screen) .hud-status { top: 72px; }
 }
+
+/* 11-27: play-it-yourself console (twin.js adds .self-play when no machine is linked):
+   dive/rise pad bottom-left and scan/collect/analyze bottom-right, inside the camera viewport */
+body.view-console.self-play .pad { display: flex !important; position: absolute; z-index: 5; left: 14px; right: auto; bottom: 14px; top: auto; gap: 6px; }
+body.view-console.self-play .pad-btn { min-width: 54px; min-height: 52px; }
+body.view-console.self-play .hud-mission { display: flex !important; flex-direction: column; position: absolute; z-index: 5; left: auto; right: 14px; bottom: 14px !important; top: auto; transform: none; gap: 6px; padding: 0; background: none; border: 0; box-shadow: none; }
+body.view-console.self-play .hud-mission #btn-explore { display: none; }
+body.view-console.self-play .mission-btn { min-height: 44px; min-width: 110px; margin: 0; }
+body.view-console.self-play .mission-btn .key { display: none; }
